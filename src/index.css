@@ -1,0 +1,274 @@
+@import 'tailwindcss';
+
+/* ============================================
+   AIthor Clone — Design System Tokens
+   Extracted from aithor.framer.website
+   IMPORTANT: custom styles live in @layer
+   base/components so Tailwind utilities
+   (in the utilities layer) can override them.
+   ============================================ */
+
+@layer base {
+  /* Font-face declarations for self-hosted fonts */
+  @font-face {
+    font-family: 'Halant';
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/A0Wcc7NgXMjUuFdquHDrIZpzZw0.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Halant';
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/yDtI2UI8XcEg1W2je9XPN3Noo.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Halant';
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/4RAEQdEOrcnDkhHiiCbJOw92Lk.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Halant';
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/cdAe8hgZ1cMyLu9g005pAW3xMo.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Halant';
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/CfMzU8w2e7tHgF4T4rATMPuWosA.woff2') format('woff2');
+  }
+
+  @font-face {
+    font-family: 'Geist';
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/gyByhwUxId8gMEwcGFU.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Geist';
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/gyByhwUxId8gMEwcGFU.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Geist';
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+    src: url('/fonts/gyB8hwUxId8gMEwZKFeHPw.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Geist';
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+    src: url('/fonts/gyB8hwUxId8gMEwZKFqHP7Tc.woff2') format('woff2');
+  }
+
+  @font-face {
+    font-family: 'Fragment Mono';
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/4iCr6K5wfMRRjxp0DA6-2CLnB45HhrUI.woff2') format('woff2');
+  }
+
+  :root {
+    /* Light theme — extracted from aithor.framer.website (measured live) */
+    --color-bg-page: #f0f0f0;        /* page background */
+    --color-bg-panel: #e5e5e5;       /* section panels */
+    --color-bg-card: #f0f0f0;        /* cards inside panels */
+    --color-bg-dark: #151619;        /* dark accent (pricing, why-us col, process step, nav pill) */
+    --color-bg-dark-deep: #0a0a0a;   /* text / deep accents */
+    --color-bg-darkest: #1c1c1c;     /* buy-template block */
+    --color-accent: #ff3700;
+    --color-accent-orange: rgb(255, 55, 0);
+    --color-text-primary: #0a0a0a;
+    --color-text-on-dark: #f0f0f0;
+    --color-text-muted: #4f4f4f;
+    --color-text-muted-dark: #999;
+    --color-border: rgba(0, 0, 0, 0.07);
+    --color-border-card: rgba(0, 0, 0, 0.06);
+    --color-border-dark: rgba(255, 255, 255, 0.15);
+    --color-link: #0099ff;
+    --color-overlay-dark: rgba(0, 0, 0, 0.2);
+    --color-status-green: #168804;
+    --color-status-teal: #063630;
+
+    --font-display: 'Halant', 'Halant Placeholder', sans-serif;
+    --font-body: 'Geist', 'Inter', sans-serif;
+    --font-mono: 'Fragment Mono', monospace;
+
+    --section-padding: 100px 40px;
+    --section-padding-mobile: 80px 15px;
+    --radius-panel: 50px;
+    --radius-card: 16px;
+    --radius-button: 50px;
+    --radius-badge: 20px;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+    background: var(--color-bg-page);
+    overflow-x: hidden;
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer components {
+  /* Section panels — the rounded stacked panels from the original.
+     Grid rule (extracted from the live site):
+     - panel: full-bleed with padding 0 40px (15px on mobile)
+     - wrapper: max-width 1400px, margin auto, padding 100px 40px
+     => content lands at L=80 / R=1360 at 1440px, matching the original */
+  .section-panel {
+    border-radius: var(--radius-panel);
+    overflow: hidden;
+    position: relative;
+    padding: 0 40px;
+  }
+
+  /* All sections on the original are light #e5e5e5 panels on a #f0f0f0 page */
+  .section-panel-dark {
+    background-color: var(--color-bg-panel);
+    color: var(--color-text-primary);
+  }
+
+  .section-panel-light {
+    background-color: var(--color-bg-panel);
+    color: var(--color-text-primary);
+  }
+
+  .section-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--section-padding);
+    position: relative;
+    z-index: 2;
+  }
+
+  .glow-orange {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(42.6% 50% at 50% 100%, var(--color-accent) 0%, rgba(0, 0, 0, 0.1) 100%);
+    border-radius: var(--radius-panel);
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  .section-label {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--color-text-primary);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px;
+  }
+  .section-panel {
+    padding: 0 15px;
+  }
+  .section-inner {
+    padding: var(--section-padding-mobile);
+  }
+}
+
+/* Safe areas (notch / home indicator) */
+body {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+footer {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* MagicUI-style marquee */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+
+@keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}
+
+.animate-marquee {
+  animation: marquee var(--duration, 40s) linear infinite;
+}
+
+.animate-marquee-vertical {
+  animation: marquee-vertical var(--duration, 40s) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-vertical {
+    animation: none;
+  }
+}
