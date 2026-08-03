@@ -61,3 +61,25 @@ Date: 2026-08-03.
 - Screenshots: `/tmp/aithor/shots/orig-hover-*.png` (hover states),
   `orig-mobile-nav.png`, `orig-faq-open.png`, `full-desktop.png`.
 - Saved DOM: `/tmp/aithor/rendered.html`; bundle: `/tmp/aithor/main.mjs`.
+
+## Fidelity-gap verification (2026-08-03)
+
+Probe round on the live original (headless Chromium, ADR-005 workflow) to close the open
+questions from the deep-research report. See ADR-006 for the decisions.
+
+| Question | Verdict (measured live) |
+|---|---|
+| Scroll-reveal re-fire | **once-only** — a case-study row (Genesy, 1280×470) sampled 16× on re-pass: zero opacity/transform change |
+| Hero parallax | **none** — badge, headline, CTAs each moved exactly 400px over 400px scroll (ratio 1.0) |
+| Testimonial marquee | original is **static** — 78 card-like elements page-wide moved 0px over 2.4s; no `marquee`-named CSS animation; no inline transform animation |
+| Buy-template block | `position: fixed`, right 20px / bottom 60px, 142×145px, bg `#1c1c1c`, radius 10px, visible on home + `/blog` + mobile (390px), no entrance animation, href = Polar checkout (`buyTemplateUrl`) |
+
+Consequences:
+
+- The clone's `once: true` reveals (`src/motion.ts`) match the original exactly.
+- The testimonials marquee is an **operator-mandated** MagicUI component (pasted and requested
+  by the operator) — a deliberate deviation from the original's static cards. It stays, and its
+  35s dual-reversed-row configuration is unchanged.
+- The Buy-template block moved out of `Hero.tsx` into a global fixed component
+  (`src/components/BuyTemplate.tsx`) rendered in `Layout`, matching the original's geometry,
+  persistence across pages, and mobile visibility.
