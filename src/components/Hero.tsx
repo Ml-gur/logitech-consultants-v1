@@ -2,7 +2,6 @@
 
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'framer-motion'
-import { buyTemplateUrl } from '../data/content'
 
 const headlineWords = ['We', 'build', 'the', 'AI', 'that', 'runs', 'your', 'business.']
 
@@ -92,21 +91,6 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Floating Buy-template block — dark, bottom-right, overhangs the panel (matches the original) */}
-        <motion.a
-          href={buyTemplateUrl}
-          target="_blank"
-          rel="noreferrer"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1.8, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="hidden md:flex absolute bottom-[-75px] right-[20px] w-[142px] h-[145px] rounded-[10px] bg-[#1c1c1c] flex-col items-center justify-center gap-3 hover:bg-[#0a0a0a] transition-colors duration-300 z-10"
-        >
-          <span className="text-[10px] uppercase tracking-wider text-[#999]">Template</span>
-          <span className="px-4 py-2 rounded-[6px] bg-[#f2f2f2] text-[#0a0a0a] text-sm font-medium">
-            Buy template
-          </span>
-        </motion.a>
       </div>
     </section>
   )
