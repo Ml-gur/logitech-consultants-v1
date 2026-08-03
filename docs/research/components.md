@@ -56,12 +56,6 @@ Date: 2026-08-03.
   bottom row: AITHOR + "©2026 AIthor." + "Designed By Marso" + "Built in Framer".
 - **Nav**: fixed, 76px tall, transparent over hero.
 
-## References
-
-- Screenshots: `/tmp/aithor/shots/orig-hover-*.png` (hover states),
-  `orig-mobile-nav.png`, `orig-faq-open.png`, `full-desktop.png`.
-- Saved DOM: `/tmp/aithor/rendered.html`; bundle: `/tmp/aithor/main.mjs`.
-
 ## Fidelity-gap verification (2026-08-03)
 
 Probe round on the live original (headless Chromium, ADR-005 workflow) to close the open
@@ -83,3 +77,9 @@ Consequences:
 - The Buy-template block moved out of `Hero.tsx` into a global fixed component
   (`src/components/BuyTemplate.tsx`) rendered in `Layout`, matching the original's geometry,
   persistence across pages, and mobile visibility.
+
+## References
+
+- Screenshots: `/tmp/aithor/shots/orig-hover-*.png` (hover states),
+  `orig-mobile-nav.png`, `orig-faq-open.png`, `full-desktop.png`.
+- Saved DOM: `/tmp/aithor/rendered.html`; bundle: `/tmp/aithor/main.mjs`.

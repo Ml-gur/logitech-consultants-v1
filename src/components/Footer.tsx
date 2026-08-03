@@ -46,7 +46,7 @@ export default function Footer() {
               required
               aria-label="Email address"
               placeholder="Enter your email"
-              className="flex-1 px-5 py-3 rounded-[50px] bg-white/70 border border-black/10 text-sm text-[#0a0a0a] placeholder:text-[#4f4f4f] focus:outline-none focus:border-[#ff3700] transition-colors"
+              className="flex-1 px-5 py-3 rounded-[50px] bg-white/70 border border-black/10 text-sm text-[#0a0a0a] placeholder:text-[#4f4f4f] focus:outline-none focus:border-[#ff3700] focus:ring-2 focus:ring-[#ff3700]/25 transition-colors"
             />
             <button
               type="submit"
