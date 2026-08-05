@@ -1,88 +1,106 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, MotionConfig } from 'framer-motion'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
+import IntegrationMarquee from './IntegrationMarquee'
 
 function FlowIllustration() {
+  // Faithful to the original: light #e5e5e5 panel, #f0f0f0 rows, dark #151619
+  // chips. Measured live: each chip icon spins ~180° with spring overshoot,
+  // one after another (icon1 → icon2 → icon3), then loops forever.
+  const rows = [
+    { label: 'New lead captured', sub: 'Trigger · Form + Email', icon: 'M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z' },
+    { label: 'AI enriches & scores it', sub: 'Under 30 sec · Automated', icon: 'M12 2a4 4 0 014 4c0 2-2 3-2 5v1h-4v-1c0-2-2-3-2-5a4 4 0 014-4zM12 15v4M8 21h8' },
+    { label: 'Routed to the right rep', sub: '0 Manual handoffs', icon: 'M22 12h-4l-3 9L9 3l-3 9H2' },
+  ]
   return (
-    <div className="h-[190px] rounded-[16px] bg-[#151619] p-5 flex flex-col justify-between border border-white/5">
-      {[
-        { label: 'New lead captured', sub: 'Trigger · Form', icon: 'M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z' },
-        { label: 'AI scores & enriches', sub: 'Under 30 sec · Auto', icon: 'M12 2a4 4 0 014 4c0 2-2 3-2 5v1h-4v-1c0-2-2-3-2-5a4 4 0 014-4zM12 15v4M8 21h8' },
-        { label: 'Routed to right rep', sub: '0 manual handoffs', icon: 'M22 12h-4l-3 9L9 3l-3 9H2' },
-      ].map((row, i) => (
-        <div key={row.label}>
-          <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg bg-[#063630] flex items-center justify-center text-[#f0f0f0] shrink-0">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d={row.icon} />
-              </svg>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-xs font-medium text-[#f0f0f0] truncate">{row.label}</div>
-              <div className="text-[10px] text-[#999] truncate">{row.sub}</div>
-            </div>
-            <span className="text-[10px] text-[#168804]">{i === 0 ? 'Now' : i === 1 ? '~12s' : 'Auto'}</span>
+    <div className="h-[190px] rounded-[16px] bg-[#e5e5e5] px-4 py-3 flex flex-col justify-between border border-black/5">
+      {rows.map((row, i) => (
+        <div key={row.label} className="flex items-center gap-3 rounded-[10px] bg-[#f0f0f0] px-2.5 py-2">
+          <div className="w-11 h-11 rounded-[7px] bg-[#151619] flex items-center justify-center shrink-0">
+            <motion.svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-[#f0f0f0]"
+              initial={{ rotate: 0 }}
+              animate={{ rotate: [0, 190, -18, 0] }}
+              transition={{
+                delay: 0.4 + i * 1.7,
+                duration: 1.5,
+                times: [0, 0.45, 0.75, 1],
+                repeat: Infinity,
+                repeatDelay: 3.2,
+                ease: 'easeInOut',
+              }}
+            >
+              <path d={row.icon} />
+            </motion.svg>
           </div>
-          {i < 2 && <div className="w-px h-3 bg-white/10 ml-[13px]" />}
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-medium text-[#0a0a0a] truncate">{row.label}</div>
+            <div className="text-[10px] text-[#4f4f4f] truncate">{row.sub}</div>
+          </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#4f4f4f] shrink-0">
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
         </div>
       ))}
     </div>
   )
 }
 
-function DataIllustration() {
-  return (
-    <div className="h-[190px] rounded-[16px] bg-[#151619] p-5 border border-white/5">
-      <div className="flex items-center justify-between mb-4">
-        <div className="text-xs font-medium text-[#f0f0f0]">Customer records</div>
-        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#168804]/15 text-[#168804]">Synced</span>
-      </div>
-      <div className="space-y-2">
-        {[
-          ['Acme Corp', '—', 'High'],
-          ['Globex Ltd', '✓', 'High'],
-          ['Initech', '—', 'Med'],
-        ].map((row, i) => (
-          <div key={i} className="flex items-center gap-3 text-[10px]">
-            <div className="flex-1 text-[#e5e5e5] truncate">{row[0]}</div>
-            <div className={`w-3 h-3 rounded-full flex items-center justify-center ${row[1] === '✓' ? 'bg-[#168804]/20 text-[#168804]' : 'bg-white/10 text-[#4f4f4f]'}`}>
-              {row[1] === '✓' ? (
-                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M20 6L9 17l-5-5" /></svg>
-              ) : (
-                <span className="text-[7px]">—</span>
-              )}
-            </div>
-            <span className="w-8 text-right text-[#999]">{row[2]}</span>
-          </div>
-        ))}
-      </div>
-      <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
-        <span className="text-[10px] text-[#999]">1,284 records enriched</span>
-        <span className="text-[10px] text-[#ff3700]">Live API</span>
-      </div>
-    </div>
-  )
-}
-
 function ChartIllustration() {
-  const bars = [42, 68, 50, 88, 64]
+  // "Work automated" mini bar chart — Jan +20% → Apr +51%. Light theme
+  // (#e5e5e5 bars on #e5e5e5 panel, #f0f0f0 cap strip, black labels).
+  // OPERATOR CHANGE (2026-08-05): the original's grow-hold-reset-LOOP cycle was
+  // replaced — bars now grow ONCE, staggered Jan→Apr, and STAY at their final
+  // heights, showing progressive growth that matches the +20% → +51% labels.
+  const bars = [
+    { label: 'Jan', value: 20, full: 99 },
+    { label: 'Feb', value: 31, full: 140 },
+    { label: 'Mar', value: 42, full: 178 },
+    { label: 'Apr', value: 51, full: 226 },
+  ]
+  // Scale to the 190px card (bars sit on a light panel with a baseline at the bottom)
+  const scale = 0.44
   return (
-    <div className="h-[190px] rounded-[16px] bg-[#151619] p-5 flex flex-col border border-white/5">
-      <div className="flex items-center justify-between mb-4">
-        <div className="text-xs font-medium text-[#f0f0f0]">Automation ROI</div>
-        <span className="text-[10px] text-[#168804]">+340%</span>
+    <div className="h-[190px] rounded-[16px] bg-[#e5e5e5] px-4 py-3 flex flex-col border border-black/5">
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-xs font-medium text-[#0a0a0a]">Work automated</div>
+        <span className="text-[10px] text-[#4f4f4f]">0–50%</span>
       </div>
-      <div className="flex-1 flex items-end gap-2">
+      <div className="flex-1 flex gap-3 items-end">
         {bars.map((b, i) => (
-          <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
-            <div className={`w-full rounded-t-md ${i === 3 ? 'bg-[#ff3700]' : 'bg-white/15'}`} style={{ height: `${b}px` }} />
+          <div key={b.label} className="flex-1 flex flex-col items-center gap-1.5">
+            <motion.div
+              initial={{ height: 0 }}
+              whileInView={{ height: b.full * scale }}
+              viewport={revealViewport}
+              transition={{
+                delay: i * 0.2,
+                duration: 0.9,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              data-testid="chart-bar"
+              className="w-full rounded-t-[8px] bg-[#e5e5e5] relative overflow-hidden"
+            >
+              <div className="absolute inset-x-0 top-0 h-[65%] bg-[#f0f0f0] rounded-t-[5px]" />
+            </motion.div>
           </div>
         ))}
       </div>
-      <div className="flex gap-2 mt-3">
-        {['Q1', 'Q2', 'Q3', 'Q4', 'Now'].map((l, i) => (
-          <div key={l} className={`flex-1 text-center text-[9px] ${i === 3 ? 'text-[#ff3700]' : 'text-[#4f4f4f]'}`}>{l}</div>
+      <div className="flex gap-3 mt-1.5">
+        {bars.map((b) => (
+          <div key={b.label} className="flex-1 flex flex-col items-center leading-none">
+            <span className="text-[10px] font-medium text-[#0a0a0a]">{b.label}</span>
+            <span className="text-[10px] text-[#0a0a0a]">+{b.value}%</span>
+          </div>
         ))}
       </div>
     </div>
@@ -100,7 +118,7 @@ const services = [
     number: '02',
     title: 'Data & Integrations',
     description: 'We get your data AI-ready and wired into the tools you already use.',
-    illustration: <DataIllustration />,
+    illustration: <IntegrationMarquee />,
   },
   {
     number: '03',
@@ -110,16 +128,10 @@ const services = [
   },
 ]
 
-const barData = [
-  { label: 'Jan', value: 20 },
-  { label: 'Feb', value: 31 },
-  { label: 'Mar', value: 42 },
-  { label: 'Apr', value: 51 },
-]
-
 export default function Services() {
   return (
-    <section className="relative">
+    <MotionConfig reducedMotion="user">
+      <section className="relative">
       <div className="section-panel section-panel-light" style={{ borderRadius: '50px' }}>
         <div className="section-inner">
           <p className="section-label">002/ Our Services</p>
@@ -133,7 +145,9 @@ export default function Services() {
           </p>
 
           {/* Service cards — illustration above, description below (matches the original) */}
-          <div className="grid md:grid-cols-3 gap-[15px] mb-20">
+          {/* Responsive grid matches the original: 1 col ≤800px, 2 cols 810–1180px
+              with the 3rd card spanning full width, 3 cols ≥1200px (measured) */}
+          <div className="grid grid-cols-1 min-[810px]:grid-cols-2 min-[1200px]:grid-cols-3 gap-[15px]">
             {services.map((svc, i) => (
               <motion.div
                 key={svc.number}
@@ -141,7 +155,7 @@ export default function Services() {
                 whileInView={revealWhileInView}
                 viewport={revealViewport}
                 transition={springReveal(i * 0.08)}
-                className="group bg-[#f0f0f0] border border-black/[0.06] rounded-[20px] p-[25px] hover:border-black/10 transition-all duration-300"
+                className={`group bg-[#e5e5e5] rounded-[20px] p-[25px] transition-all duration-300 min-w-0 ${i === 2 ? 'min-[810px]:col-span-2 min-[1200px]:col-span-1' : ''}`}
               >
                 <div className="mb-6">{svc.illustration}</div>
                 <h3 className="font-['Halant'] text-xl font-semibold text-[#0a0a0a] group-hover:text-[#4f4f4f] transition-colors duration-300 mb-3">
@@ -153,46 +167,9 @@ export default function Services() {
               </motion.div>
             ))}
           </div>
-
-          {/* Bar chart section */}
-          <div className="border-t border-black/[0.06] pt-16">
-            <div className="flex items-center justify-between mb-8">
-              <p className="text-sm font-medium text-[#4f4f4f]">Work automated</p>
-              <span className="text-xs text-[#4f4f4f]">0–50%</span>
-            </div>
-
-            <div className="flex gap-6 max-md:gap-4">
-              <div className="flex flex-col justify-between text-[10px] text-[#4f4f4f] py-1 h-[160px] max-md:hidden">
-                <span>50%</span>
-                <span>40%</span>
-                <span>30%</span>
-                <span>20%</span>
-                <span>10%</span>
-              </div>
-
-              <div className="flex-1 flex items-end gap-6 max-md:gap-4">
-                {barData.map((bar, i) => (
-                  <motion.div
-                    key={bar.label}
-                    initial={{ scaleY: 0, opacity: 0 }}
-                    whileInView={{ scaleY: 1, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                    className="flex-1 flex flex-col items-center gap-3"
-                  >
-                    <span className="text-xs font-medium text-[#0a0a0a]">+{bar.value}%</span>
-                    <div
-                      className="w-full rounded-t-lg bg-[#0a0a0a] origin-bottom"
-                      style={{ height: `${bar.value * 3}px`, minHeight: '40px' }}
-                    />
-                    <span className="text-xs text-[#4f4f4f]">{bar.label}</span>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
       </div>
-    </section>
+      </section>
+    </MotionConfig>
   )
 }

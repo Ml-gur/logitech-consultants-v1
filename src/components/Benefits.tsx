@@ -53,10 +53,10 @@ export default function Benefits() {
                 whileInView={revealWhileInView}
                 viewport={revealViewport}
                 transition={springReveal(i * 0.08)}
-                className="group border border-black/[0.06] rounded-[15px] bg-[#f0f0f0] p-[25px] transition-all duration-300 hover:bg-white"
+                className="group rounded-[15px] bg-[#e5e5e5] p-[25px] transition-all duration-300"
               >
                 <div className="w-7 h-0.5 rounded-full bg-[#ff3700] mb-5" />
-                <h3 className="font-['Halant'] text-lg font-semibold text-[#0a0a0a] mb-3">
+                <h3 className="font-['Halant'] text-lg font-semibold text-[#0a0a0a] group-hover:text-[#4f4f4f] transition-colors duration-300 mb-3">
                   {b.metric}
                 </h3>
                 <p className="text-sm text-[#4f4f4f] leading-relaxed">

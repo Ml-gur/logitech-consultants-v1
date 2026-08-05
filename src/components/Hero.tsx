@@ -11,7 +11,10 @@ const wordVariants = {
     opacity: 1,
     y: 0,
     filter: 'blur(0px)',
-    transition: { delay: 0.5 + i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
+    // Base delay 0.2s (was 0.5s): the h1 is the LCP element, and a long
+    // pre-reveal delay pushed LCP past the 2.5s budget (measured 2616ms,
+    // 2026-08-05 performance pass). Same word-by-word effect, earlier paint.
+    transition: { delay: 0.2 + i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
   }),
 }
 
@@ -20,10 +23,14 @@ export default function Hero() {
 
   return (
     <section id="home" className="relative pt-[76px]">
-      <div className="relative px-10 max-md:px-[15px]">
-        <div className="section-panel bg-[#e5e5e5]">
+      {/* Mobile: outer wrapper + section-panel + inner content previously
+          stacked 15+15+15=45px (then 15+10+15=40px) — the original's hero
+          content sits at the same 20px gutter as every section (measured
+          2026-08-05: h1 L=20/R=370 at 390px). Now 0+10+10=20px. */}
+      <div className="relative px-10 max-md:px-0">
+        <div className="section-panel">
           {/* Content column */}
-          <div className="relative max-w-[1400px] mx-auto px-10 max-md:px-[15px] py-[100px] max-md:py-16">
+          <div className="relative max-w-[1400px] mx-auto px-10 max-md:px-[10px] py-[100px] max-md:py-16">
             {/* Badge — plain dark text, centered (matches the original) */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}

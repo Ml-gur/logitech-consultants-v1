@@ -58,9 +58,15 @@ export default function Footer() {
         </motion.div>
 
         <div className="border-t border-black/10 pt-10 grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
-          {/* Brand */}
+          {/* Brand — operator-provided logo lockup */}
           <div>
-            <span className="font-['Halant'] text-xl font-semibold tracking-[0.08em]">AITHOR</span>
+            <img
+              src="/images/logitech-logo.png"
+              alt="Logitech Consultants"
+              width={128}
+              height={132}
+              className="h-[40px] sm:h-[44px] w-auto"
+            />
             <p className="text-xs text-[#4f4f4f] mt-2 max-w-xs">
               Strategy, automations, custom agents, and the support to keep them running.
             </p>
@@ -108,10 +114,9 @@ export default function Footer() {
 
         <div className="border-t border-black/10 pt-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-4">
-            <p className="text-xs text-[#4f4f4f]">&copy; 2026 AIthor. All rights reserved.</p>
-            <p className="text-xs text-[#4f4f4f]">Designed By Marso</p>
+            <p className="text-xs text-[#4f4f4f]">&copy; 2026 Logitech Consultants. All rights reserved.</p>
+            <p className="text-xs text-[#4f4f4f]">Designed By Samuel</p>
           </div>
-          <p className="text-xs text-[#4f4f4f]">Built in Framer</p>
         </div>
       </div>
     </footer>

@@ -2,53 +2,35 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useCms } from '../lib/CmsProvider'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
-const faqs = [
-  {
-    q: '01/ What does AIthor actually do?',
-    a: "We're a full-service AI agency. We find where AI creates value, build the automations, agents, and tools to capture it, then train your team to run them.",
-  },
-  {
-    q: '02/ How do I get started?',
-    a: 'Book a free discovery call. We\u2019ll discuss your goals, identify where AI can make an impact, and outline a plan\u2014no commitment required.',
-  },
-  {
-    q: '03/ How long until we see results?',
-    a: 'Most clients see their first automation live within 2 weeks. Our pilot program is designed to deliver a measurable win in 2\u20134 weeks.',
-  },
-  {
-    q: '04/ What if a pilot doesn\u2019t work out?',
-    a: "We build in stages and validate at each step. If a pilot isn't delivering value, we stop and find a better approach. Your investment is focused on what works.",
-  },
-  {
-    q: '05/ Do we need technical staff on our side?',
-    a: 'No. We handle the technical build. Your team just needs to know their workflows, and we train them to run the systems we build.',
-  },
-  {
-    q: '06/ Who owns the systems and data?',
-    a: 'You own everything. Our builds are fully documented, run on your infrastructure, and never lock you into proprietary tools.',
-  },
-  {
-    q: '07/ What tools and models do you work with?',
-    a: 'We work across all major AI platforms, LLMs, and automation tools. We choose the right stack for your specific use case, not a one-size-fits-all solution.',
-  },
-]
+// The numbered "01/ …" prefix is rendered here (not stored in the data) so
+// static fallback and CMS-sourced FAQs render identically.
+const numbered = (i: number, q: string) => `${String(i + 1).padStart(2, '0')}/ ${q}`
 
 export default function FAQ() {
+  const { faqs } = useCms()
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
     <section className="relative">
-      <div className="section-panel section-panel-dark" style={{ borderRadius: '50px' }}>
+      {/* No panel — FAQ sits directly on the page #f0f0f0, rows are #e5e5e5
+          radius-16 cards (measured live on the original, 2026-08-04) */}
+      <div className="section-panel">
         <div className="section-inner">
-          <p className="section-label">009/ FAQs</p>
+        {/* Two columns: heading left (w≈615), rows right (w≈595), gap 50px */}
+        <div className="grid lg:grid-cols-[1fr_595px] gap-[50px] max-lg:gap-12">
+          <div className="max-lg:mb-2">
+            <p className="section-label">009/ FAQs</p>
 
-          <h2 className="font-['Halant'] text-[clamp(36px,5vw,64px)] font-semibold leading-tight tracking-tight text-[#f0f0f0] mb-16">
-            Need answers?
-          </h2>
+            <h2 className="font-['Halant'] text-[clamp(36px,5vw,64px)] font-semibold leading-tight tracking-tight text-[#0a0a0a]">
+              Need answers?
+            </h2>
+          </div>
 
-          <div className="max-w-3xl mx-auto space-y-0">
+          {/* Right column — stacked #e5e5e5 radius-16 cards, 10px gap (measured) */}
+          <div className="flex flex-col gap-[10px]">
             {faqs.map((faq, i) => (
               <motion.div
                 key={i}
@@ -56,37 +38,45 @@ export default function FAQ() {
                 whileInView={revealWhileInView}
                 viewport={revealViewport}
                 transition={springReveal(i * 0.06)}
-                className="border-b border-white/5"
+                className="rounded-[16px] bg-[#e5e5e5]"
               >
                 <button
                   onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                  className="w-full flex items-center justify-between py-5 text-left group"
+                  aria-expanded={openIndex === i}
+                  aria-controls={`faq-panel-${i}`}
+                  className="w-full flex items-center justify-between gap-4 px-5 pt-6 pb-5 text-left"
                 >
-                  <span className="text-sm font-medium text-[#e5e5e5] group-hover:text-[#f0f0f0] transition-colors">
-                    {faq.q}
+                  <span className="text-[20px] font-semibold text-[#0a0a0a] leading-snug">
+                    {numbered(i, faq.q)}
                   </span>
+                  {/* Accent plus icon — two 14x2 bars, #ff3700, radius 10 (measured) */}
                   <motion.svg
                     animate={{ rotate: openIndex === i ? 45 : 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="w-4 h-4 text-[#999] shrink-0 ml-4"
-                    viewBox="0 0 24 24"
+                    transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                    className="w-[14px] h-[14px] shrink-0 ml-4 text-[#ff3700]"
+                    viewBox="0 0 14 14"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
+                    strokeLinecap="round"
+                    aria-hidden
                   >
-                    <path d="M12 5v14M5 12h14" />
+                    <path d="M7 1v12M1 7h12" />
                   </motion.svg>
                 </button>
                 <AnimatePresence>
                   {openIndex === i && (
                     <motion.div
+                      id={`faq-panel-${i}`}
+                      role="region"
+                      aria-label={numbered(i, faq.q)}
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                       className="overflow-hidden"
                     >
-                      <p className="text-sm text-[#999] pb-5 leading-relaxed">
+                      <p className="text-base text-[#4f4f4f] leading-[23.2px] pb-6 px-5">
                         {faq.a}
                       </p>
                     </motion.div>
@@ -94,6 +84,7 @@ export default function FAQ() {
                 </AnimatePresence>
               </motion.div>
             ))}
+            </div>
           </div>
         </div>
       </div>

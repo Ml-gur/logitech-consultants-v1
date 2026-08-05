@@ -34,7 +34,7 @@ const columns = [
       'Custom-built around your data',
       '2\u20134 week pilots with clear metrics',
       'Fully documented, owned by you',
-      'Ongoing optimisation and support',
+      'Ongoing optimization and support',
     ],
   },
 ]
@@ -64,9 +64,7 @@ export default function WhyUs() {
                 viewport={revealViewport}
                 transition={springReveal(i * 0.08)}
                 className={`rounded-[16px] p-[25px] flex flex-col ${
-                  col.dark
-                    ? 'bg-[#151619]'
-                    : 'bg-[#f0f0f0] border border-black/[0.06]'
+                  col.dark ? 'bg-[#151619]' : 'bg-[#e5e5e5]'
                 }`}
               >
                 <h3
@@ -80,16 +78,23 @@ export default function WhyUs() {
                 <ul className="space-y-4">
                   {col.items.map((item) => (
                     <li key={item} className="flex items-start gap-3">
+                      {/* Light columns: dark-gray X (measured). Dark "Working with Us" column: orange checkmark. */}
                       <svg
                         className={`w-4 h-4 mt-0.5 shrink-0 ${
-                          col.dark ? 'text-[#ff3700]' : 'text-black/20'
+                          col.dark ? 'text-[#ff3700]' : 'text-black/40'
                         }`}
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="2"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       >
-                        <path d="M18 6L6 18M6 6l12 12" />
+                        {col.dark ? (
+                          <path d="M20 6L9 17l-5-5" />
+                        ) : (
+                          <path d="M18 6L6 18M6 6l12 12" />
+                        )}
                       </svg>
                       <span
                         className={`text-sm leading-relaxed ${

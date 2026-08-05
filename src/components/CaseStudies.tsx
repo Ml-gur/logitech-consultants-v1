@@ -1,11 +1,13 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { caseStudies } from '../data/content'
+import { useCms } from '../lib/CmsProvider'
 import CaseStudyRow from './CaseStudyRow'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
 export default function CaseStudies() {
+  const { caseStudies } = useCms()
+
   return (
     <section id="case-studies" className="relative">
       <div className="section-panel section-panel-light rounded-[50px]">

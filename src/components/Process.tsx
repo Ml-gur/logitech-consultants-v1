@@ -49,50 +49,68 @@ export default function Process() {
               </p>
             </div>
 
-            {/* Right column — 4 stacked step cards, 3rd is dark (matches the original) */}
-            <div className="flex flex-col gap-[15px]">
+            {/* Right column — 4 step cards, each a 42px chip strip + 6px gap + content block
+                (measured live on the original, 2026-08-05: strip radius 16, block radius 18,
+                dark step is 03 "Build & integrate" = index 2, chips are plain uppercase text) */}
+            <div className="flex flex-col gap-[6px]">
               {steps.map((step, i) => {
                 const dark = i === 2
                 return (
-                  <motion.div
-                    key={step.title}
-                    initial={revealInitial}
-                    whileInView={revealWhileInView}
-                    viewport={revealViewport}
-                    transition={springReveal(i * 0.08)}
-                    className={`group rounded-[18px] p-6 transition-colors duration-300 ${
-                      dark ? 'bg-[#151619]' : 'bg-[#f0f0f0] border border-black/[0.06]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-6">
+                  <div key={step.title} className="flex flex-col gap-[6px]">
+                    {/* Chip strip — 42px tall, full-width, same bg as card */}
+                    <motion.div
+                      initial={revealInitial}
+                      whileInView={revealWhileInView}
+                      viewport={revealViewport}
+                      transition={springReveal(i * 0.08)}
+                      className={`flex h-[42px] items-center justify-between rounded-[16px] px-[25px] ${
+                        dark ? 'bg-[#151619]' : 'bg-[#e5e5e5]'
+                      }`}
+                    >
                       <span
-                        className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${
-                          dark ? 'bg-white/10 text-[#f0f0f0]' : 'bg-black/5 text-[#4f4f4f]'
+                        className={`uppercase text-[11.2px] font-semibold ${
+                          dark ? 'text-[#f0f0f0]' : 'text-[#4f4f4f]'
                         }`}
                       >
-                        <span className="w-1 h-1 rounded-full bg-[#ff3700]" />
                         {step.time}
                       </span>
+                      {/* Step bars — N thin orange bars, N = step number (measured) */}
+                      <span className="flex items-center gap-[5px]" aria-hidden>
+                        {Array.from({ length: i + 1 }).map((_, b) => (
+                          <span key={b} className="h-[10px] w-[2px] rounded-full bg-[#ff3700]" />
+                        ))}
+                      </span>
+                    </motion.div>
+
+                    {/* Content block — radius 18, pad 25, number on its own line */}
+                    <motion.div
+                      initial={revealInitial}
+                      whileInView={revealWhileInView}
+                      viewport={revealViewport}
+                      transition={springReveal(i * 0.08 + 0.04)}
+                      className={`rounded-[18px] p-[25px] ${
+                        dark ? 'bg-[#151619]' : 'bg-[#e5e5e5]'
+                      }`}
+                    >
                       <span
-                        className={`font-['Halant'] text-3xl font-semibold transition-colors duration-300 ${
-                          dark ? 'text-white/20 group-hover:text-[#ff3700]/60' : 'text-black/10 group-hover:text-[#ff3700]/40'
+                        className={`block font-['Halant'] text-2xl font-semibold ${
+                          dark ? 'text-[#f0f0f0]' : 'text-[#0a0a0a]'
                         }`}
                       >
                         {step.number}
                       </span>
-                    </div>
-
-                    <h3
-                      className={`font-['Halant'] text-2xl font-semibold mb-3 transition-colors duration-300 ${
-                        dark ? 'text-[#f0f0f0]' : 'text-[#0a0a0a] group-hover:text-[#4f4f4f]'
-                      }`}
-                    >
-                      {step.title}
-                    </h3>
-                    <p className={`text-sm leading-relaxed ${dark ? 'text-[#999]' : 'text-[#4f4f4f]'}`}>
-                      {step.description}
-                    </p>
-                  </motion.div>
+                      <h3
+                        className={`mt-1 font-['Halant'] text-2xl font-semibold leading-snug ${
+                          dark ? 'text-[#f0f0f0]' : 'text-[#0a0a0a]'
+                        }`}
+                      >
+                        {step.title}
+                      </h3>
+                      <p className={`mt-2 text-base leading-relaxed ${dark ? 'text-[#e5e5e5]' : 'text-[#4f4f4f]'}`}>
+                        {step.description}
+                      </p>
+                    </motion.div>
+                  </div>
                 )
               })}
             </div>

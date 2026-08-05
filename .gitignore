@@ -3,3 +3,19 @@ dist/
 .superpowers/
 *.log
 .DS_Store
+
+# Playwright artifacts
+playwright-report/
+test-results/
+
+# Local env files (never commit secrets; use .env.example as the template)
+.env
+.env.local
+.env.*.local
+
+# Raw logo source (optimized copy lives in public/images/logitech-logo.png)
+logitech logo.png
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+*.tsbuildinfo.*

@@ -39,11 +39,15 @@ export default function Nav() {
       )}
     >
       <div className="max-w-[1400px] mx-auto px-4 sm:px-10 h-[76px] flex items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 min-h-[44px]" aria-label="AIthor home">
-          <span className="font-['Halant'] text-xl font-semibold tracking-[0.08em] text-[#151619]">
-            AIthor
-          </span>
+        {/* Logo — operator-provided lockup, 3x retina asset (public/images/logitech-logo.png) */}
+        <Link to="/" className="flex items-center min-h-[44px]" aria-label="Logitech Consultants home">
+          <img
+            src="/images/logitech-logo.png"
+            alt=""
+            width={128}
+            height={132}
+            className="h-[32px] sm:h-[36px] w-auto select-none"
+          />
         </Link>
 
         {/* Desktop nav */}
@@ -55,7 +59,7 @@ export default function Nav() {
               end={link.to === '/'}
               className={({ isActive }) =>
                 cn(
-                  'group relative text-sm py-2 transition-colors duration-200',
+                  'group relative text-sm py-[12px] transition-colors duration-200',
                   isActive ? 'text-[#0a0a0a]' : 'text-[#4f4f4f] hover:text-[#0a0a0a]'
                 )
               }
@@ -76,7 +80,7 @@ export default function Nav() {
 
           <Link
             to="/contact"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-[50px] bg-[#151619] text-[#f0f0f0] text-sm font-medium transition-all duration-200 hover:bg-[#0a0a0a] hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 px-6 py-[12px] rounded-[50px] bg-[#151619] text-[#f0f0f0] text-sm font-medium transition-all duration-200 hover:bg-[#0a0a0a] hover:-translate-y-0.5"
           >
             Book a call
           </Link>

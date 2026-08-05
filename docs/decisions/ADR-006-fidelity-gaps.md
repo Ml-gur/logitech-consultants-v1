@@ -1,7 +1,7 @@
 # ADR-006: Fidelity-gap verification — fixed Buy-template block, once-only reveals, marquee deviation
 
 ## Status
-Accepted
+Accepted (partially superseded 2026-08-04: buy-template block REMOVED per operator instruction)
 
 ## Date
 2026-08-03
@@ -54,10 +54,14 @@ open questions about its interaction behavior. A probe round against the live or
 - Rejected: unfaithful.
 
 ## Consequences
-- Clone now matches the original's measured scroll-linked behavior (fixed persistent buy block,
-  once-only reveals, no parallax).
+- Clone now matches the original's measured scroll-linked behavior (once-only reveals, no
+  parallax).
 - The marquee deviation is on record — future reviewers will not "fix" it by accident.
-- The buy block appears on all routes incl. mobile, floating above content exactly like the
-  original (intended, faithful).
+- **2026-08-04 supersession:** the operator removed the buy-template sticker from the site
+  ("remove the buy template sticker from the website"). `BuyTemplate.tsx` was deleted,
+  `Layout.tsx` no longer renders it, and the `buyTemplateUrl` export was dropped from
+  `src/data/content.ts`. Per the project rule "operator instruction wins", this overrides
+  decision #3 above — future loop runs MUST NOT re-add the block (see `loop-constraints.md`
+  rule #5).
 - Per-task review of the fix found no Critical/Important issues; Minor notes (focus-visible
   ring on the new link, consistent with the rest of the codebase) tracked for a future a11y pass.

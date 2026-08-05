@@ -2,15 +2,25 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Logo-derived favicons (abstract mark; 2026-08-05, operator logo).
+         favicon.svg is the pre-rebrand icon and is no longer referenced. -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
+    <link rel="apple-touch-icon" href="/favicon-64.png" />
+    <!-- Preload the critical display + body fonts: the hero h1 (Halant 600) is
+         the LCP element; fetching fonts during HTML parse removes them from the
+         text-paint critical path (measured 2026-08-05, performance pass). -->
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/cdAe8hgZ1cMyLu9g005pAW3xMo.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/4RAEQdEOrcnDkhHiiCbJOw92Lk.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/gyByhwUxId8gMEwcGFU.woff2" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="AIthor – AI Agency Template for Framer" />
-    <meta property="og:description" content="AIthor is a premium Framer template for AI agencies whose results deserve a more credible website." />
+    <meta property="og:title" content="Logitech Consultants – AI Automation Agency" />
+    <meta property="og:description" content="Logitech Consultants finds where AI creates real value, builds it properly, and makes sure it keeps working long after the engagement ends." />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="AIthor – AI Agency Template for Framer" />
-    <meta name="twitter:description" content="AIthor is a premium Framer template for AI agencies whose results deserve a more credible website." />
-    <title>AIthor – AI Agency Template</title>
+    <meta name="twitter:title" content="Logitech Consultants – AI Automation Agency" />
+    <meta name="twitter:description" content="Logitech Consultants finds where AI creates real value, builds it properly, and makes sure it keeps working long after the engagement ends." />
+    <title>Logitech Consultants – AI Automation Agency</title>
   </head>
   <body>
     <div id="root"></div>

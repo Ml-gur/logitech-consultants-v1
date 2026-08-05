@@ -1,11 +1,13 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { caseStudies } from '../data/content'
+import { useCms } from '../lib/CmsProvider'
 import CaseStudyRow from '../components/CaseStudyRow'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
 export default function CaseStudiesPage() {
+  const { caseStudies } = useCms()
+
   return (
     <section className="relative pt-[76px]">
       <div className="section-panel section-panel-dark rounded-[50px]">
@@ -25,9 +27,9 @@ export default function CaseStudiesPage() {
             whileInView={revealWhileInView}
             viewport={revealViewport}
             transition={springReveal(0.08)}
-            className="font-['Halant'] text-[clamp(36px,5vw,64px)] font-semibold leading-tight tracking-tight text-[#f0f0f0] mb-6"
+            className="font-['Halant'] text-[clamp(36px,5vw,64px)] font-semibold leading-tight tracking-tight text-[#0a0a0a] mb-6"
           >
-            Real business results.
+            Real problems, real outcomes.
           </motion.h1>
 
           <motion.p
@@ -35,7 +37,7 @@ export default function CaseStudiesPage() {
             whileInView={revealWhileInView}
             viewport={revealViewport}
             transition={springReveal(0.14)}
-            className="text-base text-[#999] max-w-2xl mb-16"
+            className="text-base text-[#4f4f4f] max-w-2xl mb-16"
           >
             A look at how we&rsquo;ve helped companies cut the busywork and ship measurable results in weeks.
           </motion.p>

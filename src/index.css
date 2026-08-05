@@ -85,9 +85,9 @@
 
   :root {
     /* Light theme — extracted from aithor.framer.website (measured live) */
-    --color-bg-page: #f0f0f0;        /* page background */
-    --color-bg-panel: #e5e5e5;       /* section panels */
-    --color-bg-card: #f0f0f0;        /* cards inside panels */
+    --color-bg-page: #f0f0f0;        /* page background (sections sit transparent on it) */
+    --color-bg-card: #e5e5e5;        /* cards/rows on the page */
+    --color-bg-card-light: #f0f0f0;  /* lighter card surfaces (pricing outer) */
     --color-bg-dark: #151619;        /* dark accent (pricing, why-us col, process step, nav pill) */
     --color-bg-dark-deep: #0a0a0a;   /* text / deep accents */
     --color-bg-darkest: #1c1c1c;     /* buy-template block */
@@ -110,7 +110,11 @@
     --font-mono: 'Fragment Mono', monospace;
 
     --section-padding: 100px 40px;
-    --section-padding-mobile: 80px 15px;
+    /* Mobile gutter 20px total (panel 10 + inner 10). Measured live on the
+       original at 390px: cards sit at L=20 / R=370 (W=350) — a 20px gutter,
+       NOT 15px per layer. The previous 15+15=30px made every card 330px
+       wide (10px narrower each side) vs the original's 350px. */
+    --section-padding-mobile: 80px 10px;
     --radius-panel: 50px;
     --radius-card: 16px;
     --radius-button: 50px;
@@ -121,6 +125,9 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
+    /* Prevent horizontal pan on iOS Safari: body-only overflow-x is not
+       enough there (marquee rows are ~2000px wide); html must clip too. */
+    overflow-x: hidden;
   }
 
   body {
@@ -150,10 +157,13 @@
 }
 
 @layer components {
-  /* Section panels — the rounded stacked panels from the original.
-     Grid rule (extracted from the live site):
-     - panel: full-bleed with padding 0 40px (15px on mobile)
-     - wrapper: max-width 1400px, margin auto, padding 100px 40px
+  /* Section wrappers — transparent over the page #f0f0f0.
+     Measured live 2026-08-04 (verified-scroll pixel ground truth): the original
+     has NO full-bleed #e5e5e5 section panels. Every section sits directly on the
+     page background; #e5e5e5 appears only on individual cards/rows inside.
+     Grid rule (from the live site):
+     - wrapper: full-bleed with padding 0 40px (15px on mobile)
+     - inner: max-width 1400px, margin auto, padding 100px 40px
      => content lands at L=80 / R=1360 at 1440px, matching the original */
   .section-panel {
     border-radius: var(--radius-panel);
@@ -162,14 +172,10 @@
     padding: 0 40px;
   }
 
-  /* All sections on the original are light #e5e5e5 panels on a #f0f0f0 page */
-  .section-panel-dark {
-    background-color: var(--color-bg-panel);
-    color: var(--color-text-primary);
-  }
-
+  /* Retained for API compat — both are transparent (sections sit on page #f0f0f0) */
+  .section-panel-dark,
   .section-panel-light {
-    background-color: var(--color-bg-panel);
+    background-color: transparent;
     color: var(--color-text-primary);
   }
 
@@ -198,12 +204,21 @@
 
   .section-label {
     font-family: var(--font-body);
-    font-size: 14px;
+    font-size: 11.2px;
     font-weight: 600;
     letter-spacing: 0.05em;
     color: var(--color-text-primary);
     text-transform: uppercase;
     margin-bottom: 12px;
+  }
+
+  /* Pricing card hover — soft layered shadow, bg stays #151619 (measured live
+     on the original 2026-08-04: no bg change, only a soft shadow appears) */
+  .pricing-card {
+    transition: box-shadow 0.25s ease;
+  }
+  .pricing-card:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.08), 0 20px 40px rgba(0, 0, 0, 0.07);
   }
 
 }
@@ -213,7 +228,7 @@
     padding: 0 15px;
   }
   .section-panel {
-    padding: 0 15px;
+    padding: 0 10px;
   }
   .section-inner {
     padding: var(--section-padding-mobile);

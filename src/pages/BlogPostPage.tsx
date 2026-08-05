@@ -2,11 +2,12 @@
 
 import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { blogPosts } from '../data/content'
+import { useCms } from '../lib/CmsProvider'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
 export default function BlogPostPage() {
   const { slug } = useParams()
+  const { blogPosts } = useCms()
   const post = blogPosts.find((p) => p.slug === slug)
   const others = blogPosts.filter((p) => p.slug !== slug)
 
@@ -40,7 +41,8 @@ export default function BlogPostPage() {
 
           {/* Header */}
           <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)} className="max-w-[760px] mb-12">
-            <div className="flex items-center gap-3 text-xs text-[#999] mb-6">
+            {/* #666 not #999: passes WCAG AA 4.5:1 on #f0f0f0 (a11y fix 2026-08-05) */}
+            <div className="flex items-center gap-3 text-xs text-[#666] mb-6">
               <span className="font-medium text-[#0a0a0a]">{post.category}</span>
               <span className="w-1 h-1 rounded-full bg-[#e5e5e5]" />
               <span>{post.date}</span>
@@ -104,12 +106,12 @@ export default function BlogPostPage() {
                   <Link to={`/blog/${o.slug}`} className="group block h-full">
                     <div className="aspect-[4/5] rounded-2xl overflow-hidden mb-4 bg-[#e5e5e5]">
                       {o.image ? (
-                        <img src={o.image} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                        <img src={o.image} alt="" className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-[#e5e5e5] to-[#f0f0f0]" />
                       )}
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-[#999] mb-2">
+                    <div className="flex items-center gap-3 text-xs text-[#666] mb-2">
                       <span className="font-medium text-[#0a0a0a]">{o.category}</span>
                       <span className="w-1 h-1 rounded-full bg-[#e5e5e5]" />
                       <span>{o.date}</span>

@@ -13,9 +13,21 @@ scroll site:
 - Nav links carry real URLs: About → `/about`, Case Studies → `/case-studies`,
   Blog → `/blog`, "Book a call" → `/contact`.
 - Case-study rows are `<a>` links to `/case-studies/etery|genesy|zenon` (a 4th case, Formix,
-  also exists).
+  also exists on the original).
 - Blog cards link to real post URLs; posts have full article content.
 - The contact page has a real form (sales@aithor.com, Sofia address).
+
+> **Correction (2026-08-05):** the `sales@aithor.com` / Sofia details above describe the
+> **original template** being cloned (aithor.framer.website), not this clone. The clone's
+> contact page uses operator-provided values: `hello@logitechconsultants.com`,
+> `+254112292847`, and "51 Lenana Road Nairobi, Nairobi, 00100 Kenya" (rebrand per operator,
+> 2026-08-04/05). Future loop runs MUST NOT re-introduce the original's contact details.
+
+> **Correction (2026-08-05, second):** Formix is **not part of the clone**. Per operator
+> instruction the case-studies list was reduced to three (Etery, Genesy, Zenon) and the
+> Formix case study was removed from `src/data/content.ts` (with its image asset no longer
+> referenced). The mention above describes the original template only. Future loop runs MUST
+> NOT re-add Formix (see `loop-constraints.md`).
 
 The initial clone was a single `HomePage`; every "page" was an in-page section or dead anchor.
 
@@ -30,8 +42,8 @@ Use **react-router-dom v7** `BrowserRouter` with a shared shell and route-level 
   behavior).
 - `src/pages/*` are route-level compositions; `src/components/*` stay presentational and are
   shared across pages.
-- Content lives in `src/data/content.ts` (case studies incl. Formix; blog posts with full
-  articles), fetched via a scripted pass over the live site.
+- Content lives in `src/data/content.ts` (case studies: Etery, Genesy, Zenon; blog posts
+  with full articles), fetched via a scripted pass over the live site.
 
 ## Alternatives Considered
 

@@ -52,7 +52,7 @@ const tiers = [
 export default function Pricing() {
   return (
     <section id="pricing" className="relative">
-      <div className="section-panel rounded-[50px]" style={{ backgroundColor: '#e5e5e5', color: '#0a0a0a' }}>
+      <div className="section-panel">
         <div className="section-inner">
           <p className="section-label">008/ Our Pricing</p>
 
@@ -64,7 +64,7 @@ export default function Pricing() {
             Start with a focused pilot, grow into an embedded partnership.
           </p>
 
-          {/* All three cards dark #151619, radius 14px — matches the original */}
+          {/* Light #f0f0f0 cards with dark #151619 top block — matches the measured original */}
           <div className="grid md:grid-cols-3 gap-[15px]">
             {tiers.map((tier, i) => (
               <motion.div
@@ -73,42 +73,54 @@ export default function Pricing() {
                 whileInView={revealWhileInView}
                 viewport={revealViewport}
                 transition={springReveal(i * 0.08)}
-                className="rounded-[14px] bg-[#151619] p-[25px] text-[#f0f0f0] flex flex-col transition-colors duration-300 hover:bg-[#0a0a0a]"
+                className="pricing-card rounded-[20px] bg-[#f0f0f0] p-[10px]"
               >
-                <div className="mb-6 flex items-center justify-between">
-                  <h3 className="font-['Halant'] text-2xl font-semibold">{tier.name}</h3>
-                  <span className="text-xs font-medium text-[#999]">{tier.badge}</span>
-                </div>
-
-                <div className="mb-6">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-semibold font-['Halant']">${tier.price}</span>
-                    <span className="text-xs text-[#999]">/{tier.period}</span>
+                {/* Inner #e5e5e5 layer wrapping the dark block + CTA (matches original) */}
+                <div className="bg-[#e5e5e5] rounded-[16px] p-[10px]">
+                  {/* Dark top block: name, subtitle, badge, price */}
+                  <div className="bg-[#151619] rounded-[14px] p-[15px]">
+                    <div className="mb-1 flex items-start justify-between gap-2">
+                      <h3 className="font-['Halant'] text-[20px] font-semibold leading-snug text-[#f0f0f0]">
+                        {tier.name}
+                      </h3>
+                      <span className="text-[11.2px] font-semibold whitespace-nowrap uppercase text-[#f0f0f0]">
+                        {tier.badge}
+                      </span>
+                    </div>
+                    <p className="text-[16px] leading-[23.2px] text-[#e5e5e5] mb-[54px]">{tier.subtitle}</p>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-[34px] leading-none font-semibold font-['Halant'] text-[#f0f0f0]">
+                        ${tier.price}
+                      </span>
+                      <span className="text-[11.2px] font-semibold uppercase text-[#f0f0f0]">/{tier.period}</span>
+                    </div>
                   </div>
-                  <p className="text-sm text-[#999] mt-2">{tier.subtitle}</p>
+
+                  {/* Dark CTA pill */}
+                  <Link
+                    to="/contact"
+                    className="block text-center py-[15px] mt-[10px] rounded-[50px] bg-[#151619] text-[#f0f0f0] text-[16px] font-semibold transition-colors duration-200 hover:bg-[#0a0a0a]"
+                  >
+                    Book a call
+                  </Link>
                 </div>
 
-                <Link
-                  to="/contact"
-                  className="block text-center py-3 rounded-[50px] bg-[#f0f0f0] text-[#0a0a0a] text-sm font-semibold transition-all duration-200 hover:bg-white hover:-translate-y-0.5 mb-8"
-                >
-                  Book a call
-                </Link>
-
-                <div className="text-xs uppercase tracking-wider text-[#999] mb-4">
-                  What&rsquo;s included:
+                {/* Light lower area: included + features in dark text */}
+                <div className="pt-[18px]">
+                  <h4 className="font-['Halant'] text-[18.4px] font-medium text-[#0a0a0a] mb-3">
+                    What&rsquo;s included:
+                  </h4>
+                  <ul className="space-y-[18px]">
+                    {tier.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-[13.6px] font-semibold leading-snug text-[#4f4f4f]">
+                        <svg className="w-[22px] h-[22px] mt-[1px] shrink-0 text-[#0a0a0a]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M20 6L9 17l-5-5" />
+                        </svg>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-
-                <ul className="space-y-3">
-                  {tier.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm">
-                      <svg className="w-4 h-4 mt-0.5 shrink-0 text-[#168804]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M20 6L9 17l-5-5" />
-                      </svg>
-                      <span className="text-[#e5e5e5]">{f}</span>
-                    </li>
-                  ))}
-                </ul>
               </motion.div>
             ))}
           </div>

@@ -2,10 +2,12 @@
 
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { blogPosts } from '../data/content'
+import { useCms } from '../lib/CmsProvider'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
 export default function BlogPage() {
+  const { blogPosts } = useCms()
+
   return (
     <section className="relative pt-[76px]">
       <div className="section-panel section-panel-light rounded-[50px]">
@@ -46,12 +48,13 @@ export default function BlogPage() {
                 <Link to={`/blog/${post.slug}`} className="group block h-full">
                   <div className="aspect-[4/5] rounded-2xl overflow-hidden mb-4 bg-[#e5e5e5]">
                     {post.image ? (
-                      <img src={post.image} alt="" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                      <img src={post.image} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-[#e5e5e5] to-[#f0f0f0]" />
                     )}
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-[#999] mb-2">
+                  {/* #666 not #999: passes WCAG AA 4.5:1 on #f0f0f0 (a11y fix 2026-08-05) */}
+                  <div className="flex items-center gap-3 text-xs text-[#666] mb-2">
                     <span className="font-medium text-[#0a0a0a]">{post.category}</span>
                     <span className="w-1 h-1 rounded-full bg-[#e5e5e5]" />
                     <span>{post.date}</span>

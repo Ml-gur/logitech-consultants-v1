@@ -9,12 +9,14 @@ import CaseStudyDetail from './pages/CaseStudyDetail'
 import BlogPage from './pages/BlogPage'
 import BlogPostPage from './pages/BlogPostPage'
 import ContactPage from './pages/ContactPage'
+import { CmsProvider } from './lib/CmsProvider'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
+    <CmsProvider>
+      <BrowserRouter>
+        <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
@@ -25,7 +27,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path="/contact" element={<ContactPage />} />
           <Route path="*" element={<HomePage />} />
         </Route>
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
+    </CmsProvider>
   </React.StrictMode>,
 )

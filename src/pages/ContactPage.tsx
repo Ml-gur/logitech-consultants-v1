@@ -3,21 +3,26 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import FAQ from '../components/FAQ'
+import { useCms } from '../lib/CmsProvider'
+import { cmsEnabled, submitInquiry } from '../lib/cms'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
-const contactInfo = [
-  { label: 'Email', value: 'sales@aithor.com', href: 'mailto:sales@aithor.com' },
-  { label: 'Phone', value: '+359-88777980', href: 'tel:+35988777980' },
-  { label: 'Address', value: 'Georgi S. Rakovski Street, Sofia, Bulgaria', href: null },
-]
-
 export default function ContactPage() {
+  const { contactInfo } = useCms()
+
+  const contactInfoCards = [
+    { label: 'Email', value: contactInfo.email, href: `mailto:${contactInfo.email}` },
+    { label: 'Phone', value: contactInfo.phone, href: `tel:${contactInfo.phone}` },
+    { label: 'Address', value: contactInfo.address, href: null },
+  ]
+
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [budget, setBudget] = useState('')
   const [message, setMessage] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [sent, setSent] = useState(false)
+  const [submitFailed, setSubmitFailed] = useState(false)
 
   const validate = () => {
     const next: Record<string, string> = {}
@@ -30,9 +35,22 @@ export default function ContactPage() {
     return Object.keys(next).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (validate()) setSent(true)
+    setSubmitFailed(false)
+    if (!validate()) return
+
+    // When the CMS is configured, persist the submission so it lands in the
+    // admin panel (Inquiries collection). Without it, keep the original
+    // client-only behavior so the site works standalone.
+    if (cmsEnabled) {
+      const ok = await submitInquiry({ name, email, budget, message })
+      if (!ok) {
+        setSubmitFailed(true)
+        return
+      }
+    }
+    setSent(true)
   }
 
   return (
@@ -48,7 +66,7 @@ export default function ContactPage() {
             whileInView={revealWhileInView}
             viewport={revealViewport}
             transition={springReveal(0.08)}
-            className="font-['Halant'] text-[clamp(40px,6vw,80px)] font-semibold leading-[1.05] tracking-tight text-[#f0f0f0] mb-6"
+            className="font-['Halant'] text-[clamp(40px,6vw,80px)] font-semibold leading-[1.05] tracking-tight text-[#0a0a0a] mb-6"
           >
             Get in touch.
           </motion.h1>
@@ -58,7 +76,7 @@ export default function ContactPage() {
             whileInView={revealWhileInView}
             viewport={revealViewport}
             transition={springReveal(0.14)}
-            className="text-base text-[#999] max-w-[520px] leading-relaxed mb-16"
+            className="text-base text-[#4f4f4f] max-w-[520px] leading-relaxed mb-16"
           >
             Have questions or need support? Our team is here to help you every step of the way.
           </motion.p>
@@ -67,14 +85,14 @@ export default function ContactPage() {
             {/* Form */}
             <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.1)}>
               {sent ? (
-                <div className="rounded-[20px] border border-dashed border-white/15 bg-[#151619] p-10 text-center">
+                <div className="rounded-[20px] border border-black/[0.06] bg-[#f0f0f0] p-10 text-center">
                   <div className="w-12 h-12 rounded-full bg-[#168804]/15 text-[#168804] flex items-center justify-center mx-auto mb-5">
                     <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M20 6L9 17l-5-5" />
                     </svg>
                   </div>
-                  <h2 className="font-['Halant'] text-2xl font-semibold text-[#f0f0f0] mb-2">Message sent</h2>
-                  <p className="text-sm text-[#999]">Thanks {name.trim() || 'there'} — we&rsquo;ll get back to you within one business day.</p>
+                  <h2 className="font-['Halant'] text-2xl font-semibold text-[#0a0a0a] mb-2">Message sent</h2>
+                  <p className="text-sm text-[#4f4f4f]">Thanks {name.trim() || 'there'}. We&rsquo;ll get back to you within one business day.</p>
                   <button
                     onClick={() => {
                       setSent(false)
@@ -83,7 +101,7 @@ export default function ContactPage() {
                       setBudget('')
                       setMessage('')
                     }}
-                    className="mt-8 px-6 py-3 rounded-[50px] bg-[#f0f0f0] text-[#0a0a0a] text-sm font-medium transition-colors duration-200 hover:bg-white"
+                    className="mt-8 px-6 py-3 rounded-[50px] bg-[#151619] text-[#f0f0f0] text-sm font-medium transition-colors duration-200 hover:bg-[#0a0a0a]"
                   >
                     Send another message
                   </button>
@@ -92,7 +110,7 @@ export default function ContactPage() {
                 <form onSubmit={handleSubmit} noValidate className="space-y-6">
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-[#f0f0f0] mb-2">
+                      <label htmlFor="name" className="block text-sm font-medium text-[#0a0a0a] mb-2">
                         Full Name <span className="text-[#ff3700]" aria-hidden="true">*</span>
                       </label>
                       <input
@@ -102,14 +120,14 @@ export default function ContactPage() {
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Jane Smith"
                         aria-invalid={!!errors.name}
-                        className={`w-full px-5 py-3.5 rounded-[16px] bg-[#151619] border text-sm text-[#f0f0f0] placeholder:text-[#4f4f4f] focus:outline-none focus:ring-2 transition-colors ${
-                          errors.name ? 'border-[#ff3700] focus:ring-[#ff3700]/30' : 'border-white/10 focus:ring-white/20'
+                        className={`w-full px-5 py-3.5 rounded-[8px] bg-transparent border text-sm text-[#0a0a0a] placeholder:text-[#999] focus:outline-none focus:ring-2 transition-colors ${
+                          errors.name ? 'border-[#ff3700] focus:ring-[#ff3700]/30' : 'border-[#0a0a0a] focus:ring-black/10'
                         }`}
                       />
                       {errors.name && <p className="text-xs text-[#ff3700] mt-1.5">{errors.name}</p>}
                     </div>
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-[#f0f0f0] mb-2">
+                      <label htmlFor="email" className="block text-sm font-medium text-[#0a0a0a] mb-2">
                         Your Email <span className="text-[#ff3700]" aria-hidden="true">*</span>
                       </label>
                       <input
@@ -119,8 +137,8 @@ export default function ContactPage() {
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="jane@company.com"
                         aria-invalid={!!errors.email}
-                        className={`w-full px-5 py-3.5 rounded-[16px] bg-[#151619] border text-sm text-[#f0f0f0] placeholder:text-[#4f4f4f] focus:outline-none focus:ring-2 transition-colors ${
-                          errors.email ? 'border-[#ff3700] focus:ring-[#ff3700]/30' : 'border-white/10 focus:ring-white/20'
+                        className={`w-full px-5 py-3.5 rounded-[8px] bg-transparent border text-sm text-[#0a0a0a] placeholder:text-[#999] focus:outline-none focus:ring-2 transition-colors ${
+                          errors.email ? 'border-[#ff3700] focus:ring-[#ff3700]/30' : 'border-[#0a0a0a] focus:ring-black/10'
                         }`}
                       />
                       {errors.email && <p className="text-xs text-[#ff3700] mt-1.5">{errors.email}</p>}
@@ -128,7 +146,7 @@ export default function ContactPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="budget" className="block text-sm font-medium text-[#f0f0f0] mb-2">
+                    <label htmlFor="budget" className="block text-sm font-medium text-[#0a0a0a] mb-2">
                       Budget <span className="text-[#ff3700]" aria-hidden="true">*</span>
                     </label>
                     <select
@@ -136,8 +154,8 @@ export default function ContactPage() {
                       value={budget}
                       onChange={(e) => setBudget(e.target.value)}
                       aria-invalid={!!errors.budget}
-                      className={`w-full px-5 py-3.5 rounded-[16px] bg-[#151619] border text-sm text-[#f0f0f0] focus:outline-none focus:ring-2 transition-colors appearance-none ${
-                        errors.budget ? 'border-[#ff3700] focus:ring-[#ff3700]/30' : 'border-white/10 focus:ring-white/20'
+                      className={`w-full px-5 py-3.5 rounded-[8px] bg-transparent border text-sm text-[#0a0a0a] focus:outline-none focus:ring-2 transition-colors appearance-none ${
+                        errors.budget ? 'border-[#ff3700] focus:ring-[#ff3700]/30' : 'border-[#0a0a0a] focus:ring-black/10'
                       } ${budget ? '' : 'text-[#4f4f4f]'}`}
                     >
                       <option value="" disabled>
@@ -153,7 +171,7 @@ export default function ContactPage() {
                   </div>
 
                   <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-[#f0f0f0] mb-2">
+                    <label htmlFor="message" className="block text-sm font-medium text-[#0a0a0a] mb-2">
                       Message <span className="text-[#ff3700]" aria-hidden="true">*</span>
                     </label>
                     <textarea
@@ -163,16 +181,26 @@ export default function ContactPage() {
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder="Tell us about your project..."
                       aria-invalid={!!errors.message}
-                      className={`w-full px-5 py-3.5 rounded-[16px] bg-[#151619] border text-sm text-[#f0f0f0] placeholder:text-[#4f4f4f] focus:outline-none focus:ring-2 transition-colors resize-y ${
-                        errors.message ? 'border-[#ff3700] focus:ring-[#ff3700]/30' : 'border-white/10 focus:ring-white/20'
+                      className={`w-full px-5 py-3.5 rounded-[8px] bg-transparent border text-sm text-[#0a0a0a] placeholder:text-[#999] focus:outline-none focus:ring-2 transition-colors resize-y ${
+                        errors.message ? 'border-[#ff3700] focus:ring-[#ff3700]/30' : 'border-[#0a0a0a] focus:ring-black/10'
                       }`}
                     />
                     {errors.message && <p className="text-xs text-[#ff3700] mt-1.5">{errors.message}</p>}
                   </div>
 
+                  {submitFailed && (
+                    <p className="text-xs text-[#ff3700]">
+                      Something went wrong sending your message. Please try again, or email{' '}
+                      <a href={`mailto:${contactInfo.email}`} className="underline">
+                        {contactInfo.email}
+                      </a>
+                      .
+                    </p>
+                  )}
+
                   <button
                     type="submit"
-                    className="w-full sm:w-auto px-8 py-4 rounded-[50px] bg-[#f0f0f0] text-[#0a0a0a] text-sm font-medium transition-colors duration-200 hover:bg-white"
+                    className="w-full sm:w-auto px-8 py-4 rounded-[50px] bg-[#151619] text-[#f0f0f0] text-sm font-medium transition-colors duration-200 hover:bg-[#0a0a0a]"
                   >
                     Send Your Message
                   </button>
@@ -182,9 +210,9 @@ export default function ContactPage() {
 
             {/* Contact info */}
             <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.14)} className="space-y-4 h-fit">
-              {contactInfo.map((info) => (
+              {contactInfoCards.map((info) => (
                 <div key={info.label} className="rounded-[20px] bg-[#151619] border border-white/5 p-6">
-                  <div className="text-xs uppercase tracking-wider text-[#4f4f4f] mb-1.5">{info.label}</div>
+                  <div className="text-xs uppercase tracking-wider text-[#999] mb-1.5">{info.label}</div>
                   {info.href ? (
                     <a href={info.href} className="text-base font-medium text-[#f0f0f0] hover:text-[#ff3700] transition-colors break-all">
                       {info.value}

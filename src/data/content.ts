@@ -18,7 +18,7 @@ export const caseStudies: CaseStudy[] = [
     slug: 'etery',
     name: 'Etery',
     category: 'E-commerce',
-    image: '/images/M5MY3Wk4Y4dsOCa2vifZ9R6pI.png',
+    image: '/images/M5MY3Wk4Y4dsOCa2vifZ9R6pI.webp',
     tagline: 'Automating customer support and inventory ops for a high-volume e-commerce brand.',
     year: '2025',
     timeframe: '7 Weeks',
@@ -43,7 +43,7 @@ export const caseStudies: CaseStudy[] = [
     slug: 'genesy',
     name: 'Genesy',
     category: 'Fintech',
-    image: '/images/J7KZFcCw0ZrENLKo0wuCy6nASg.png',
+    image: '/images/J7KZFcCw0ZrENLKo0wuCy6nASg.webp',
     tagline: 'Scaling content operations for an AI tools company without scaling the team.',
     year: '2026',
     timeframe: '6 Weeks',
@@ -68,7 +68,7 @@ export const caseStudies: CaseStudy[] = [
     slug: 'zenon',
     name: 'Zenon',
     category: 'SaaS',
-    image: '/images/Tf9L4582eDStTX4KSFaUOoUP5Ys.png',
+    image: '/images/Tf9L4582eDStTX4KSFaUOoUP5Ys.webp',
     tagline: 'Automating lead routing and deal workflows for a fast-growing SaaS company.',
     year: '2026',
     timeframe: '8 Weeks',
@@ -83,37 +83,14 @@ export const caseStudies: CaseStudy[] = [
     ],
     review: {
       quote:
-        "AIthor killed two of our pet projects and saved us a fortune. Honest advice we couldn't get internally.",
+        "Logitech Consultants killed two of our pet projects and saved us a fortune. Honest advice we couldn't get internally.",
       name: 'Lucas Bennett',
       role: 'CEO & Founder',
     },
     metric: { value: '14h', label: 'Hours Saved Weekly' },
   },
-  {
-    slug: 'formix',
-    name: 'Formix',
-    category: 'Services',
-    image: '',
-    tagline: 'Automating data entry and reporting workflows for a professional services firm.',
-    year: '2026',
-    timeframe: '5 Weeks',
-    challenge:
-      "Formix's back-office team was buried in manual data entry across client spreadsheets, invoices, and internal systems. Errors crept into reports, and month-end close took days of re-checking the same numbers by hand.",
-    build:
-      'We built a document pipeline that reads incoming files, extracts the fields that matter, and writes them straight into the right systems with validation at every step. Reports assemble themselves from live data, and anomalies are flagged before they reach a client.',
-    outcome: [
-      { value: '20h', label: 'Weekly Hours Saved' },
-      { value: '-94%', label: 'Data Entry Errors' },
-    ],
-    review: {
-      quote:
-        'The month-end close that used to take days now takes an afternoon. The numbers are just right the first time.',
-      name: 'James Okafor',
-      role: 'Implementation Engineer',
-    },
-    metric: { value: '20h', label: 'Weekly Hours Saved' },
-  },
 ]
+
 
 export interface BlogPost {
   slug: string
@@ -133,7 +110,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Getting Your Data AI-Ready, Without the Big Project',
     category: 'Guides',
     date: 'Jun 24, 2026',
-    image: '/images/vl5w99JCKqkuvW49lyswomsyhnY.png',
+    image: '/images/vl5w99JCKqkuvW49lyswomsyhnY.webp',
     author: 'Sara Vance',
     role: 'Client Success Lead',
     excerpt:
@@ -152,7 +129,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Buy, Build, or Wait: A Simpler Way to Decide',
     category: 'AI Strategy',
     date: 'Jun 24, 2026',
-    image: '/images/WZnkJ0N8GjD8YGH73bVRdcc9tvI.png',
+    image: '/images/WZnkJ0N8GjD8YGH73bVRdcc9tvI.webp',
     author: 'Lena Hoffmann',
     role: 'Automation Architect',
     excerpt:
@@ -172,7 +149,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Your Tools Already Talk. You Don\u2019t Have To.',
     category: 'Automation',
     date: 'Jun 24, 2026',
-    image: '/images/Eu8lb04bFCoyCpFuitulq7gxSfM.png',
+    image: '/images/Eu8lb04bFCoyCpFuitulq7gxSfM.webp',
     author: 'Marcus Elliot',
     role: 'AI Strategy Lead',
     excerpt:
@@ -204,6 +181,51 @@ export const blogPosts: BlogPost[] = [
   },
 ]
 
+// Contact details shown on the Contact page and footer. This is the static
+// fallback when the CMS is unreachable; the live value syncs from the CMS
+// `contact-info` global when VITE_CMS_URL is configured (see src/lib/cms.ts).
+export const contactInfo = {
+  email: 'hello@logitechconsultants.com',
+  phone: '+254112292847',
+  address: '51 Lenana Road Nairobi, Nairobi, 00100 Kenya',
+}
+
+// FAQ accordion items (Contact page). Static fallback; the live value syncs
+// from the CMS `faqs` global when VITE_CMS_URL is configured.
+// Question text is stored WITHOUT the "01/" numbering prefix — the FAQ
+// component renders the numbered prefix automatically so static and CMS
+// content stay consistent.
+export const faqs = [
+  {
+    q: 'What does Logitech Consultants actually do?',
+    a: "We're a full-service AI agency. We find where AI creates value, build the automations, agents, and tools to capture it, then train your team to run them.",
+  },
+  {
+    q: 'How do I get started?',
+    a: 'Book a free discovery call. We\u2019ll discuss your goals, identify where AI can make an impact, and outline a plan\u2014no commitment required.',
+  },
+  {
+    q: 'How long until we see results?',
+    a: 'Most clients see their first automation live within 2 weeks. Our pilot program is designed to deliver a measurable win in 2\u20134 weeks.',
+  },
+  {
+    q: 'What if a pilot doesn\u2019t work out?',
+    a: "We build in stages and validate at each step. If a pilot isn't delivering value, we stop and find a better approach. Your investment is focused on what works.",
+  },
+  {
+    q: 'Do we need technical staff on our side?',
+    a: 'No. We handle the technical build. Your team just needs to know their workflows, and we train them to run the systems we build.',
+  },
+  {
+    q: 'Who owns the systems and data?',
+    a: 'You own everything. Our builds are fully documented, run on your infrastructure, and never lock you into proprietary tools.',
+  },
+  {
+    q: 'What tools and models do you work with?',
+    a: 'We work across all major AI platforms, LLMs, and automation tools. We choose the right stack for your specific use case, not a one-size-fits-all solution.',
+  },
+]
+
 export const aboutValues = [
   { title: 'Results Over Hype', description: 'Outcomes you can measure, not vague AI promises.' },
   { title: 'Built to Last', description: 'Systems that keep working long after we hand off.' },
@@ -214,12 +236,15 @@ export const aboutValues = [
 ]
 
 export const team = [
-  { name: 'Lena Hoffmann', role: 'Automation Architect' },
-  { name: 'Marcus Elliot', role: 'AI Strategy Lead' },
-  { name: 'Sara Vance', role: 'Client Success Lead' },
-  { name: 'James Okafor', role: 'Implementation Engineer' },
+  { name: 'John', role: 'Automation Architect' },
+  { name: 'Samuel', role: 'AI Strategy Lead' },
+  { name: 'Kenei', role: 'Client Success Lead' },
+  { name: 'Emmanuel', role: 'Implementation Engineer' },
 ]
 
+// Careers — reserved for future job advertisements. The section is currently
+// hidden from the site (AboutPage no longer renders it); re-enable by adding
+// the section back and mapping over this array.
 export const careers = [
   { title: 'Growth Strategist', dept: 'Strategy', type: 'Remote', hours: 'Part-time' },
   { title: 'Client Success Manager', dept: 'Operations', type: 'Remote', hours: 'Full-time' },
@@ -228,5 +253,4 @@ export const careers = [
   { title: 'Automation Engineer', dept: 'Engineering', type: 'Remote', hours: 'Full-time' },
 ]
 
-export const buyTemplateUrl =
-  'https://buy.polar.sh/polar_cl_nr5ULzxyEoO9oJcPXT0o7Vt9uB5JAFfpZAdI32zPzUt'
+
