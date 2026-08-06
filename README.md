@@ -164,10 +164,12 @@ and the CMS (`cms/`). Deploy them separately.
    | `BLOB_READ_WRITE_TOKEN` | Vercel Blob token — enables image uploads in the admin panel |
    | `CORS_ORIGINS` | Your site's origin, e.g. `https://your-site.vercel.app` |
 
-4. After first deploy, run the seed once against production (from `cms/`) to load
-   the initial content + admin user:
+4. After first deploy, run the database migration **first** to create the schema
+   (Payload does not auto-create tables in production), then the seed to load
+   the initial content + admin user (both from `cms/`):
 
    ```bash
+   DATABASE_URL=<prod-postgres-url> PAYLOAD_SECRET=<prod-secret> npm run migrate
    DATABASE_URL=<prod-postgres-url> PAYLOAD_SECRET=<prod-secret> \
    SEED_ADMIN_PASSWORD=<strong-password> npm run seed
    ```

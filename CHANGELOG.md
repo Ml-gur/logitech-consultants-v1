@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Payload DB migrations were untracked — production deploy blocker** (2026-08-06
+  daily triage): `cms/src/migrations/` (generated after the previous commit) was
+  never committed, and Payload does **not** auto-create tables in production —
+  the schema comes from `payload migrate`, which reads those files. A fresh
+  Neon/Vercel database would have been empty and the documented "seed once
+  against production" step would have failed. Fixed: migrations tracked in git,
+  `migrate` npm script added to `cms/package.json`, and the deploy guides
+  (`README.md` + `cms/README.md`) now run `npm run migrate` **before** `npm run
+  seed`. Verified end-to-end: migration applied to a scratch Postgres 16
+  container (all 21 tables created), then `npm run seed` against that schema
+  succeeded (4 posts, 3 case studies, contact-info + faqs globals, admin user);
+  CMS `next build` clean; full E2E suite 60/60.
+
 ### Added
 - **Payload CMS (`cms/`) — full content management for blog + contact details**
   (2026-08-05, operator request: "create an admin CMS for managing blogs and

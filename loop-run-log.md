@@ -58,4 +58,17 @@ Append one entry per run. Prune entries older than 30 days.
 }
 ```
 
+```json
+{
+  "run_id": "2026-08-06T11:15:00Z",
+  "pattern": "daily-triage (manual continue)",
+  "duration_s": 2400,
+  "items_found": 1,
+  "actions_taken": 1,
+  "escalations": 0,
+  "tokens_estimate": 30000,
+  "outcome": "fix-proposed"
+}
+```
+
 <!-- Loop appends below this line -->

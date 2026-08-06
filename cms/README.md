@@ -56,8 +56,21 @@ Environment variables (Vercel Project Settings → Environment Variables):
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob token — enables media uploads in the admin panel (serverless filesystems are read-only). |
 | `CORS_ORIGINS` | Comma-separated site origins, e.g. `https://logitechconsultants.com` (plus `http://localhost:3000` for local testing against the deployed CMS). |
 
-After first deploy, run the seed once against production to load the initial
-content and admin user:
+After first deploy, run the database migration **first** to create the schema
+(Payload does not auto-create tables in production — the committed migrations in
+`src/migrations/` define it):
+
+```bash
+# from cms/
+DATABASE_URL=<prod-postgres-url> PAYLOAD_SECRET=<prod-secret> npm run migrate
+```
+
+> Note: `npm run migrate` targets the **production Postgres** database. Local
+> dev (SQLite) auto-creates the schema via Payload's push-mode, so migrations
+> are never run against the dev database.
+
+Then run the seed once against production to load the initial content and admin
+user:
 
 ```bash
 # from cms/

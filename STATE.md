@@ -1,7 +1,28 @@
 # Loop State — My Project
 
-Last run: 2026-08-05 (operator: install+adapt taste-skill for any agent, invoke
-playwright, fully interact + develop the site)
+Last run: 2026-08-06 (daily triage: untracked Payload migrations = deploy blocker,
+now tracked + migrate script + docs, validated on real Postgres 16)
+
+## 2026-08-06 — Daily triage: production DB migrations were missing from git
+
+- Triage found `cms/src/migrations/` **untracked** (generated 22:46 after the
+  22:16 deploy commit) — the ONLY uncommitted work on main. Deploy blocker:
+  Payload does not auto-create tables in production; the schema comes from
+  `payload migrate`, which reads those files. The README's "seed once against
+  production" step would have failed on an empty Neon DB.
+- Verified the migration is valid on the real target adapter: applied it to a
+  scratch `postgres:16-alpine` container → all 21 tables created → ran
+  `npm run seed` against that migrated schema → full success (4 posts, 3 case
+  studies, contact-info + faqs globals, admin user). The earlier SQLite migrate
+  failure (`db.execute is not a function`) was expected — the migration is
+  Postgres-flavored (serial/jsonb/ENUM) and SQLite dev uses push-mode, not
+  migrations.
+- Fix (one fix per run): `git add cms/src/migrations/` + new `migrate` script in
+  `cms/package.json` + deploy docs (`README.md`, `cms/README.md`) now run
+  `npm run migrate` BEFORE `npm run seed` on production.
+- Verified: `npm run migrate` via the new script (Postgres container) ✓, CMS
+  `next build` ✓, site typecheck ✓, full E2E suite 60/60 ✓, no lingering
+  preview server. Committed locally (no push).
 
 ## High Priority (loop is acting or waiting on human)
 

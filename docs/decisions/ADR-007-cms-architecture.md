@@ -51,6 +51,10 @@ service with a bundled static fallback:
   otherwise keeps the original client-only behavior.
 - **Seed script (`cms/src/seed.ts`)** imports the existing site content
   (posts, contact, FAQs) and creates the admin user; idempotent.
+- **DB migrations (`cms/src/migrations/`) are committed to git.** Payload does
+  not auto-create tables in production, so the first deploy to a fresh Neon DB
+  must run `npm run migrate` (new script) **before** `npm run seed` — see
+  `cms/README.md`. Local SQLite dev uses push-mode and never runs migrations.
 
 ### Notes / deviations
 - The native Payload `slug` field type currently builds a broken query with the
