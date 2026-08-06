@@ -193,6 +193,20 @@ now tracked + migrate script + docs, validated on real Postgres 16)
 - `npm run test:e2e` — 28/28 green (22 desktop + 6 mobile), typecheck + build
   green. `playwright-report/` + `test-results/` gitignored. README updated.
 
+## 2026-08-06 round 2 — GitHub Action: automatic CMS migrations
+
+- Operator: "Add a GitHub Action that runs `payload migrate` automatically
+  before CMS deploys".
+- New `.github/workflows/cms-migrate.yml`: on push to `main` touching `cms/**`
+  (or manual `workflow_dispatch`) → `npm ci` + `npm run migrate` against the
+  production DB using repo secrets `CMS_DATABASE_URL` + `CMS_PAYLOAD_SECRET`
+  (fail-fast validation step if unset; concurrency guard to serialize runs).
+  Optional `VERCEL_CMS_DEPLOY_HOOK_URL` step POSTs the Vercel Deploy Hook
+  AFTER migrate succeeds for strict migrate-then-deploy ordering (docs explain
+  the Ignored Build Step needed to avoid double deploys).
+- Docs: `README.md` + `cms/README.md` (secrets table + ordering caveat),
+  CHANGELOG. YAML validated. Committed locally `33fbf22` (no push).
+
 ## Watch List
 
 - Uncommitted changes (awaiting human approval): FAQ, Blog, Pricing, `src/index.css`
