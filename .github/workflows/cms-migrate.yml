@@ -1,0 +1,79 @@
+# CMS database migrations
+#
+# Runs `payload migrate` against the production database whenever CMS code or
+# migrations change on main.
+#
+# Required repo secrets (Settings → Secrets and variables → Actions):
+#   CMS_DATABASE_URL   Production Postgres connection string (Neon, postgres://…)
+#   CMS_PAYLOAD_SECRET Must match the CMS project's PAYLOAD_SECRET on Vercel
+#
+# Ordering vs. Vercel's Git auto-deploy: the push trigger starts migrate at
+# roughly the same time Vercel begins building, so it does NOT strictly run
+# "before" the deploy — on a fresh database the CMS could boot and error on
+# missing tables for the minute or two until migrate finishes. For strict
+# migrate-then-deploy ordering, set VERCEL_CMS_DEPLOY_HOOK_URL below AND add
+# an Ignored Build Step to the CMS Vercel project that skips git-triggered
+# builds (deploy via the hook only) — otherwise every push triggers two
+# deploys.
+#
+# Optional — strict "migrate then deploy" ordering:
+#   VERCEL_CMS_DEPLOY_HOOK_URL  A Vercel Deploy Hook for the CMS project. When
+#   set, the workflow POSTs to it AFTER migrations succeed, so the CMS deploy
+#   only starts once the schema is up to date.
+
+name: CMS database migrations
+
+on:
+  push:
+    branches: [main]
+    # Only run when the CMS (or its migrations) actually changed.
+    paths:
+      - 'cms/**'
+      - '.github/workflows/cms-migrate.yml'
+  workflow_dispatch:
+
+# One migrate at a time — two parallel runs would race on the same database.
+concurrency:
+  group: cms-migrate
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: Run payload migrate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cms
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: cms/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate secrets are configured
+        env:
+          CMS_DATABASE_URL: ${{ secrets.CMS_DATABASE_URL }}
+          CMS_PAYLOAD_SECRET: ${{ secrets.CMS_PAYLOAD_SECRET }}
+        run: |
+          test -n "$CMS_DATABASE_URL" || { echo '::error::CMS_DATABASE_URL secret is not set. Add it under Settings → Secrets and variables → Actions.'; exit 1; }
+          test -n "$CMS_PAYLOAD_SECRET" || { echo '::error::CMS_PAYLOAD_SECRET secret is not set. Add it under Settings → Secrets and variables → Actions.'; exit 1; }
+
+      - name: Run database migrations
+        env:
+          DATABASE_URL: ${{ secrets.CMS_DATABASE_URL }}
+          PAYLOAD_SECRET: ${{ secrets.CMS_PAYLOAD_SECRET }}
+        run: npm run migrate
+
+      - name: Trigger Vercel CMS deploy (optional — only when the hook secret is set)
+        if: ${{ secrets.VERCEL_CMS_DEPLOY_HOOK_URL != '' }}
+        env:
+          VERCEL_CMS_DEPLOY_HOOK_URL: ${{ secrets.VERCEL_CMS_DEPLOY_HOOK_URL }}
+        run: curl -fsS -o /dev/null -X POST "$VERCEL_CMS_DEPLOY_HOOK_URL"

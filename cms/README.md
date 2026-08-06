@@ -56,9 +56,30 @@ Environment variables (Vercel Project Settings → Environment Variables):
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob token — enables media uploads in the admin panel (serverless filesystems are read-only). |
 | `CORS_ORIGINS` | Comma-separated site origins, e.g. `https://logitechconsultants.com` (plus `http://localhost:3000` for local testing against the deployed CMS). |
 
-After first deploy, run the database migration **first** to create the schema
-(Payload does not auto-create tables in production — the committed migrations in
-`src/migrations/` define it):
+#### Automatic migrations (recommended)
+
+A GitHub Action (`.github/workflows/cms-migrate.yml`) runs `npm run migrate`
+against the production database automatically on every push to `main` that
+changes `cms/` — the schema is always ready when the CMS deploy starts. Add
+these repository secrets (Settings → Secrets and variables → Actions):
+
+| Secret | Value |
+|---|---|
+| `CMS_DATABASE_URL` | The production `postgres://…` connection string |
+| `CMS_PAYLOAD_SECRET` | Must match the Vercel `PAYLOAD_SECRET` above |
+
+Optionally set `VERCEL_CMS_DEPLOY_HOOK_URL` (a Vercel Deploy Hook for the CMS
+project) and the workflow will trigger the CMS deploy **after** migrations
+succeed — strict migrate-then-deploy ordering. For that strict ordering, also
+add an **Ignored Build Step** to the CMS Vercel project that skips git-triggered
+builds (deploy via the hook only); otherwise each push triggers both Vercel's
+auto-deploy and the hook deploy.
+
+#### Manual migration (first deploy / fallback)
+
+If you prefer to migrate by hand, run the database migration **first** to
+create the schema (Payload does not auto-create tables in production — the
+committed migrations in `src/migrations/` define it):
 
 ```bash
 # from cms/

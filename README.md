@@ -164,9 +164,17 @@ and the CMS (`cms/`). Deploy them separately.
    | `BLOB_READ_WRITE_TOKEN` | Vercel Blob token — enables image uploads in the admin panel |
    | `CORS_ORIGINS` | Your site's origin, e.g. `https://your-site.vercel.app` |
 
-4. After first deploy, run the database migration **first** to create the schema
-   (Payload does not auto-create tables in production), then the seed to load
-   the initial content + admin user (both from `cms/`):
+4. **Migrations run automatically** — a GitHub Action
+   (`.github/workflows/cms-migrate.yml`) executes `npm run migrate` against the
+   production database on every push to `main` that changes `cms/`. Add these
+   repo secrets so it can connect: `CMS_DATABASE_URL` (the production
+   `postgres://…` URL) and `CMS_PAYLOAD_SECRET` (must match the Vercel
+   `PAYLOAD_SECRET`). Optionally add `VERCEL_CMS_DEPLOY_HOOK_URL` to make the
+   workflow trigger the CMS deploy only after migrations succeed.
+
+   Alternatively, migrate by hand on first deploy (Payload does not
+   auto-create tables in production), then run the seed once to load the
+   initial content + admin user (both from `cms/`):
 
    ```bash
    DATABASE_URL=<prod-postgres-url> PAYLOAD_SECRET=<prod-secret> npm run migrate

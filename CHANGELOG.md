@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **GitHub Action: automatic CMS migrations** (`.github/workflows/cms-migrate.yml`, 2026-08-06):
+  runs `npm run migrate` against the production Postgres database on every push
+  to `main` that changes `cms/` (or on manual `workflow_dispatch`), so the
+  schema is always ready before the CMS deploys. Uses repo secrets
+  `CMS_DATABASE_URL` + `CMS_PAYLOAD_SECRET` (with a fail-fast check that both
+  are configured); optional `VERCEL_CMS_DEPLOY_HOOK_URL` triggers the Vercel
+  CMS deploy only after migrations succeed. Documented in `README.md` +
+  `cms/README.md`.
+
 ### Fixed
 - **Payload DB migrations were untracked — production deploy blocker** (2026-08-06
   daily triage): `cms/src/migrations/` (generated after the previous commit) was
