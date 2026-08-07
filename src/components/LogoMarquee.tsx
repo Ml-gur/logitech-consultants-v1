@@ -2,9 +2,58 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 
+/**
+ * "Trusted by teams" logo strip — infinite marquee (kept as-is: 28s linear
+ * loop, grayscale monochrome treatment per operator, fade edges).
+ *
+ * Logos are real brand marks, transparent SVGs (no background):
+ *  - Tech / AI:  Claude, OpenAI, LangChain, n8n, Zapier, Docker, Stripe,
+ *    Notion, HubSpot (Simple Icons)
+ *  - Agriculture: John Deere, Bayer, Syngenta, Corteva, CNH Industrial,
+ *    BASF, Nutrien, Kubota (official vector wordmarks, Wikimedia Commons)
+ *
+ * Company names are also exposed as visually-hidden text for screen readers
+ * and SEO (the repeated decorative <img>s keep alt="" so brands aren't
+ * announced six times).
+ */
 const logos = [
-  { src: '/images/Sy5KWX2qzve6uVKx4PA8RCd4A.svg', width: 124 },
-  { src: '/images/ThiPMi5yUjVdKo6t4N9wLOgcQ.svg', width: 168 },
+  { src: '/images/logos/claude.svg', width: 36, height: 36 },
+  { src: '/images/logos/openai.svg', width: 36, height: 36 },
+  { src: '/images/logos/langchain.svg', width: 36, height: 36 },
+  { src: '/images/logos/n8n.svg', width: 36, height: 36 },
+  { src: '/images/logos/zapier.svg', width: 36, height: 36 },
+  { src: '/images/logos/docker.svg', width: 36, height: 36 },
+  { src: '/images/logos/stripe.svg', width: 36, height: 36 },
+  { src: '/images/logos/notion.svg', width: 36, height: 36 },
+  { src: '/images/logos/hubspot.svg', width: 36, height: 36 },
+  { src: '/images/logos/johndeere.svg', width: 36, height: 36 },
+  { src: '/images/logos/bayer.svg', width: 40, height: 40 },
+  { src: '/images/logos/basf.svg', width: 96, height: 34 },
+  { src: '/images/logos/syngenta.svg', width: 100, height: 33 },
+  { src: '/images/logos/corteva.svg', width: 148, height: 31 },
+  { src: '/images/logos/cnh-industrial.svg', width: 100, height: 32 },
+  { src: '/images/logos/nutrien.svg', width: 144, height: 33 },
+  { src: '/images/logos/kubota.svg', width: 142, height: 32 },
+]
+
+const brandNames = [
+  'Claude',
+  'OpenAI',
+  'LangChain',
+  'n8n',
+  'Zapier',
+  'Docker',
+  'Stripe',
+  'Notion',
+  'HubSpot',
+  'John Deere',
+  'Bayer',
+  'BASF',
+  'Syngenta',
+  'Corteva',
+  'CNH Industrial',
+  'Nutrien',
+  'Kubota',
 ]
 
 export default function LogoMarquee() {
@@ -16,6 +65,10 @@ export default function LogoMarquee() {
       <div className="max-w-[1400px] mx-auto px-10 max-md:px-4 mb-8">
         <p className="text-xs text-[#4f4f4f] uppercase tracking-[0.15em]">
           Trusted by teams shipping AI that works
+        </p>
+        {/* Visually-hidden brand names for screen readers / SEO */}
+        <p className="sr-only">
+          {brandNames.join(', ')}
         </p>
       </div>
 
@@ -32,14 +85,16 @@ export default function LogoMarquee() {
           {[...items, ...items].map((logo, i) => (
             <div
               key={i}
-              className="shrink-0 flex items-center justify-center opacity-40 grayscale hover:opacity-80 hover:grayscale-0 transition-all duration-300"
+              className="shrink-0 flex items-center justify-center opacity-40 grayscale hover:opacity-90 transition-all duration-300"
             >
               <img
                 src={logo.src}
                 alt=""
                 width={logo.width}
-                height={logo.width / 4}
-                className="object-contain"
+                height={logo.height}
+                decoding="async"
+                draggable={false}
+                className="object-contain select-none"
               />
             </div>
           ))}

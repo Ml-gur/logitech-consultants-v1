@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Real brand logos in the "Trusted by teams" marquee** (`src/components/LogoMarquee.tsx`, 2026-08-07):
+  replaced the two template placeholder lockups with 17 real, background-free brand
+  SVG marks — Claude, OpenAI, LangChain, n8n, Zapier, Docker, Stripe, Notion,
+  HubSpot (Simple Icons) and John Deere, Bayer, Syngenta, Corteva, CNH Industrial,
+  BASF, Nutrien, Kubota (official vector wordmarks from Wikimedia Commons) — stored
+  in `public/images/logos/`. The 28s infinite marquee (framer-motion
+  `x: ['0%','-50%']`, duplicated items, fade edges, reduced-motion fallback) is
+  unchanged; logos render monochrome via the existing `grayscale` treatment per
+  operator choice. Company names are also exposed as visually-hidden (`sr-only`)
+  text for screen readers and SEO while the repeated decorative images keep
+  `alt=""`.
+
+### Fixed
 - **GitHub Action: automatic CMS migrations** (`.github/workflows/cms-migrate.yml`, 2026-08-06):
   runs `npm run migrate` against the production Postgres database on every push
   to `main` that changes `cms/` (or on manual `workflow_dispatch`), so the
