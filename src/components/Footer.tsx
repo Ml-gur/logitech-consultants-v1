@@ -58,15 +58,11 @@ export default function Footer() {
         </motion.div>
 
         <div className="border-t border-black/10 pt-10 grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
-          {/* Brand — operator-provided logo lockup */}
+          {/* Brand — text wordmark (image logo removed, 2026-08-10) */}
           <div>
-            <img
-              src="/images/logitech-logo.png"
-              alt="Logitech Consultants"
-              width={128}
-              height={132}
-              className="h-[40px] sm:h-[44px] w-auto"
-            />
+            <p className="font-['Halant'] text-2xl font-semibold tracking-[-0.02em] text-[#0a0a0a]">
+              Logitech<span className="text-[#ff3700]">.</span> Consultants
+            </p>
             <p className="text-xs text-[#4f4f4f] mt-2 max-w-xs">
               Strategy, automations, custom agents, and the support to keep them running.
             </p>

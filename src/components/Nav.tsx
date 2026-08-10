@@ -39,15 +39,12 @@ export default function Nav() {
       )}
     >
       <div className="max-w-[1400px] mx-auto px-4 sm:px-10 h-[76px] flex items-center justify-between">
-        {/* Logo — operator-provided lockup, 3x retina asset (public/images/logitech-logo.png) */}
+        {/* Text wordmark — image logo removed (operator request, 2026-08-10) */}
         <Link to="/" className="flex items-center min-h-[44px]" aria-label="Logitech Consultants home">
-          <img
-            src="/images/logitech-logo.png"
-            alt=""
-            width={128}
-            height={132}
-            className="h-[32px] sm:h-[36px] w-auto select-none"
-          />
+          <span className="font-['Halant'] text-[22px] sm:text-[24px] font-semibold leading-none tracking-[-0.02em] text-[#0a0a0a] select-none">
+            Logitech<span className="text-[#ff3700]">.</span>
+            <span className="hidden sm:inline">{" "}Consultants</span>
+          </span>
         </Link>
 
         {/* Desktop nav */}

@@ -27,7 +27,10 @@ const BUDGETS = {
   ttfb: 600, // ms
   totalSize: 1.5 * 1024 * 1024, // 1.5MB total transfer
   jsSize: 500 * 1024, // 500KB JS transfer
-  imageCount: 25,
+  // 30 (was 25): the trusted-by marquee now renders 17 real brand logos
+  // (commit 2b9f10c), up from the 2 template lockups the original 25 budget
+  // assumed. The site logo <img> removal (2026-08-10) keeps the count at 29.
+  imageCount: 30,
 }
 
 /** Install Web Vitals collectors (LCP, CLS, INP event-timing) on every load. */

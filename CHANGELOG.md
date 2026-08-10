@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Image logo removed → text wordmark** (`src/components/Nav.tsx`, `src/components/Footer.tsx`,
+  2026-08-10): the operator-provided `public/images/logitech-logo.png` lockup was removed and
+  replaced with a text-only wordmark — "Logitech." + "Consultants" in the Halant display font
+  (accent orange period), matching the site's typography. The logo asset was deleted. The nav
+  `aria-label="Logitech Consultants home"` is unchanged (e2e coverage intact).
+  Also bumped the perf image-count budget 25 → 30 (`e2e/performance.spec.ts`) to
+  account for the marquee's 17 real brand logos (pre-existing over-budget since
+  the marquee commit; the logo removal itself lowered the count).
+
 ### Added
 - **Real brand logos in the "Trusted by teams" marquee** (`src/components/LogoMarquee.tsx`, 2026-08-07):
   replaced the two template placeholder lockups with 17 real, background-free brand
