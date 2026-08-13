@@ -13,15 +13,8 @@ const navLinks = [
 ]
 
 export default function Nav() {
-  const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const { pathname } = useLocation()
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
 
   // Close the mobile menu on navigation
   useEffect(() => {
@@ -30,25 +23,23 @@ export default function Nav() {
 
   return (
     <motion.header
-      initial={{ y: -20, opacity: 0 }}
+      initial={{ y: -24, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#f0f0f0]',
-        scrolled ? 'border-b border-black/[0.06]' : 'border-b border-transparent'
-      )}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed top-4 inset-x-0 z-50 px-4"
     >
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-10 h-[76px] flex items-center justify-between">
-        {/* Text wordmark — image logo removed (operator request, 2026-08-10) */}
-        <Link to="/" className="flex items-center min-h-[44px]" aria-label="Logitech Consultants home">
-          <span className="font-['Halant'] text-[22px] sm:text-[24px] font-semibold leading-none tracking-[-0.02em] text-[#0a0a0a] select-none">
-            Logitech<span className="text-[#ff3700]">.</span>
+      {/* Floating nav pill — 60px radius, Carbon fill, 1px white-alpha border */}
+      <div className="mx-auto max-w-[1100px] rounded-[60px] bg-[#191919] border border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.45)] px-3 sm:px-5 h-14 sm:h-16 flex items-center justify-between">
+        {/* Text wordmark — violet dot replaces the old orange mark */}
+        <Link to="/" className="flex items-center min-h-[44px] pl-2 sm:pl-3" aria-label="Logitech Consultants home">
+          <span className="font-display text-[18px] sm:text-[20px] font-medium leading-none tracking-[-0.02em] text-paper select-none">
+            Logitech<span className="text-signal">.</span>
             <span className="hidden sm:inline">{" "}Consultants</span>
           </span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-8" aria-label="Primary">
+        <nav className="hidden md:flex items-center gap-1" aria-label="Primary">
           {navLinks.map((link) => (
             <NavLink
               key={link.label}
@@ -56,8 +47,8 @@ export default function Nav() {
               end={link.to === '/'}
               className={({ isActive }) =>
                 cn(
-                  'group relative text-sm py-[12px] transition-colors duration-200',
-                  isActive ? 'text-[#0a0a0a]' : 'text-[#4f4f4f] hover:text-[#0a0a0a]'
+                  'group relative text-sm py-[12px] px-4 rounded-full transition-colors duration-200',
+                  isActive ? 'text-paper' : 'text-ash hover:text-paper'
                 )
               }
             >
@@ -66,7 +57,7 @@ export default function Nav() {
                   {link.label}
                   <span
                     className={cn(
-                      'absolute left-0 -bottom-0.5 h-px w-full origin-left bg-[#ff3700] transition-transform duration-300 ease-out',
+                      'absolute left-4 right-4 -bottom-0.5 h-px origin-left bg-signal transition-transform duration-300 ease-out',
                       isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                     )}
                   />
@@ -77,21 +68,21 @@ export default function Nav() {
 
           <Link
             to="/contact"
-            className="inline-flex items-center gap-2 px-6 py-[12px] rounded-[50px] bg-[#151619] text-[#f0f0f0] text-sm font-medium transition-all duration-200 hover:bg-[#0a0a0a] hover:-translate-y-0.5"
+            className="ml-3 inline-flex items-center gap-2 px-5 py-3 rounded-[30px] bg-[#405bff] text-white text-sm font-medium transition-colors duration-200 hover:bg-[#3351e6]"
           >
-            Book a call
+            Get a demo
           </Link>
         </nav>
 
         {/* Mobile toggle */}
         <button
-          className="md:hidden flex items-center justify-center w-11 h-11 rounded-xl text-[#0a0a0a] hover:bg-black/5 transition-colors"
+          className="md:hidden flex items-center justify-center w-11 h-11 rounded-full text-ash hover:text-paper hover:bg-white/5 transition-colors"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileOpen}
           aria-controls="mobile-menu"
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             {mobileOpen ? (
               <path d="M18 6L6 18M6 6l12 12" />
             ) : (
@@ -101,15 +92,18 @@ export default function Nav() {
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu — carbon dropdown matching the pill */}
       <motion.div
         id="mobile-menu"
         initial={false}
         animate={{ height: mobileOpen ? 'auto' : 0, opacity: mobileOpen ? 1 : 0 }}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        className="md:hidden overflow-hidden bg-[#f0f0f0] border-t border-black/[0.06]"
+        className="md:hidden overflow-hidden mx-auto max-w-[1100px]"
       >
-        <nav className="px-4 py-4 flex flex-col" aria-label="Mobile">
+        <nav
+          className="mt-2 rounded-[30px] bg-[#191919] border border-white/10 px-4 py-4 flex flex-col"
+          aria-label="Mobile"
+        >
           {navLinks.map((link) => (
             <NavLink
               key={link.label}
@@ -117,13 +111,13 @@ export default function Nav() {
               end={link.to === '/'}
               className={({ isActive }) =>
                 cn(
-                  'flex items-center justify-between py-3.5 text-sm border-b border-black/5 transition-colors',
-                  isActive ? 'text-[#0a0a0a]' : 'text-[#4f4f4f] hover:text-[#0a0a0a]'
+                  'flex items-center justify-between py-3.5 text-sm border-b border-white/5 transition-colors',
+                  isActive ? 'text-paper' : 'text-ash hover:text-paper'
                 )
               }
             >
               {link.label}
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-signal">
                 <path d="M6 3l5 5-5 5" />
               </svg>
             </NavLink>
@@ -131,9 +125,9 @@ export default function Nav() {
           <div className="flex flex-col gap-3 pt-4">
             <Link
               to="/contact"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-[50px] bg-[#151619] text-[#f0f0f0] text-sm font-medium"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-[30px] bg-[#405bff] text-white text-sm font-medium"
             >
-              Book a call
+              Get a demo
             </Link>
           </div>
         </nav>

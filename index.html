@@ -7,20 +7,42 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
     <link rel="apple-touch-icon" href="/favicon-64.png" />
-    <!-- Preload the critical display + body fonts: the hero h1 (Halant 600) is
+    <!-- Preload the critical display + body fonts: the hero h1 (Inter 500) is
          the LCP element; fetching fonts during HTML parse removes them from the
          text-paint critical path (measured 2026-08-05, performance pass). -->
-    <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/cdAe8hgZ1cMyLu9g005pAW3xMo.woff2" />
-    <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/4RAEQdEOrcnDkhHiiCbJOw92Lk.woff2" />
-    <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/gyByhwUxId8gMEwcGFU.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/5A3Ce6C9YYmCjpQx9M4inSaKU.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/5vvr9Vy74if2I6bQbJvbw7SY1pQ.woff2" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0e0e0e" />
+    <!-- SEO baseline (index.html is served for every route before JS runs;
+         per-route title/description/canonical/OG are applied at runtime by
+         src/lib/Seo.tsx, and Googlebot reads the rendered DOM). -->
+    <title>Logitech Consultants – AI Automation Agency</title>
+    <meta name="description" content="AI automation agency: we find where AI creates real value, build the automations and agents to capture it, and make sure they keep working long after the engagement ends." />
+    <link rel="canonical" href="https://logitechconsultants.com/" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Logitech Consultants – AI Automation Agency" />
-    <meta property="og:description" content="Logitech Consultants finds where AI creates real value, builds it properly, and makes sure it keeps working long after the engagement ends." />
+    <meta property="og:description" content="AI automation agency: we find where AI creates real value, build the automations and agents to capture it, and make sure they keep working long after the engagement ends." />
+    <meta property="og:url" content="https://logitechconsultants.com/" />
+    <meta property="og:image" content="https://logitechconsultants.com/og-image.png" />
+    <meta property="og:site_name" content="Logitech Consultants" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Logitech Consultants – AI Automation Agency" />
-    <meta name="twitter:description" content="Logitech Consultants finds where AI creates real value, builds it properly, and makes sure it keeps working long after the engagement ends." />
-    <title>Logitech Consultants – AI Automation Agency</title>
+    <meta name="twitter:description" content="AI automation agency: we find where AI creates real value, build the automations and agents to capture it, and make sure they keep working long after the engagement ends." />
+    <meta name="twitter:image" content="https://logitechconsultants.com/og-image.png" />
+    <!-- Organization structured data (sitewide baseline; route-specific JSON-LD
+         is injected at runtime by Seo.tsx). -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Logitech Consultants",
+        "url": "https://logitechconsultants.com/",
+        "logo": "https://logitechconsultants.com/favicon-64.png",
+        "email": "hello@logitechconsultants.com",
+        "telephone": "+254112292847"
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

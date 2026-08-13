@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useCms } from '../lib/CmsProvider'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
@@ -14,23 +14,33 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <section className="relative">
-      {/* No panel — FAQ sits directly on the page #f0f0f0, rows are #e5e5e5
-          radius-16 cards (measured live on the original, 2026-08-04) */}
-      <div className="section-panel">
-        <div className="section-inner">
-        {/* Two columns: heading left (w≈615), rows right (w≈595), gap 50px */}
-        <div className="grid lg:grid-cols-[1fr_595px] gap-[50px] max-lg:gap-12">
+    <section id="faq" className="relative">
+      <div className="relative max-w-[1200px] mx-auto px-6 py-24 max-md:py-16">
+        <div className="grid lg:grid-cols-[1fr_560px] gap-12 max-lg:gap-10">
           <div className="max-lg:mb-2">
-            <p className="section-label">009/ FAQs</p>
+            <motion.p
+              initial={revealInitial}
+              whileInView={revealWhileInView}
+              viewport={revealViewport}
+              transition={springReveal()}
+              className="section-label"
+            >
+              FAQs
+            </motion.p>
 
-            <h2 className="font-['Halant'] text-[clamp(36px,5vw,64px)] font-semibold leading-tight tracking-tight text-[#0a0a0a]">
+            <motion.h2
+              initial={revealInitial}
+              whileInView={revealWhileInView}
+              viewport={revealViewport}
+              transition={springReveal(0.06)}
+              className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em]"
+            >
               Need answers?
-            </h2>
+            </motion.h2>
           </div>
 
-          {/* Right column — stacked #e5e5e5 radius-16 cards, 10px gap (measured) */}
-          <div className="flex flex-col gap-[10px]">
+          {/* Right column — stacked carbon radius-24 cards */}
+          <div className="flex flex-col gap-3">
             {faqs.map((faq, i) => (
               <motion.div
                 key={i}
@@ -38,22 +48,22 @@ export default function FAQ() {
                 whileInView={revealWhileInView}
                 viewport={revealViewport}
                 transition={springReveal(i * 0.06)}
-                className="rounded-[16px] bg-[#e5e5e5]"
+                className="rounded-[24px] bg-[#191919] border border-white/10"
               >
                 <button
                   onClick={() => setOpenIndex(openIndex === i ? null : i)}
                   aria-expanded={openIndex === i}
                   aria-controls={`faq-panel-${i}`}
-                  className="w-full flex items-center justify-between gap-4 px-5 pt-6 pb-5 text-left"
+                  className="w-full flex items-center justify-between gap-4 px-6 pt-6 pb-5 text-left"
                 >
-                  <span className="text-[20px] font-semibold text-[#0a0a0a] leading-snug">
+                  <span className="text-[16px] font-medium text-paper leading-snug">
                     {numbered(i, faq.q)}
                   </span>
-                  {/* Accent plus icon — two 14x2 bars, #ff3700, radius 10 (measured) */}
+                  {/* Accent plus icon — Signal Violet, rotates 45deg when open */}
                   <motion.svg
                     animate={{ rotate: openIndex === i ? 45 : 0 }}
                     transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                    className="w-[14px] h-[14px] shrink-0 ml-4 text-[#ff3700]"
+                    className="w-[14px] h-[14px] shrink-0 ml-4 text-signal"
                     viewBox="0 0 14 14"
                     fill="none"
                     stroke="currentColor"
@@ -64,27 +74,22 @@ export default function FAQ() {
                     <path d="M7 1v12M1 7h12" />
                   </motion.svg>
                 </button>
-                <AnimatePresence>
-                  {openIndex === i && (
-                    <motion.div
-                      id={`faq-panel-${i}`}
-                      role="region"
-                      aria-label={numbered(i, faq.q)}
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                      className="overflow-hidden"
-                    >
-                      <p className="text-base text-[#4f4f4f] leading-[23.2px] pb-6 px-5">
-                        {faq.a}
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {/* Answer — conditional render (the rotating plus provides the
+                    motion cue; no JS height tween keeps the toggle cheap for
+                    INP) */}
+                {openIndex === i && (
+                  <div
+                    id={`faq-panel-${i}`}
+                    role="region"
+                    aria-label={numbered(i, faq.q)}
+                  >
+                    <p className="text-[15px] text-fog leading-relaxed pb-6 px-6">
+                      {faq.a}
+                    </p>
+                  </div>
+                )}
               </motion.div>
             ))}
-            </div>
           </div>
         </div>
       </div>

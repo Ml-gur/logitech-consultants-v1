@@ -1,248 +1,280 @@
 @import 'tailwindcss';
 
 /* ============================================
-   AIthor Clone — Design System Tokens
-   Extracted from aithor.framer.website
-   IMPORTANT: custom styles live in @layer
-   base/components so Tailwind utilities
-   (in the utilities layer) can override them.
+   Logitech Consultants — Design System
+   Dark "control room" system adopted from the
+   LaunchDarkly-style reference (design.md).
+   Monochromatic-plus-violet: Midnight canvas,
+   Carbon surfaces, Signal Violet + Voltage Blue
+   accents, pill radii, glow-based elevation.
    ============================================ */
 
+@theme {
+  /* Colors — design.md tokens */
+  --color-signal: #7084ff;        /* Signal Violet — accent, hero line 2, links */
+  --color-voltage: #405bff;       /* Voltage Blue — primary CTA fill */
+  --color-plasma: #3dd6f5;        /* Plasma Cyan — sparing radial warmth */
+  --color-midnight: #0e0e0e;      /* Midnight Ink — page canvas */
+  --color-carbon: #191919;        /* Carbon — nav pill, cards, footer */
+  --color-smoke: #2c2c2c;         /* Smoke — list dividers, dense rows */
+  --color-graphite: #414042;      /* Graphite — card borders, elevated panels */
+  --color-steel: #58595b;         /* Steel — input borders, inactive fields */
+  --color-slate: #6d6e71;         /* Slate — muted helper text */
+  --color-fog: #a7a9ac;           /* Fog — secondary text, placeholders */
+  --color-ash: #d1d3d4;           /* Ash — tertiary text, icons */
+  --color-paper: #ffffff;         /* Paper — primary text, white panels */
+
+  /* Gradient — the brand's electronic pulse (179deg #405bff → #7084ff) */
+  --color-signal-gradient: linear-gradient(179deg, #405bff 1.06%, #7084ff 123.42%);
+
+  /* Typography — Inter (design.md substitute #1) + JetBrains Mono */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Type scale (design.md) */
+  --text-caption: 12px;
+  --text-body-sm: 14px;
+  --text-body: 16px;
+  --text-subheading: 20px;
+  --text-heading-sm: 24px;
+  --text-heading: 36px;
+  --text-heading-lg: 66px;
+  --text-display: 100px;
+
+  /* Radii — pill language */
+  --radius-card: 30px;      /* cards, tags, buttons */
+  --radius-tag: 30px;
+  --radius-button: 30px;
+  --radius-pill: 60px;      /* nav pill + full-width pill containers */
+  --radius-input: 10px;     /* form fields */
+
+  /* Elevation — glow, not drop shadow */
+  --shadow-nav: 0 4px 20px rgba(0, 0, 0, 0.45);            /* floating nav pill */
+  --shadow-glow-strong: 0 0 40px rgba(64, 91, 255, 0.25);  /* hero form halo */
+  --shadow-glow-soft: 0 0 32px rgba(112, 132, 255, 0.19);  /* card glow */
+  --shadow-glow-faint: 0 0 24px rgba(112, 132, 255, 0.12); /* hover lift */
+}
+
 @layer base {
-  /* Font-face declarations for self-hosted fonts */
+  /* Self-hosted fonts — Inter (400/500/600/700) + JetBrains Mono (400/500) */
   @font-face {
-    font-family: 'Halant';
-    font-weight: 300;
+    font-family: 'Inter';
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/5vvr9Vy74if2I6bQbJvbw7SY1pQ.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/5A3Ce6C9YYmCjpQx9M4inSaKU.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-weight: 600;
     font-style: normal;
     font-display: swap;
     src: url('/fonts/A0Wcc7NgXMjUuFdquHDrIZpzZw0.woff2') format('woff2');
   }
   @font-face {
-    font-family: 'Halant';
+    font-family: 'Inter';
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    src: url('/fonts/1K3W8DizY3v4emK8Mb08YHxTbs.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'JetBrains Mono';
     font-weight: 400;
     font-style: normal;
     font-display: swap;
-    src: url('/fonts/yDtI2UI8XcEg1W2je9XPN3Noo.woff2') format('woff2');
+    src: url('/fonts/jetbrains-mono-latin-400-normal.woff2') format('woff2');
   }
   @font-face {
-    font-family: 'Halant';
+    font-family: 'JetBrains Mono';
     font-weight: 500;
     font-style: normal;
     font-display: swap;
-    src: url('/fonts/4RAEQdEOrcnDkhHiiCbJOw92Lk.woff2') format('woff2');
-  }
-  @font-face {
-    font-family: 'Halant';
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
-    src: url('/fonts/cdAe8hgZ1cMyLu9g005pAW3xMo.woff2') format('woff2');
-  }
-  @font-face {
-    font-family: 'Halant';
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-    src: url('/fonts/CfMzU8w2e7tHgF4T4rATMPuWosA.woff2') format('woff2');
-  }
-
-  @font-face {
-    font-family: 'Geist';
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-    src: url('/fonts/gyByhwUxId8gMEwcGFU.woff2') format('woff2');
-  }
-  @font-face {
-    font-family: 'Geist';
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-    src: url('/fonts/gyByhwUxId8gMEwcGFU.woff2') format('woff2');
-  }
-  @font-face {
-    font-family: 'Geist';
-    font-weight: 400;
-    font-style: italic;
-    font-display: swap;
-    src: url('/fonts/gyB8hwUxId8gMEwZKFeHPw.woff2') format('woff2');
-  }
-  @font-face {
-    font-family: 'Geist';
-    font-weight: 700;
-    font-style: italic;
-    font-display: swap;
-    src: url('/fonts/gyB8hwUxId8gMEwZKFqHP7Tc.woff2') format('woff2');
-  }
-
-  @font-face {
-    font-family: 'Fragment Mono';
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-    src: url('/fonts/4iCr6K5wfMRRjxp0DA6-2CLnB45HhrUI.woff2') format('woff2');
+    src: url('/fonts/jetbrains-mono-latin-500-normal.woff2') format('woff2');
   }
 
   :root {
-    /* Light theme — extracted from aithor.framer.website (measured live) */
-    --color-bg-page: #f0f0f0;        /* page background (sections sit transparent on it) */
-    --color-bg-card: #e5e5e5;        /* cards/rows on the page */
-    --color-bg-card-light: #f0f0f0;  /* lighter card surfaces (pricing outer) */
-    --color-bg-dark: #151619;        /* dark accent (pricing, why-us col, process step, nav pill) */
-    --color-bg-dark-deep: #0a0a0a;   /* text / deep accents */
-    --color-bg-darkest: #1c1c1c;     /* buy-template block */
-    --color-accent: #ff3700;
-    --color-accent-orange: rgb(255, 55, 0);
-    --color-text-primary: #0a0a0a;
-    --color-text-on-dark: #f0f0f0;
-    --color-text-muted: #4f4f4f;
-    --color-text-muted-dark: #999;
-    --color-border: rgba(0, 0, 0, 0.07);
-    --color-border-card: rgba(0, 0, 0, 0.06);
-    --color-border-dark: rgba(255, 255, 255, 0.15);
-    --color-link: #0099ff;
-    --color-overlay-dark: rgba(0, 0, 0, 0.2);
-    --color-status-green: #168804;
-    --color-status-teal: #063630;
-
-    --font-display: 'Halant', 'Halant Placeholder', sans-serif;
-    --font-body: 'Geist', 'Inter', sans-serif;
-    --font-mono: 'Fragment Mono', monospace;
-
-    --section-padding: 100px 40px;
-    /* Mobile gutter 20px total (panel 10 + inner 10). Measured live on the
-       original at 390px: cards sit at L=20 / R=370 (W=350) — a 20px gutter,
-       NOT 15px per layer. The previous 15+15=30px made every card 330px
-       wide (10px narrower each side) vs the original's 350px. */
-    --section-padding-mobile: 80px 10px;
-    --radius-panel: 50px;
-    --radius-card: 16px;
-    --radius-button: 50px;
-    --radius-badge: 20px;
+    color-scheme: dark;
   }
 
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
-    /* Prevent horizontal pan on iOS Safari: body-only overflow-x is not
-       enough there (marquee rows are ~2000px wide); html must clip too. */
+    /* Prevent horizontal pan on iOS Safari (marquee rows are wide) */
     overflow-x: hidden;
   }
 
   body {
-    font-family: var(--font-body);
+    font-family: var(--font-sans);
     font-size: 16px;
     line-height: 1.5;
-    color: var(--color-text-primary);
-    background: var(--color-bg-page);
+    color: var(--color-paper);
+    background: var(--color-midnight);
     overflow-x: hidden;
   }
 
-  h2 {
+  h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1.1;
     letter-spacing: -0.02em;
+    color: var(--color-paper);
+    text-wrap: balance;
   }
 
-  /* Designed keyboard focus rings (premium bar) — accent #ff3700, offset 3px, follows element radius */
+  ::selection {
+    background: rgba(112, 132, 255, 0.35);
+    color: var(--color-paper);
+  }
+
+  /* Designed keyboard focus rings — Signal Violet, follows element radius */
   :focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid var(--color-signal);
     outline-offset: 3px;
+    border-radius: 4px;
   }
   :focus:not(:focus-visible) {
     outline: none;
   }
+
+  /* Dark scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-graphite) transparent;
+  }
 }
 
 @layer components {
-  /* Section wrappers — transparent over the page #f0f0f0.
-     Measured live 2026-08-04 (verified-scroll pixel ground truth): the original
-     has NO full-bleed #e5e5e5 section panels. Every section sits directly on the
-     page background; #e5e5e5 appears only on individual cards/rows inside.
-     Grid rule (from the live site):
-     - wrapper: full-bleed with padding 0 40px (15px on mobile)
-     - inner: max-width 1400px, margin auto, padding 100px 40px
-     => content lands at L=80 / R=1360 at 1440px, matching the original */
-  .section-panel {
-    border-radius: var(--radius-panel);
-    overflow: hidden;
-    position: relative;
-    padding: 0 40px;
-  }
-
-  /* Retained for API compat — both are transparent (sections sit on page #f0f0f0) */
-  .section-panel-dark,
-  .section-panel-light {
-    background-color: transparent;
-    color: var(--color-text-primary);
-  }
-
-  .section-inner {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: var(--section-padding);
-    position: relative;
-    z-index: 2;
-  }
-
-  .glow-orange {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background: radial-gradient(42.6% 50% at 50% 100%, var(--color-accent) 0%, rgba(0, 0, 0, 0.1) 100%);
-    border-radius: var(--radius-panel);
-  }
-
-  .container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 40px;
-  }
-
+  /* Uppercase eyebrow labels — wide tracking (design.md letter-spacing 0.129-0.167em) */
   .section-label {
-    font-family: var(--font-body);
-    font-size: 11.2px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
+    color: var(--color-fog);
     margin-bottom: 12px;
   }
 
-  /* Pricing card hover — soft layered shadow, bg stays #151619 (measured live
-     on the original 2026-08-04: no bg change, only a soft shadow appears) */
-  .pricing-card {
-    transition: box-shadow 0.25s ease;
-  }
-  .pricing-card:hover {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 8px 16px rgba(0, 0, 0, 0.08), 0 20px 40px rgba(0, 0, 0, 0.07);
+  /* Ambient violet glow — radial wash behind hero text / cards */
+  .glow-violet {
+    position: absolute;
+    pointer-events: none;
+    background: radial-gradient(50% 55% at 50% 100%, rgba(64, 91, 255, 0.35) 0%, rgba(112, 132, 255, 0.08) 45%, transparent 100%);
   }
 
-}
+  .glow-violet-center {
+    position: absolute;
+    pointer-events: none;
+    background: radial-gradient(45% 45% at 50% 40%, rgba(64, 91, 255, 0.28) 0%, rgba(112, 132, 255, 0.06) 55%, transparent 100%);
+  }
 
-@media (max-width: 768px) {
+  /* Hairline border — 1px white-alpha on near-black */
+  .hairline {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Primary action — Voltage Blue is the only correct CTA fill */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: var(--radius-button);
+    background: var(--color-voltage);
+    color: var(--color-paper);
+    font-weight: 500;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+  .btn-primary:hover {
+    background: #3351e6; /* slightly deeper blue on hover */
+  }
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  /* Ghost / outlined action — Signal Violet echo of the primary CTA */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: var(--radius-button);
+    border: 1px solid var(--color-signal);
+    color: var(--color-signal);
+    background: transparent;
+    font-weight: 500;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .btn-ghost:hover {
+    background: rgba(112, 132, 255, 0.1);
+  }
+  .btn-ghost:active {
+    transform: scale(0.98);
+  }
+
+  /* Dark form field — Carbon fill, Steel border, 10px radius */
+  .input-dark {
+    width: 100%;
+    border-radius: var(--radius-input);
+    background: var(--color-carbon);
+    border: 1px solid var(--color-steel);
+    color: var(--color-paper);
+    /* 16px — under this, iOS Safari zooms the page on focus (mobile tap UX) */
+    font-size: 16px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .input-dark::placeholder {
+    color: var(--color-steel);
+  }
+  .input-dark:focus {
+    outline: none;
+    border-color: var(--color-signal);
+    box-shadow: 0 0 0 3px rgba(112, 132, 255, 0.2);
+  }
+
+  /* Dark card — Carbon fill, hairline border, 30px radius, soft glow hover */
+  .card-dark {
+    border-radius: var(--radius-card);
+    background: var(--color-carbon);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  }
+  .card-dark:hover {
+    border-color: rgba(112, 132, 255, 0.35);
+    box-shadow: var(--shadow-glow-faint);
+  }
+
+  /* Pill tag — 30px radius, Carbon fill, hairline */
+  .tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: var(--radius-tag);
+    background: var(--color-carbon);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-fog);
+  }
+
+  /* Container — design.md page max-width 1200px */
   .container {
-    padding: 0 15px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
   }
-  .section-panel {
-    padding: 0 10px;
-  }
-  .section-inner {
-    padding: var(--section-padding-mobile);
-  }
-}
-
-/* Safe areas (notch / home indicator) */
-body {
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-}
-
-footer {
-  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* Lenis smooth scroll */
@@ -295,4 +327,14 @@ html.lenis body {
   .animate-marquee-vertical {
     animation: none;
   }
+}
+
+/* Safe areas (notch / home indicator) */
+body {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+footer {
+  padding-bottom: env(safe-area-inset-bottom);
 }

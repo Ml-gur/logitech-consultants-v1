@@ -3,18 +3,9 @@
 import { motion, useReducedMotion } from 'framer-motion'
 
 /**
- * "Trusted by teams" logo strip — infinite marquee (kept as-is: 28s linear
- * loop, grayscale monochrome treatment per operator, fade edges).
- *
- * Logos are real brand marks, transparent SVGs (no background):
- *  - Tech / AI:  Claude, OpenAI, LangChain, n8n, Zapier, Docker, Stripe,
- *    Notion, HubSpot (Simple Icons)
- *  - Agriculture: John Deere, Bayer, Syngenta, Corteva, CNH Industrial,
- *    BASF, Nutrien, Kubota (official vector wordmarks, Wikimedia Commons)
- *
- * Company names are also exposed as visually-hidden text for screen readers
- * and SEO (the repeated decorative <img>s keep alt="" so brands aren't
- * announced six times).
+ * "Trusted by teams" logo strip — infinite marquee. Logos render as quiet
+ * white silhouettes (brightness-0 invert) at ~70% opacity on the dark canvas,
+ * no boxes or borders (design.md Logo Strip).
  */
 const logos = [
   { src: '/images/logos/claude.svg', width: 36, height: 36 },
@@ -37,23 +28,8 @@ const logos = [
 ]
 
 const brandNames = [
-  'Claude',
-  'OpenAI',
-  'LangChain',
-  'n8n',
-  'Zapier',
-  'Docker',
-  'Stripe',
-  'Notion',
-  'HubSpot',
-  'John Deere',
-  'Bayer',
-  'BASF',
-  'Syngenta',
-  'Corteva',
-  'CNH Industrial',
-  'Nutrien',
-  'Kubota',
+  'Claude', 'OpenAI', 'LangChain', 'n8n', 'Zapier', 'Docker', 'Stripe', 'Notion', 'HubSpot',
+  'John Deere', 'Bayer', 'BASF', 'Syngenta', 'Corteva', 'CNH Industrial', 'Nutrien', 'Kubota',
 ]
 
 export default function LogoMarquee() {
@@ -61,21 +37,19 @@ export default function LogoMarquee() {
   const items = [...logos, ...logos, ...logos]
 
   return (
-    <section className="relative overflow-hidden bg-[#f0f0f0] py-14 max-md:py-10">
-      <div className="max-w-[1400px] mx-auto px-10 max-md:px-4 mb-8">
-        <p className="text-xs text-[#4f4f4f] uppercase tracking-[0.15em]">
+    <section className="relative overflow-hidden py-14 max-md:py-10 border-y border-white/5">
+      <div className="max-w-[1200px] mx-auto px-6 mb-8">
+        <p className="text-center text-xs text-fog uppercase tracking-[0.14em]">
           Trusted by teams shipping AI that works
         </p>
         {/* Visually-hidden brand names for screen readers / SEO */}
-        <p className="sr-only">
-          {brandNames.join(', ')}
-        </p>
+        <p className="sr-only">{brandNames.join(', ')}</p>
       </div>
 
       <div className="relative">
-        {/* Fade edges */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#f0f0f0] to-transparent z-10" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#f0f0f0] to-transparent z-10" />
+        {/* Fade edges — midnight canvas */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#0e0e0e] to-transparent z-10" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#0e0e0e] to-transparent z-10" />
 
         <motion.div
           className="flex items-center gap-16 w-max"
@@ -85,7 +59,7 @@ export default function LogoMarquee() {
           {[...items, ...items].map((logo, i) => (
             <div
               key={i}
-              className="shrink-0 flex items-center justify-center opacity-40 grayscale hover:opacity-90 transition-all duration-300"
+              className="shrink-0 flex items-center justify-center opacity-70 brightness-0 invert hover:opacity-100 transition-opacity duration-300"
             >
               <img
                 src={logo.src}

@@ -2,18 +2,19 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Lenis from 'lenis'
+import Seo, { siteLd } from '../lib/Seo'
 import Hero from '../components/Hero'
 import LogoMarquee from '../components/LogoMarquee'
-import Services from '../components/Services'
-import Benefits from '../components/Benefits'
-import Process from '../components/Process'
-import CaseStudies from '../components/CaseStudies'
-import WhyUs from '../components/WhyUs'
-import Testimonials from '../components/Testimonials'
+import TabbedFeatures from '../components/TabbedFeatures'
+import CodeIntegration from '../components/CodeIntegration'
 import Metrics from '../components/Metrics'
+import CaseStudies from '../components/CaseStudies'
+import Testimonials from '../components/Testimonials'
+import WhyUs from '../components/WhyUs'
+import Process from '../components/Process'
+import ResourceCards from '../components/ResourceCards'
 import Pricing from '../components/Pricing'
 import FAQ from '../components/FAQ'
-import Blog from '../components/Blog'
 
 export default function HomePage() {
   const lenisRef = useRef<Lenis | null>(null)
@@ -54,18 +55,24 @@ export default function HomePage() {
 
   return (
     <>
+      <Seo
+        title="AI Automation Agency"
+        description="AI automation agency: we find where AI creates real value, build the automations and agents to capture it, and keep them working long after handoff."
+        path="/"
+        jsonLd={[siteLd()]}
+      />
       <Hero />
       <LogoMarquee />
-      <Services />
-      <Benefits />
-      <Process />
-      <CaseStudies />
-      <WhyUs />
-      <Testimonials />
+      <TabbedFeatures />
+      <CodeIntegration />
       <Metrics />
+      <CaseStudies />
+      <Testimonials />
+      <WhyUs />
+      <Process />
+      <ResourceCards />
       <Pricing />
       <FAQ />
-      <Blog />
     </>
   )
 }

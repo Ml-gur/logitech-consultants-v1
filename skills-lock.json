@@ -1,6 +1,24 @@
 {
   "version": 1,
   "skills": {
+    "content-optimization": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "skillPath": "skills/seo/content/content-optimization/SKILL.md",
+      "computedHash": "bc1b64cdd23120a2e20a817552133b2b760ae24cf6535b1abb7f2b3be4550537"
+    },
+    "image-optimization": {
+      "source": "aj-geddes/useful-ai-prompts",
+      "sourceType": "github",
+      "skillPath": "skills/image-optimization/SKILL.md",
+      "computedHash": "edc3d87e2c423d75b6ead9735dfb9f2cacd779887a23cf7f4c5f896c8782a702"
+    },
+    "mobile-responsiveness": {
+      "source": "hoodini/ai-agents-skills",
+      "sourceType": "github",
+      "skillPath": "skills/mobile-responsiveness/SKILL.md",
+      "computedHash": "d40ffbede786927da70723ebd4bfd332505d04f495e7e75ab4b6651a13006a62"
+    },
     "payload": {
       "source": "payloadcms/payload",
       "sourceType": "github",
@@ -12,6 +30,42 @@
       "sourceType": "github",
       "skillPath": "playwright-best-practices/SKILL.md",
       "computedHash": "7eb144f734450fee649dc1d209114775ddda07cbf45be84fe969d3d4f3971dce"
+    },
+    "refero-design": {
+      "source": "referodesign/refero_skill",
+      "sourceType": "github",
+      "skillPath": "skills/refero-design/SKILL.md",
+      "computedHash": "b39b8c1f87664b1b63c50f5e2bbe7586b08790101920c96d9bbf75fc3a2d5a61"
+    },
+    "review-image": {
+      "source": "mizchi/skills",
+      "sourceType": "github",
+      "skillPath": "ai/review-image/SKILL.md",
+      "computedHash": "dac2463bcdc529b8ef160a716f65dc16dfc574a5a792711c778cedb6fa91d8e0"
+    },
+    "screenshot-critique": {
+      "source": "dzhng/skills",
+      "sourceType": "github",
+      "skillPath": "skills/visual/screenshot-critique/SKILL.md",
+      "computedHash": "ac59faa72e14ef9089f2a6a10472235ef392d1ff0643874917e7c5badab9718d"
+    },
+    "seeing-images": {
+      "source": "oaustegard/claude-skills",
+      "sourceType": "github",
+      "skillPath": "seeing-images/SKILL.md",
+      "computedHash": "e10e3dd9eafc4421aae4231fb614175d8979ddafa2cd5581a1cc87fe2636e101"
+    },
+    "seo-specialist": {
+      "source": "borghei/claude-skills",
+      "sourceType": "github",
+      "skillPath": "marketing/seo-specialist/SKILL.md",
+      "computedHash": "bd5f226a35acdcfe03e10507e3705d4edecf37ae477cac4063797c3aa5d1ab50"
+    },
+    "visual-content": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "skillPath": "skills/content/visual-content/SKILL.md",
+      "computedHash": "448ce5819574c9120dece89031c805c028551f573d3118f263100238a7bbe796"
     }
   }
 }

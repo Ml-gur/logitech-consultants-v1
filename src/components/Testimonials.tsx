@@ -45,23 +45,31 @@ const testimonials = [
 
 function ReviewCard({ quote, name, role, avatar }: (typeof testimonials)[number]) {
   return (
-    <figure className="group relative w-[320px] max-md:w-[280px] cursor-pointer overflow-hidden rounded-[16px] bg-[#e5e5e5] p-5 transition-colors duration-300">
-      <div className="flex flex-row items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-full overflow-hidden bg-[#e5e5e5] ring-1 ring-black/5 shrink-0">
+    <figure className="group relative w-[320px] max-md:w-[280px] overflow-hidden rounded-[20px] bg-[#191919] border border-white/10 p-5 transition-colors duration-300 hover:border-signal/40">
+      <svg
+        className="w-5 h-5 text-signal/40 mb-4"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        aria-hidden
+      >
+        <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151C7.545 6.068 5.982 8.789 5.982 11H10v10H0z" />
+      </svg>
+      <blockquote className="text-sm text-fog leading-relaxed mb-6">
+        {quote}
+      </blockquote>
+      <div className="flex flex-row items-center gap-3">
+        <div className="w-10 h-10 rounded-full overflow-hidden ring-1 ring-white/10 shrink-0">
           <img className="w-full h-full object-cover" width="40" height="40" alt="" src={avatar} />
         </div>
         <div className="flex flex-col">
-          <figcaption className="text-sm font-medium text-[#0a0a0a]">
+          <figcaption className="text-sm font-medium text-paper">
             {name}
           </figcaption>
-          <p className="text-xs text-[#4f4f4f]">
+          <p className="text-xs text-fog">
             {role}
           </p>
         </div>
       </div>
-      <blockquote className="text-sm text-[#4f4f4f] leading-relaxed">
-        {quote}
-      </blockquote>
     </figure>
   )
 }
@@ -72,51 +80,49 @@ export default function Testimonials() {
 
   return (
     <section className="relative">
-      <div className="section-panel section-panel-light" style={{ borderRadius: '50px' }}>
-        <div className="section-inner">
-          <motion.p
-            initial={revealInitial}
-            whileInView={revealWhileInView}
-            viewport={revealViewport}
-            transition={springReveal()}
-            className="section-label"
-          >
-            007/ Our Clients
-          </motion.p>
+      <div className="relative max-w-[1200px] mx-auto px-6 py-24 max-md:py-16">
+        <motion.p
+          initial={revealInitial}
+          whileInView={revealWhileInView}
+          viewport={revealViewport}
+          transition={springReveal()}
+          className="section-label"
+        >
+          Testimonials
+        </motion.p>
 
-          <motion.h2
-            initial={revealInitial}
-            whileInView={revealWhileInView}
-            viewport={revealViewport}
-            transition={springReveal(0.08)}
-            className="font-['Halant'] text-[clamp(36px,5vw,64px)] font-semibold leading-tight tracking-tight text-[#0a0a0a] mb-16"
-          >
-            What our clients say.
-          </motion.h2>
+        <motion.h2
+          initial={revealInitial}
+          whileInView={revealWhileInView}
+          viewport={revealViewport}
+          transition={springReveal(0.08)}
+          className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] mb-16"
+        >
+          What our clients say.
+        </motion.h2>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={revealViewport}
-            transition={{ duration: 0.6 }}
-            className="relative flex w-full flex-col items-center justify-center overflow-hidden"
-          >
-            <Marquee pauseOnHover className="[--duration:35s] [--gap:16px]">
-              {firstRow.map((review) => (
-                <ReviewCard key={review.name} {...review} />
-              ))}
-            </Marquee>
-            <Marquee reverse pauseOnHover className="mt-6 [--duration:35s] [--gap:16px]">
-              {secondRow.map((review) => (
-                <ReviewCard key={review.name} {...review} />
-              ))}
-            </Marquee>
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={revealViewport}
+          transition={{ duration: 0.6 }}
+          className="relative flex w-full flex-col items-center justify-center overflow-hidden"
+        >
+          <Marquee pauseOnHover className="[--duration:35s] [--gap:16px]">
+            {firstRow.map((review) => (
+              <ReviewCard key={review.name} {...review} />
+            ))}
+          </Marquee>
+          <Marquee reverse pauseOnHover className="mt-6 [--duration:35s] [--gap:16px]">
+            {secondRow.map((review) => (
+              <ReviewCard key={review.name} {...review} />
+            ))}
+          </Marquee>
 
-            {/* Fade edges */}
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-[#f0f0f0] to-transparent" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-[#f0f0f0] to-transparent" />
-          </motion.div>
-        </div>
+          {/* Fade edges */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-[#0e0e0e] to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-[#0e0e0e] to-transparent" />
+        </motion.div>
       </div>
     </section>
   )

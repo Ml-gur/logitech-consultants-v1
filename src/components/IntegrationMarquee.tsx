@@ -174,9 +174,9 @@ const ROW2: Glyph[] = [Chrome, Claude, Codepen, N8n, Dribbble, Framer, Gitlab, H
 
 function Logo({ Icon }: { Icon: Glyph }) {
   return (
-    <div className="h-11 w-11 shrink-0 rounded-[15px] bg-[#e5e5e5] border border-black/10 flex items-center justify-center transition-transform hover:scale-110 cursor-pointer">
-      <div className="h-9 w-9 rounded-[10px] bg-[#f0f0f0] flex items-center justify-center">
-        <Icon className="h-5 w-5 text-zinc-800" />
+    <div className="h-11 w-11 shrink-0 rounded-[15px] bg-[#f4f4f6] border border-black/10 flex items-center justify-center transition-transform hover:scale-110 cursor-pointer">
+      <div className="h-9 w-9 rounded-[10px] bg-white flex items-center justify-center">
+        <Icon className="h-5 w-5 text-zinc-600" />
       </div>
     </div>
   )
@@ -199,16 +199,16 @@ function LogoRow({ icons, reverse = false }: { icons: Glyph[]; reverse?: boolean
           </div>
         ))}
       </div>
-      {/* Edge fades — match the light panel #e5e5e5 */}
-      <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-[#e5e5e5] to-transparent pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-[#e5e5e5] to-transparent pointer-events-none" />
+      {/* Edge fades — match the white product panel */}
+      <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-white to-transparent pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent pointer-events-none" />
     </div>
   )
 }
 
 export default function IntegrationMarquee() {
   return (
-    <div className="h-[190px] rounded-[16px] bg-[#e5e5e5] p-4 border border-black/5 flex flex-col justify-center gap-3 overflow-hidden">
+    <div className="h-full rounded-[12px] bg-white p-3 flex flex-col justify-center gap-3 overflow-hidden">
       <LogoRow icons={ROW1} reverse />
       <LogoRow icons={ROW2} />
     </div>

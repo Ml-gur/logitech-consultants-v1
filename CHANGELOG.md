@@ -7,6 +7,92 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Full SEO + content optimization pass** (2026-08-13, operator: "push to
+  github but ensure full audit, SEO optimization… install relevant skill for
+  SEO optimization and content management"). Skills installed (locked in
+  `skills-lock.json`): `seo-specialist` (borghei/claude-skills) +
+  `content-optimization` (kostja94/marketing-skills). Audited with a new
+  `scripts/probe-seo-audit.mjs` against the built site; the site is a
+  client-rendered Vite SPA with a single static meta set, so the fixes are:
+  - **Per-route head manager** `src/lib/Seo.tsx` — sets title (≤60 chars,
+    brand suffix dropped when it would overflow the SERP limit), meta
+    description, canonical, Open Graph, Twitter cards, and JSON-LD on every
+    route change (Googlebot renders JS and reads the final DOM).
+  - **JSON-LD structured data** — Organization (home + static baseline in
+    `index.html`), BreadcrumbList (all listing + detail routes),
+    BlogPosting with Person author (blog posts), Article (case studies),
+    FAQPage (contact FAQs — rich-snippet opportunity), ContactPage.
+  - **`public/robots.txt` + `public/sitemap.xml`** — previously the SPA
+    rewrite returned index.html for these paths (crawlers would parse HTML
+    instead of directives); now real static files. Sitemap covers all 12
+    indexable routes.
+  - **`public/og-image.png`** — branded 1200×630 OG image (dark + violet) so
+    shared links render a preview card.
+  - **Blog article outline** — optional `subheads` (H2 sections) on the
+    BlogPost model, applied to the two longest posts; posts without subheads
+    render flat (backward compatible with CMS content). Descriptive alt text
+    on blog cover images.
+  - Verified: SEO audit all-clear on 12 routes, design + mobile audits pass,
+    full E2E suite **61/61** (blog-post golden regenerated for the new H2
+    outline). Docs: `docs/research/seo-content-optimization.md`.
+
+### Changed
+- **Mobile optimization pass** (2026-08-13, operator: "invoke the skill for
+  mobile optimization"; skill: `mobile-responsiveness`). New
+  `scripts/probe-mobile-audit.mjs` gate (320/360/390/414/768 on all routes):
+  - Inputs bumped to **16px** (hero form, contact form, footer newsletter) —
+    under 16px, iOS Safari zooms the page on focus.
+  - Contact email/phone links + footer nav/legal/social links get full **44px
+    tap targets** via padded focus space (`py-3 -my-3`), layout unchanged.
+  - Segmented service tabs, desktop nav CTA, and code-block language tabs /
+    copy button bumped to 44px hit areas.
+  - Footer brand blurb raised 12px → 14px (design.md body floor).
+  - All checks pass at every tested width/route; full E2E suite green (hero +
+    services goldens regenerated for the input/tab size changes).
+
+### Changed
+- **Full-site redesign to a dark LaunchDarkly-style design system** (2026-08-13,
+  operator request: "improve our website following the instructions the design.md
+  file… audit the full website through that"; design.md is an extracted
+  LaunchDarkly-style reference — also the refero style the operator asked to
+  adopt). Summary:
+  - **Design system** (`src/index.css`): Midnight `#0e0e0e` canvas, Carbon
+    `#191919` surfaces, Signal Violet `#7084ff` + Voltage Blue `#405bff`
+    accents (orange `#ff3700` removed everywhere), `179deg #405bff→#7084ff`
+    glow gradient, 60px nav-pill / 30px card-tag-button / 10px input radii,
+    glow-based elevation, wide-tracked uppercase eyebrows. All tokens exposed
+    as Tailwind v4 `@theme` utilities.
+  - **Typography**: Inter (self-hosted, weights 400/500/600/700 — the font
+    files were always Inter; the old Halant/Geist names were mislabels and the
+    Geist/Fragment-Mono URLs were 404ing) with weight-500 tight headlines
+    (leading 1.0–1.09). JetBrains Mono (400/500) newly self-hosted for SDK
+    names / code / technical identifiers.
+  - **Home page** rebuilt to the design.md anatomy: hero with white/violet
+    split headline ("Move at AI speed. / Stay in control.") + glowing email
+    form, dark logo strip, segmented-tab services (Workflow Automations /
+    Data & Integrations / Business Consulting) with **white product panels**,
+    "Copy, paste, go." code block (Dracula syntax + copy button), metrics,
+    case studies, testimonials, WhyUs, process, 3-column resource cards,
+    pricing (featured tier glows violet), FAQ. Section labels drop the "00X/"
+    numbering. `Services.tsx` + `Benefits.tsx` deleted (superseded by
+    `TabbedFeatures.tsx`; benefits folded into the tab checklists).
+  - **All inner pages** (About, Case Studies, Case Study detail, Blog, Blog
+    post, Contact) re-skinned to the dark system; contact form uses Carbon
+    inputs with violet focus/error states.
+  - **Nav** is now a floating 60px Carbon pill with a Voltage Blue "Get a demo"
+    CTA; footer is a Carbon panel.
+  - **E2E suite** updated to the new design (labels, violet color assertions,
+    exact-match locators, tab-switch chart/marquee coverage, case-insensitive
+    contact/footer matchers) and **all 16 visual goldens regenerated**.
+    Full suite **61/61 green** at `--workers=1` (CI config); typecheck + build
+    clean; axe A/AA clean on all routes; LCP ~0.8s / CLS 0 / INP 32–64ms
+    isolated.
+  - `scripts/design-audit.mjs` added — repeatable design.md compliance probe
+    (pill radii, CTA fill, mono code, zero orange, overflow/console checks)
+    against the production build.
+  - Docs: `docs/decisions/ADR-008-dark-design-system.md`.
+
 ### Changed
 - **Image logo removed → text wordmark** (`src/components/Nav.tsx`, `src/components/Footer.tsx`,
   2026-08-10): the operator-provided `public/images/logitech-logo.png` lockup was removed and

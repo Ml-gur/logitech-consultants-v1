@@ -32,7 +32,7 @@ const columns = [
     items: [
       'Senior team across the full AI stack',
       'Custom-built around your data',
-      '2\u20134 week pilots with clear metrics',
+      '2–4 week pilots with clear metrics',
       'Fully documented, owned by you',
       'Ongoing optimization and support',
     ],
@@ -41,74 +41,90 @@ const columns = [
 
 export default function WhyUs() {
   return (
-    <section className="relative">
-      <div className="section-panel section-panel-light rounded-[50px]">
-        <div className="section-inner">
-          <p className="section-label">006/ Why Us</p>
+    <section id="why-us" className="relative">
+      <div className="relative max-w-[1200px] mx-auto px-6 py-24 max-md:py-16">
+        <motion.p
+          initial={revealInitial}
+          whileInView={revealWhileInView}
+          viewport={revealViewport}
+          transition={springReveal()}
+          className="section-label text-center"
+        >
+          Why Us
+        </motion.p>
 
-          <h2 className="font-['Halant'] text-[clamp(36px,5vw,64px)] font-semibold leading-tight tracking-tight text-[#0a0a0a] text-center max-w-[700px] mx-auto mb-6">
-            AI Partner, Done Right.
-          </h2>
+        <motion.h2
+          initial={revealInitial}
+          whileInView={revealWhileInView}
+          viewport={revealViewport}
+          transition={springReveal(0.06)}
+          className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] text-center max-w-[640px] mx-auto mb-4"
+        >
+          AI partner, done right.
+        </motion.h2>
 
-          <p className="text-base text-[#4f4f4f] text-center max-w-[410px] mx-auto mb-16">
-            The difference between a quick fix and a system that lasts.
-          </p>
+        <motion.p
+          initial={revealInitial}
+          whileInView={revealWhileInView}
+          viewport={revealViewport}
+          transition={springReveal(0.1)}
+          className="text-[17px] text-fog text-center max-w-[440px] mx-auto mb-16"
+        >
+          The difference between a quick fix and a system that lasts.
+        </motion.p>
 
-          {/* Three comparison cards — 2 light + 1 dark (matches the original) */}
-          <div className="grid md:grid-cols-3 gap-[15px]">
-            {columns.map((col, i) => (
-              <motion.div
-                key={col.title}
-                initial={revealInitial}
-                whileInView={revealWhileInView}
-                viewport={revealViewport}
-                transition={springReveal(i * 0.08)}
-                className={`rounded-[16px] p-[25px] flex flex-col ${
-                  col.dark ? 'bg-[#151619]' : 'bg-[#e5e5e5]'
-                }`}
-              >
-                <h3
-                  className={`font-['Halant'] text-2xl font-semibold mb-8 ${
-                    col.dark ? 'text-[#f0f0f0]' : 'text-[#0a0a0a]'
-                  }`}
-                >
-                  {col.title}
-                </h3>
+        {/* Three comparison cards — the featured column glows violet */}
+        <div className="grid md:grid-cols-3 gap-4">
+          {columns.map((col, i) => (
+            <motion.div
+              key={col.title}
+              initial={revealInitial}
+              whileInView={revealWhileInView}
+              viewport={revealViewport}
+              transition={springReveal(i * 0.08)}
+              className={`rounded-[30px] p-7 flex flex-col ${
+                col.dark
+                  ? 'bg-[#191919] border border-signal/40 shadow-[0_0_32px_rgba(112,132,255,0.19)]'
+                  : 'bg-[#121212] border border-white/10'
+              }`}
+            >
+              <h3 className={`text-xl font-medium mb-8 ${col.dark ? 'text-paper' : 'text-ash'}`}>
+                {col.title}
+              </h3>
 
-                <ul className="space-y-4">
-                  {col.items.map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      {/* Light columns: dark-gray X (measured). Dark "Working with Us" column: orange checkmark. */}
-                      <svg
-                        className={`w-4 h-4 mt-0.5 shrink-0 ${
-                          col.dark ? 'text-[#ff3700]' : 'text-black/40'
-                        }`}
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        {col.dark ? (
-                          <path d="M20 6L9 17l-5-5" />
-                        ) : (
-                          <path d="M18 6L6 18M6 6l12 12" />
-                        )}
-                      </svg>
-                      <span
-                        className={`text-sm leading-relaxed ${
-                          col.dark ? 'text-[#999]' : 'text-[#4f4f4f]'
-                        }`}
-                      >
-                        {item}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
+              <ul className="space-y-4">
+                {col.items.map((item) => (
+                  <li key={item} className="flex items-start gap-3">
+                    <svg
+                      className={`w-4 h-4 mt-1 shrink-0 ${
+                        col.dark ? 'text-signal' : 'text-slate'
+                      }`}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden
+                    >
+                      {col.dark ? (
+                        <path d="M20 6L9 17l-5-5" />
+                      ) : (
+                        <path d="M18 6L6 18M6 6l12 12" />
+                      )}
+                    </svg>
+                    <span
+                      className={`text-sm leading-relaxed ${
+                        col.dark ? 'text-fog' : 'text-ash'
+                      }`}
+                    >
+                      {item}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

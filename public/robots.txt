@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+# CMS admin panel is never exposed on this origin; nothing else to block.
+
+Sitemap: https://logitechconsultants.com/sitemap.xml

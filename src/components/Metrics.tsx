@@ -34,9 +34,9 @@ function CountUp({ value, suffix, started }: { value: number; suffix: string; st
   }, [started, value, reduce])
 
   return (
-    <span className="font-['Halant'] text-[56px] leading-[1em] font-semibold tracking-[-0.04em] text-[#0a0a0a]">
+    <span className="font-display text-[44px] leading-[1em] font-medium tracking-[-0.04em] text-paper tabular-nums">
       {display}
-      <span className="text-[#ff3700]">{suffix}</span>
+      <span className="text-signal">{suffix}</span>
     </span>
   )
 }
@@ -51,30 +51,30 @@ function MetricCard({ metric, index }: { metric: (typeof metrics)[number]; index
       initial={{ opacity: 0, y: 40 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={springReveal(index * 0.08)}
-      className="rounded-[16px] border border-black/[0.06] bg-[#f0f0f0] p-6 max-md:p-5"
+      className="card-dark rounded-[30px] p-6 max-md:p-5"
     >
       <div className="mb-5">
         <CountUp value={metric.value} suffix={metric.suffix} started={inView} />
       </div>
 
-      {/* Highlighter segments: 1 orange + 3 gray */}
+      {/* Highlighter segments — 1 violet + 3 hairline */}
       <div className="flex gap-1.5 mb-5">
-        <div className="h-2.5 flex-1 rounded-[13px] bg-[#ff3700]" />
+        <div className="h-2 flex-1 rounded-full bg-gradient-to-r from-[#405bff] to-[#7084ff]" />
         {[0, 1, 2].map((i) => (
-          <div key={i} className="h-2.5 flex-1 rounded-[13px] bg-black/10" />
+          <div key={i} className="h-2 flex-1 rounded-full bg-white/10" />
         ))}
       </div>
 
-      <p className="text-sm text-[#4f4f4f] leading-snug">{metric.label}</p>
+      <p className="text-sm text-fog leading-snug">{metric.label}</p>
     </motion.div>
   )
 }
 
 export default function Metrics() {
   return (
-    <section className="relative bg-[#f0f0f0]">
-      <div className="max-w-[1400px] mx-auto px-10 max-md:px-4 pt-6 pb-0 max-md:pt-4">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-[15px]">
+    <section className="relative">
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {metrics.map((m, i) => (
             <MetricCard key={m.label} metric={m} index={i} />
           ))}

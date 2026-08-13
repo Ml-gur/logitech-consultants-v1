@@ -73,8 +73,13 @@ test('perf: home meets LCP / INP / CLS budgets', async ({ page }) => {
     () => (window as unknown as { __perf: { lcp: number; cls: number; interactions: number[] } }).__perf,
   )
 
-  // Simulate real interactions to measure INP: FAQ accordion toggle (no nav)
-  await page.getByText('009/ FAQs').scrollIntoViewIfNeeded()
+  // Simulate real interactions to measure INP: FAQ accordion toggle (no nav).
+  // Settle first: the long scroll fires one-shot reveal springs (0.7s) and the
+  // metrics count-ups (1.6s); a click landing mid-animation measures scroll
+  // work instead of the interaction itself (measured 416ms vs 112ms
+  // steady-state in 2026-08-13 redesign).
+  await page.getByText('Need answers?').scrollIntoViewIfNeeded()
+  await page.waitForTimeout(1900)
   const faqBtn = page
     .getByRole('button', { name: /01\/ What does Logitech Consultants actually do/i })
     .first()

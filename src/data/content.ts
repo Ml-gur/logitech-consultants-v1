@@ -102,6 +102,10 @@ export interface BlogPost {
   role: string
   excerpt: string
   paragraphs: string[]
+  /** Optional H2 section headings. Each heading introduces the following
+   * paragraphs up to the next heading (or the end). Posts without subheads
+   * render flat. Used for article outline / featured-snippet structure. */
+  subheads?: { heading: string; paragraphs: string[] }[]
 }
 
 export const blogPosts: BlogPost[] = [
@@ -118,10 +122,32 @@ export const blogPosts: BlogPost[] = [
     paragraphs: [
       "There's a myth that before you can use AI, you need a massive data cleanup, a new warehouse, and six months of engineering. For most teams, that's not true. You don't need perfect data everywhere. You need usable data in the specific places you're about to apply AI.",
       "That shift, from boiling the ocean to cleaning one bucket, is what makes the whole thing achievable.",
-      'Start where the AI will actually look. You don\u2019t need every system tidy. You need the data that the automation or agent will touch. If you\u2019re qualifying leads, that\u2019s your lead records. If you\u2019re answering support questions, that\u2019s your help docs and past tickets. Scope the data work to the project in front of you, and the task shrinks from overwhelming to manageable.',
-      'Fix the three things that break AI. In practice, most data problems come down to three issues: duplicates, where the same customer exists three times under slightly different names; gaps, where key fields are empty; and inconsistency, where the same thing is written five different ways. Cleaning up these three in the data the AI will use solves the vast majority of "the AI gave a weird answer" problems before they happen.',
-      'Make it stay clean. A one-time cleanup is worth little if the mess comes straight back. The lasting fix is to tidy the inputs: the form that creates the duplicate, the field that\u2019s allowed to stay empty, the dropdown that should replace the free-text box. Clean the data once, then close the door that let it get messy in the first place.',
-      "Good enough is the goal. AI-ready doesn't mean flawless. It means clean and consistent enough, in the right place, for the job at hand. Aim for that, project by project, and you'll be using AI long before the company that's still planning its perfect data overhaul.",
+    ],
+    subheads: [
+      {
+        heading: 'Start where the AI will actually look',
+        paragraphs: [
+          "You don't need every system tidy. You need the data that the automation or agent will touch. If you're qualifying leads, that's your lead records. If you're answering support questions, that's your help docs and past tickets. Scope the data work to the project in front of you, and the task shrinks from overwhelming to manageable.",
+        ],
+      },
+      {
+        heading: 'Fix the three things that break AI',
+        paragraphs: [
+          'In practice, most data problems come down to three issues: duplicates, where the same customer exists three times under slightly different names; gaps, where key fields are empty; and inconsistency, where the same thing is written five different ways. Cleaning up these three in the data the AI will use solves the vast majority of "the AI gave a weird answer" problems before they happen.',
+        ],
+      },
+      {
+        heading: 'Make it stay clean',
+        paragraphs: [
+          "A one-time cleanup is worth little if the mess comes straight back. The lasting fix is to tidy the inputs: the form that creates the duplicate, the field that's allowed to stay empty, the dropdown that should replace the free-text box. Clean the data once, then close the door that let it get messy in the first place.",
+        ],
+      },
+      {
+        heading: 'Good enough is the goal',
+        paragraphs: [
+          "AI-ready doesn't mean flawless. It means clean and consistent enough, in the right place, for the job at hand. Aim for that, project by project, and you'll be using AI long before the company that's still planning its perfect data overhaul.",
+        ],
+      },
     ],
   },
   {
@@ -137,11 +163,28 @@ export const blogPosts: BlogPost[] = [
     paragraphs: [
       'Every AI decision eventually comes down to three options: buy something off the shelf, build something custom, or wait until the moment is right. Teams get into trouble when they reach for "build" by default, because building feels serious and impressive. Often it\u2019s the slowest, most expensive way to solve a problem that already has a tool.',
       "Here's a cleaner way to choose.",
-      'Buy when the problem is common. If your problem looks like a lot of other companies\u2019 problems, someone has probably already built a good solution for it. Standard support chat, scheduling, transcription, common integrations: these are solved categories. Buying gets you ninety percent of the value in days, not months, and someone else maintains it. The temptation to build a "slightly better" version of an existing tool almost never pays off.',
-      'Build when the edge is yours. Building makes sense when the value comes from something only you have: your data, your specific workflow, your way of doing things. An agent built around your exact process, wired into your exact tools, is something no off-the-shelf product can match, because no off-the-shelf product knows your business. That\u2019s where a custom build earns its cost.',
-      'The test is simple. If the advantage comes from your own data and process, build. If it comes from features anyone could buy, don\u2019t.',
-      'Wait when the cost of being early is high. Sometimes the honest answer is "not yet." If the data isn\u2019t ready, the workflow keeps changing, or the team can\u2019t yet support a new system, waiting a quarter is a strategy, not a failure. Building on an unstable foundation just means rebuilding later.',
-      "Buy what's common, build what's yours, and wait when the timing is wrong. Most expensive AI mistakes come from picking the wrong one of those three, not from picking the wrong model.",
+    ],
+    subheads: [
+      {
+        heading: 'Buy when the problem is common',
+        paragraphs: [
+          "If your problem looks like a lot of other companies' problems, someone has probably already built a good solution for it. Standard support chat, scheduling, transcription, common integrations: these are solved categories. Buying gets you ninety percent of the value in days, not months, and someone else maintains it. The temptation to build a \"slightly better\" version of an existing tool almost never pays off.",
+        ],
+      },
+      {
+        heading: 'Build when the edge is yours',
+        paragraphs: [
+          'Building makes sense when the value comes from something only you have: your data, your specific workflow, your way of doing things. An agent built around your exact process, wired into your exact tools, is something no off-the-shelf product can match, because no off-the-shelf product knows your business. That\u2019s where a custom build earns its cost.',
+          'The test is simple. If the advantage comes from your own data and process, build. If it comes from features anyone could buy, don\u2019t.',
+        ],
+      },
+      {
+        heading: 'Wait when the cost of being early is high',
+        paragraphs: [
+          "Sometimes the honest answer is \"not yet.\" If the data isn't ready, the workflow keeps changing, or the team can't yet support a new system, waiting a quarter is a strategy, not a failure. Building on an unstable foundation just means rebuilding later.",
+          "Buy what's common, build what's yours, and wait when the timing is wrong. Most expensive AI mistakes come from picking the wrong one of those three, not from picking the wrong model.",
+        ],
+      },
     ],
   },
   {

@@ -47,29 +47,19 @@ test('mobile: no console errors', async ({ page }) => {
   expect(errors).toEqual([])
 })
 
-test('mobile: services cards fit the viewport at every common width', async ({ page }) => {
-  // Regression guard for the reported issue: services cards overflowing the
-  // right edge on mobile. Verifies card bounds + document overflow across
-  // phones (320-412), tablets (768) and small desktops (1024).
+test('mobile: services tab control fits the viewport at every common width', async ({ page }) => {
   for (const width of [320, 360, 390, 412, 768, 1024]) {
     await page.setViewportSize({ width, height: 900 })
     await page.goto('/')
-    await page.getByText('002/ Our Services').scrollIntoViewIfNeeded()
+    const section = page.locator('section').filter({ hasText: /Our Services/ }).first()
+    await section.scrollIntoViewIfNeeded()
 
-    const section = page.locator('section').filter({ hasText: /002\/ Our Services/ }).first()
-    const cards = section.locator('.grid > div')
-    expect(await cards.count(), `card count at ${width}px`).toBe(3)
-
-    const bounds = await cards.evaluateAll((els) =>
-      els.map((c) => {
-        const r = c.getBoundingClientRect()
-        return { left: Math.round(r.left), right: Math.round(r.right) }
-      })
-    )
-    for (const b of bounds) {
-      expect(b.left, `left edge at ${width}px`).toBeGreaterThanOrEqual(0)
-      expect(b.right, `right edge at ${width}px`).toBeLessThanOrEqual(width)
-    }
+    const tablist = section.getByRole('tablist')
+    await expect(tablist, `tablist visible at ${width}px`).toBeVisible()
+    const box = await tablist.boundingBox()
+    expect(box, `tablist box at ${width}px`).not.toBeNull()
+    expect(box!.x, `tablist left edge at ${width}px`).toBeGreaterThanOrEqual(0)
+    expect(box!.x + box!.width, `tablist right edge at ${width}px`).toBeLessThanOrEqual(width + 1)
 
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth
@@ -78,32 +68,22 @@ test('mobile: services cards fit the viewport at every common width', async ({ p
   }
 })
 
-test('mobile: services cards are near full-bleed like the original', async ({ page }) => {
-  // Original site at 390px: cards sit at 20px side margins (W=350). The clone
-  // must match — not sit at 30px margins (W=330) like before.
+test('mobile: all three service tabs render and panels switch on tap', async ({ page }) => {
   await page.goto('/')
-  await page.getByText('002/ Our Services').scrollIntoViewIfNeeded()
+  const section = page.locator('section').filter({ hasText: /Our Services/ }).first()
+  await section.scrollIntoViewIfNeeded()
 
-  const section = page.locator('section').filter({ hasText: /002\/ Our Services/ }).first()
-  const box = await section.locator('.grid > div').first().boundingBox()
-  expect(box).not.toBeNull()
-  // 20px gutter + tolerance for rounding
-  expect(box!.x).toBeGreaterThanOrEqual(16)
-  expect(box!.x).toBeLessThanOrEqual(24)
-})
+  await expect(section.getByRole('tab', { name: 'Workflow Automations' })).toBeVisible()
+  await expect(section.getByRole('tab', { name: 'Data & Integrations' })).toBeVisible()
+  await expect(section.getByRole('tab', { name: 'Business Consulting' })).toBeVisible()
 
-test('mobile: services cards stack and marquee renders', async ({ page }) => {
-  await page.goto('/')
-  await page.getByText('002/ Our Services').scrollIntoViewIfNeeded()
-
-  const section = page.locator('section').filter({ hasText: /002\/ Our Services/ }).first()
-  // All three cards visible in a single column on mobile
-  await expect(section.getByText('Workflow Automations')).toBeVisible()
-  await expect(section.getByText('Data & Integrations')).toBeVisible()
-  await expect(section.getByText('Business Consulting')).toBeVisible()
-  // Marquee animates on mobile too
-  const tracks = section.locator('.animate-marquee')
-  expect(await tracks.count()).toBeGreaterThanOrEqual(8)
+  // Marquee animates on mobile too — switch to the Data tab (the panel
+  // mounts after the tab-switch transition, so assert with auto-retry)
+  await section.getByRole('tab', { name: 'Data & Integrations' }).tap()
+  await expect(section.locator('.animate-marquee').first()).toBeVisible()
+  await expect
+    .poll(async () => (await section.locator('.animate-marquee').count()) >= 8)
+    .toBe(true)
 })
 
 test('mobile: nav links and CTA are at least 44px tall', async ({ page }) => {
@@ -117,7 +97,7 @@ test('mobile: nav links and CTA are at least 44px tall', async ({ page }) => {
 
   const cta = page
     .getByRole('navigation', { name: 'Mobile' })
-    .getByRole('link', { name: 'Book a call' })
+    .getByRole('link', { name: 'Get a demo' })
   const ctaBox = await cta.boundingBox()
   expect(ctaBox).not.toBeNull()
   expect(ctaBox!.height).toBeGreaterThanOrEqual(44)
@@ -125,7 +105,7 @@ test('mobile: nav links and CTA are at least 44px tall', async ({ page }) => {
 
 test('mobile: FAQ accordion works on touch', async ({ page }) => {
   await page.goto('/')
-  await page.getByText('009/ FAQs').scrollIntoViewIfNeeded()
+  await page.getByText('Need answers?').scrollIntoViewIfNeeded()
 
   const firstButton = page
     .getByRole('button', { name: /01\/ What does Logitech Consultants actually do/i })

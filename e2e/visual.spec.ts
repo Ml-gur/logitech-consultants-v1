@@ -12,9 +12,6 @@ import { test, expect, Locator, Page } from '@playwright/test'
  * - JS-driven framer-motion reveals are one-shot: we scroll the section (or the
  *   whole page) into view and wait for the 0.7s springs / 1.6s count-ups to
  *   settle before capturing.
- * - The two infinitely-looping framer-motion illustrations inside the Services
- *   cards (chart bars animate `height`, chips spin) cannot be frozen by CSS, so
- *   their fixed-size `mb-6` wrappers are MASKED in the Services golden.
  *
  * Regenerate after an intentional visual change:
  *   npx playwright test e2e/visual.spec.ts --update-snapshots
@@ -27,9 +24,30 @@ async function waitFonts(page: Page) {
   await page.evaluate(() => document.fonts.ready)
 }
 
-/** Scroll a section into view and wait for one-shot reveals/count-ups to settle. */
+/**
+ * Scroll a section into view and wait for one-shot reveals/count-ups to
+ * settle. Hardened against reveal-timing flakiness the same way settleReveals
+ * is: after scrolling, force-fire any reveal still at its hidden state, so a
+ * heavy section elsewhere on the page can't leave a below-fold section
+ * half-revealed at capture time.
+ */
 async function settleSection(page: Page, section: Locator) {
   await waitFonts(page)
+  await section.scrollIntoViewIfNeeded()
+  // Force-fire reveals still at their hidden state (opacity 0 inline style).
+  await page.evaluate(async () => {
+    for (let pass = 0; pass < 4; pass++) {
+      const hidden = Array.from(
+        document.querySelectorAll<HTMLElement>('[style*="opacity"]')
+      ).filter((el) => getComputedStyle(el).opacity === '0')
+      if (hidden.length === 0) break
+      for (const el of hidden) {
+        el.scrollIntoView({ block: 'center' })
+        await new Promise((r) => setTimeout(r, 150))
+      }
+    }
+  })
+  // Back to the section under capture, then let the last springs finish.
   await section.scrollIntoViewIfNeeded()
   await page.waitForTimeout(2000)
 }
@@ -107,22 +125,17 @@ test('visual: home hero section', async ({ page }) => {
 test('visual: home services section', async ({ page }) => {
   await page.goto('/')
   await page.waitForLoadState('networkidle')
-  const services = page.locator('section').filter({ hasText: '002/ Our Services' }).first()
+  const services = page.locator('section').filter({ hasText: 'Our Services' }).first()
   await settleSection(page, services)
-  const cards = services.locator('.grid > div')
-  await expect(services).toHaveScreenshot('home-services.png', {
-    // Mask the infinite framer-motion illustrations (fixed-size mb-6 wrappers):
-    // card 1 chips spin, card 3 chart bars loop. Card 2 is a CSS marquee and is
-    // already frozen by animations:'disabled'.
-    mask: [cards.nth(0).locator('div.mb-6'), cards.nth(2).locator('div.mb-6')],
-    maxDiffPixels: 500,
-  })
+  // Default tab (Workflow Automations) shows a static white product panel —
+  // no infinite illustrations to mask in the default state.
+  await expect(services).toHaveScreenshot('home-services.png', { maxDiffPixels: 500 })
 })
 
 test('visual: home testimonials section', async ({ page }) => {
   await page.goto('/')
   await page.waitForLoadState('networkidle')
-  const testimonials = page.locator('section').filter({ hasText: '007/ Our Clients' }).first()
+  const testimonials = page.locator('section').filter({ hasText: 'What our clients say' }).first()
   await settleSection(page, testimonials)
   await expect(testimonials).toHaveScreenshot('home-testimonials.png', { maxDiffPixels: 500 })
 })
@@ -138,7 +151,7 @@ test('visual: home metrics section', async ({ page }) => {
 test('visual: home pricing section', async ({ page }) => {
   await page.goto('/')
   await page.waitForLoadState('networkidle')
-  const pricing = page.locator('section').filter({ hasText: '008/ Our Pricing' }).first()
+  const pricing = page.locator('section').filter({ hasText: 'Pricing that scales with you' }).first()
   await settleSection(page, pricing)
   await expect(pricing).toHaveScreenshot('home-pricing.png', { maxDiffPixels: 500 })
 })
@@ -146,7 +159,7 @@ test('visual: home pricing section', async ({ page }) => {
 test('visual: home FAQ section', async ({ page }) => {
   await page.goto('/')
   await page.waitForLoadState('networkidle')
-  const faq = page.locator('section').filter({ hasText: '009/ FAQs' }).first()
+  const faq = page.locator('section').filter({ hasText: 'Need answers?' }).first()
   await settleSection(page, faq)
   await expect(faq).toHaveScreenshot('home-faq.png', { maxDiffPixels: 500 })
 })
@@ -196,19 +209,15 @@ test.describe('mobile widths', () => {
   test('visual mobile: home services', async ({ page }) => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
-    const services = page.locator('section').filter({ hasText: '002/ Our Services' }).first()
+    const services = page.locator('section').filter({ hasText: 'Our Services' }).first()
     await settleSection(page, services)
-    const cards = services.locator('.grid > div')
-    await expect(services).toHaveScreenshot('mobile-home-services.png', {
-      mask: [cards.nth(0).locator('div.mb-6'), cards.nth(2).locator('div.mb-6')],
-      maxDiffPixels: 500,
-    })
+    await expect(services).toHaveScreenshot('mobile-home-services.png', { maxDiffPixels: 500 })
   })
 
   test('visual mobile: home FAQ', async ({ page }) => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
-    const faq = page.locator('section').filter({ hasText: '009/ FAQs' }).first()
+    const faq = page.locator('section').filter({ hasText: 'Need answers?' }).first()
     await settleSection(page, faq)
     await expect(faq).toHaveScreenshot('mobile-home-faq.png', { maxDiffPixels: 500 })
   })

@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test'
 
 /**
- * Homepage interaction tests: integration marquee animates, animated
- * "Work automated" chart, WhyUs X/check glyphs, FAQ accordion, pricing
- * cards, and hover micro-interactions.
+ * Homepage interaction tests: tabbed service section (white panels),
+ * integration marquee animates, animated "Work automated" chart, WhyUs
+ * X/check glyphs, FAQ accordion, pricing cards, and hover micro-interactions.
  */
 
 async function scrollToSection(page, labelRegex: RegExp) {
@@ -17,10 +17,31 @@ async function scrollToSection(page, labelRegex: RegExp) {
   return section
 }
 
-test('services section: integration marquee tiles render and animate', async ({ page }) => {
+test('services: segmented tabs switch panels and the white product panel renders', async ({ page }) => {
   await page.goto('/')
-  const section = await scrollToSection(page, /002\/ Our Services/)
-  await expect(section.getByText('Data & Integrations')).toBeVisible()
+  const section = await scrollToSection(page, /Our Services/)
+
+  // Three tabs present
+  await expect(section.getByRole('tab', { name: 'Workflow Automations' })).toBeVisible()
+  await expect(section.getByRole('tab', { name: 'Data & Integrations' })).toBeVisible()
+  await expect(section.getByRole('tab', { name: 'Business Consulting' })).toBeVisible()
+
+  // Default panel is Workflow Automations with its checklist
+  const panel = section.getByRole('tabpanel')
+  await expect(panel).toContainText('Let the repetitive work run itself.')
+
+  // Switching tabs swaps the panel content
+  await section.getByRole('tab', { name: 'Data & Integrations' }).click()
+  await expect(panel).toContainText('Your data, wired and AI-ready.')
+
+  await section.getByRole('tab', { name: 'Business Consulting' }).click()
+  await expect(panel).toContainText('AI that pays for itself.')
+})
+
+test('services: integration marquee tiles render and animate', async ({ page }) => {
+  await page.goto('/')
+  const section = await scrollToSection(page, /Our Services/)
+  await section.getByRole('tab', { name: 'Data & Integrations' }).click()
 
   // Marquee tracks exist (2 rows × 4 copies)
   const tracks = section.locator('.animate-marquee')
@@ -38,33 +59,31 @@ test('services section: integration marquee tiles render and animate', async ({ 
       .first()
       .evaluate((el) => getComputedStyle(el).transform)
   const t0 = await transform()
-  // Poll until the translateX changes (auto-retrying, no arbitrary sleeps)
   await expect
     .poll(transform, { timeout: 5000, intervals: [100, 200, 400] })
     .not.toBe(t0)
 })
 
-test('services section: Work-automated chart shows progressive Jan→Apr growth', async ({ page }) => {
+test('services: Work-automated chart shows progressive Jan→Apr growth', async ({ page }) => {
   await page.goto('/')
-  const section = await scrollToSection(page, /002\/ Our Services/)
+  const section = await scrollToSection(page, /Our Services/)
+  await section.getByRole('tab', { name: 'Business Consulting' }).click()
 
-  // Business Consulting card contains the "Work automated" chart
-  const card = page.getByRole('heading', { name: 'Business Consulting' }).locator('..')
-  await expect(card.getByText('Work automated')).toBeVisible()
-  await expect(card.getByText('+20%')).toBeVisible()
-  await expect(card.getByText('+51%')).toBeVisible()
-  await expect(card.getByText('Jan')).toBeVisible()
-  await expect(card.getByText('Apr')).toBeVisible()
+  // Business Consulting panel contains the "Work automated" chart (exact
+  // matches — the checklist copy also mentions the same figures)
+  const panel = section.getByRole('tabpanel')
+  await expect(panel.getByText('Work automated', { exact: true })).toBeVisible()
+  await expect(panel.getByText('+20%', { exact: true })).toBeVisible()
+  await expect(panel.getByText('+51%', { exact: true })).toBeVisible()
+  await expect(panel.getByText('Jan', { exact: true })).toBeVisible()
+  await expect(panel.getByText('Apr', { exact: true })).toBeVisible()
 
-  // 4 bars that grow once (staggered Jan→Apr) on scroll into view and STAY —
-  // progressive growth matching the +20% → +51% labels (no reset/loop)
-  const bars = card.getByTestId('chart-bar')
+  // 4 bars that grow once (staggered Jan→Apr) on scroll into view and STAY
+  const bars = panel.getByTestId('chart-bar')
   await expect(bars).toHaveCount(4)
   const heights = async () =>
     Promise.all((await bars.all()).map((b) => b.evaluate((el) => el.getBoundingClientRect().height)))
 
-  // Wait for the staggered grow-in to finish (last bar Apr grew, then its
-  // 0.9s animation completes)
   await expect.poll(async () => (await heights())[3], { timeout: 10000, intervals: [300] }).toBeGreaterThan(0)
   await page.waitForTimeout(1200)
   const grown = await heights()
@@ -79,17 +98,17 @@ test('services section: Work-automated chart shows progressive Jan→Apr growth'
   expect(await heights()).toEqual(grown)
 })
 
-test('services section: no standalone Work automated section remains', async ({ page }) => {
+test('services: no standalone Work automated section remains', async ({ page }) => {
   await page.goto('/')
-  const section = await scrollToSection(page, /002\/ Our Services/)
-  // The old standalone chart had a 0–50% y-axis scale + 5 label rows — the card
-  // version has "0–50%" too, so assert the standalone header markup is gone:
+  const section = await scrollToSection(page, /Our Services/)
+  await section.getByRole('tab', { name: 'Business Consulting' }).click()
+  // The chart exists exactly once, inside the consulting tab panel
   await expect(section.getByText('Work automated', { exact: true })).toHaveCount(1)
 })
 
-test('WhyUs: light columns use X, dark column uses checkmark', async ({ page }) => {
+test('WhyUs: light columns use X, dark column uses violet checkmark', async ({ page }) => {
   await page.goto('/')
-  const section = await scrollToSection(page, /006\/ Why Us/)
+  const section = await scrollToSection(page, /Why Us/)
 
   const freelance = section.getByRole('heading', { name: 'Freelance' }).locator('..')
   const workingUs = section.getByRole('heading', { name: 'Working with Us' }).locator('..')
@@ -104,13 +123,13 @@ test('WhyUs: light columns use X, dark column uses checkmark', async ({ page }) 
   const checkPath = await workingUs.locator('svg path').first().getAttribute('d')
   expect(checkPath).toContain('M20 6L9 17l-5-5')
 
-  // Dark column checkmark is accent orange
-  await expect(workingUs.locator('svg').first()).toHaveCSS('color', 'rgb(255, 55, 0)')
+  // Featured column checkmark is Signal Violet
+  await expect(workingUs.locator('svg').first()).toHaveCSS('color', 'rgb(112, 132, 255)')
 })
 
 test('FAQ accordion opens and closes', async ({ page }) => {
   await page.goto('/')
-  const section = await scrollToSection(page, /009\/ FAQs/)
+  const section = await scrollToSection(page, /Need answers\?/)
 
   const firstButton = section.getByRole('button', { name: /01\/ What does Logitech Consultants actually do/i })
   await expect(firstButton).toBeVisible()
@@ -130,28 +149,39 @@ test('FAQ accordion opens and closes', async ({ page }) => {
   await expect(firstButton).toHaveAttribute('aria-expanded', 'false')
 })
 
-test('pricing: 3 cards with dark CTA buttons', async ({ page }) => {
+test('pricing: 3 cards with prices and CTAs', async ({ page }) => {
   await page.goto('/')
-  const section = await scrollToSection(page, /008\/ Our Pricing/)
+  const section = await scrollToSection(page, /Pricing that scales with you/)
   await expect(section.getByText('$1.995')).toBeVisible()
   await expect(section.getByText('$2.995')).toBeVisible()
   await expect(section.getByText('$5.995')).toBeVisible()
+  // Featured tier carries the Voltage Blue CTA
+  await expect(section.getByRole('link', { name: 'Book a call' }).nth(1)).toHaveCSS('background-color', 'rgb(64, 91, 255)')
 })
 
-test('nav "Book a call" pill links to contact', async ({ page }) => {
+test('nav "Get a demo" pill links to contact', async ({ page }) => {
   await page.goto('/')
   await page
     .getByRole('navigation', { name: 'Primary' })
-    .getByRole('link', { name: 'Book a call' })
+    .getByRole('link', { name: 'Get a demo' })
     .click()
   await expect(page).toHaveURL(/\/contact$/)
 })
 
-test('hero CTA pill has hover translate effect', async ({ page }) => {
+test('hero "Get started" button hovers to deeper Voltage Blue', async ({ page }) => {
   await page.goto('/')
-  const cta = page.getByRole('link', { name: /Book a call/i }).first()
+  const cta = page.getByRole('button', { name: 'Get started', exact: true })
   await expect(cta).toBeVisible()
   await cta.hover()
-  // bg darkens #151619 → #0a0a0a
-  await expect(cta).toHaveCSS('background-color', 'rgb(10, 10, 10)')
+  // Voltage Blue #405bff → deeper #3351e6 on hover
+  await expect(cta).toHaveCSS('background-color', 'rgb(51, 81, 230)')
+})
+
+test('hero headline splits white and Signal Violet lines', async ({ page }) => {
+  await page.goto('/')
+  const h1 = page.getByRole('heading', { level: 1 })
+  await expect(h1).toContainText('Move at AI speed.')
+  await expect(h1).toContainText('Stay in control.')
+  // Second line carries the violet accent
+  await expect(h1.getByText('Stay in control.', { exact: true })).toHaveCSS('color', 'rgb(112, 132, 255)')
 })
