@@ -33,20 +33,6 @@ export default function Hero() {
       <div className="glow-violet-center inset-0" aria-hidden />
 
       <div className="relative w-full max-w-[1200px] mx-auto px-6 pt-32 pb-24 text-center">
-        {/* Availability badge — pill tag with Signal Violet border */}
-        <motion.div
-          variants={fadeUp}
-          custom={0}
-          initial={reduce ? false : 'hidden'}
-          animate={reduce ? undefined : 'visible'}
-          className="flex justify-center mb-10"
-        >
-          <span className="tag-pill px-4 py-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-signal shadow-[0_0_8px_rgba(112,132,255,0.9)]" aria-hidden />
-            2 slots available this month
-          </span>
-        </motion.div>
-
         {/* Headline — line 1 white, line 2 Signal Violet (the signature) */}
         <h1 className="mb-8">
           <span className="sr-only">Move at AI speed. Stay in control.</span>

@@ -9,6 +9,7 @@ import CaseStudyDetail from './pages/CaseStudyDetail'
 import BlogPage from './pages/BlogPage'
 import BlogPostPage from './pages/BlogPostPage'
 import ContactPage from './pages/ContactPage'
+import NairobiPillarPage from './pages/NairobiPillarPage'
 import { CmsProvider } from './lib/CmsProvider'
 import './index.css'
 
@@ -25,6 +26,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/ai-automation-nairobi" element={<NairobiPillarPage />} />
           <Route path="*" element={<HomePage />} />
         </Route>
         </Routes>

@@ -7,9 +7,10 @@ import { cn } from '../utils'
 
 const navLinks = [
   { label: 'Home', to: '/' },
-  { label: 'About', to: '/about' },
+  { label: 'AI in Nairobi', to: '/ai-automation-nairobi' },
   { label: 'Case Studies', to: '/case-studies' },
   { label: 'Blog', to: '/blog' },
+  { label: 'About', to: '/about' },
 ]
 
 export default function Nav() {

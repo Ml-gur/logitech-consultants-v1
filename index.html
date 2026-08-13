@@ -30,17 +30,42 @@
     <meta name="twitter:title" content="Logitech Consultants – AI Automation Agency" />
     <meta name="twitter:description" content="AI automation agency: we find where AI creates real value, build the automations and agents to capture it, and make sure they keep working long after the engagement ends." />
     <meta name="twitter:image" content="https://logitechconsultants.com/og-image.png" />
-    <!-- Organization structured data (sitewide baseline; route-specific JSON-LD
-         is injected at runtime by Seo.tsx). -->
+    <!-- ProfessionalService structured data (sitewide baseline; route-specific
+         JSON-LD is injected at runtime by Seo.tsx). Local-business entity with
+         Nairobi geo + hours anchors regional relevance for local & AI search. -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Organization",
+        "@type": "ProfessionalService",
         "name": "Logitech Consultants",
         "url": "https://logitechconsultants.com/",
         "logo": "https://logitechconsultants.com/favicon-64.png",
         "email": "hello@logitechconsultants.com",
-        "telephone": "+254112292847"
+        "telephone": "+254112292847",
+        "description": "AI automation agency: we find where AI creates real value, build the automations and agents to capture it, and make sure they keep working long after the engagement ends.",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "51 Lenana Road",
+          "addressLocality": "Nairobi",
+          "addressCountry": "KE",
+          "postalCode": "00100"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": -1.2864,
+          "longitude": 36.7812
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          "opens": "09:00",
+          "closes": "17:00"
+        },
+        "areaServed": [
+          { "@type": "City", "name": "Nairobi" },
+          { "@type": "Country", "name": "Kenya" }
+        ],
+        "priceRange": "$$"
       }
     </script>
   </head>

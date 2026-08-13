@@ -103,22 +103,47 @@ export function breadcrumbLd(crumbs: { name: string; path: string }[]) {
   }
 }
 
-/** Organization + WebSite — injected once on the home page. */
+/**
+ * ProfessionalService entity — injected on the home page.
+ *
+ * Local-business structured data (deep-research priority #4): type
+ * ProfessionalService is the agency-correct schema type, with address, geo,
+ * opening hours, and the Nairobi/Kenya areaServed that anchors regional
+ * relevance for local + AI-answer ranking.
+ */
 export function siteLd() {
   return {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
+    '@type': 'ProfessionalService',
     name: SITE.name,
     url: SITE.url,
     logo: SITE.url + '/favicon-64.png',
     email: 'hello@logitechconsultants.com',
     telephone: '+254112292847',
+    description: SITE.description,
     address: {
       '@type': 'PostalAddress',
       streetAddress: '51 Lenana Road',
       addressLocality: 'Nairobi',
       addressCountry: 'KE',
+      postalCode: '00100',
     },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: -1.2864,
+      longitude: 36.7812,
+    },
+    openingHoursSpecification: {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '09:00',
+      closes: '17:00',
+    },
+    areaServed: [
+      { '@type': 'City', name: 'Nairobi' },
+      { '@type': 'Country', name: 'Kenya' },
+    ],
+    priceRange: '$$',
     sameAs: [],
   }
 }

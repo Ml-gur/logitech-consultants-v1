@@ -200,9 +200,26 @@ export const blogPosts: BlogPost[] = [
     paragraphs: [
       'Your CRM, inbox, calendar, and billing system were built to connect. They ship with APIs, webhooks, and integrations designed for exactly this. The only missing piece is the glue between them \u2014 and that glue is automation.',
       'Every time someone copies a row from one tool into another, a human is doing work a machine could do in milliseconds. Copy-paste is not a strategy; it is the most expensive manual process most companies still run.',
-      'Start with the handoff. Look for the moment where information changes hands: a lead moves from the form to the CRM, a ticket moves from support to engineering, an invoice moves from the contract to the billing system. That handoff is where automation earns its keep.',
-      'Automate the middle, not the judgment. Rules handle the predictable parts \u2014 routing, formatting, filing, notifying. Judgment stays with your team. The result is a system that does the boring work perfectly and surfaces the interesting work for people.',
-      'One connected workflow beats ten disconnected tools. You don\u2019t need more software. You need the software you already pay for to stop being islands.',
+    ],
+    subheads: [
+      {
+        heading: 'Start with the handoff',
+        paragraphs: [
+          'Look for the moment where information changes hands: a lead moves from the form to the CRM, a ticket moves from support to engineering, an invoice moves from the contract to the billing system. That handoff is where automation earns its keep.',
+        ],
+      },
+      {
+        heading: 'Automate the middle, not the judgment',
+        paragraphs: [
+          'Rules handle the predictable parts \u2014 routing, formatting, filing, notifying. Judgment stays with your team. The result is a system that does the boring work perfectly and surfaces the interesting work for people.',
+        ],
+      },
+      {
+        heading: 'One connected workflow beats ten disconnected tools',
+        paragraphs: [
+          "You don\u2019t need more software. You need the software you already pay for to stop being islands. If you're weighing whether to build or buy the glue, our guide to deciding helps you pick the cheaper, faster path.",
+        ],
+      },
     ],
   },
   {
@@ -218,8 +235,20 @@ export const blogPosts: BlogPost[] = [
     paragraphs: [
       'The best first automation is never the impressive one. It\u2019s the tedious one the whole team dreads \u2014 the weekly report, the data entry, the reconciliation \u2014 because everyone will feel it working from day one.',
       'Ask the team what they hate doing. The answers are usually the same: copying data between systems, chasing approvals, formatting the same document differently for every client.',
-      'Pick the task with a measurable time cost and a clear owner. If you can name who does it, how long it takes, and how often it happens, you have a pilot with a built-in metric.',
-      'A small win changes how the whole company thinks about AI. One live automation that saves an hour a week is worth more than a roadmap of impressive projects that never ship.',
+    ],
+    subheads: [
+      {
+        heading: 'Pick the task with a measurable cost',
+        paragraphs: [
+          'If you can name who does it, how long it takes, and how often it happens, you have a pilot with a built-in metric. The task needs a clear owner and a time cost you can actually measure before and after.',
+        ],
+      },
+      {
+        heading: 'A small win changes how the company thinks about AI',
+        paragraphs: [
+          'One live automation that saves an hour a week is worth more than a roadmap of impressive projects that never ship. Start there, and the next project gets easier \u2014 the team has seen it work, and the data to justify it already exists.',
+        ],
+      },
     ],
   },
 ]

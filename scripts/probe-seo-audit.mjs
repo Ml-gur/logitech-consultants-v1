@@ -9,7 +9,7 @@ const chromiumLaunchOptions = {
 
 const browser = await chromium.launch(chromiumLaunchOptions)
 const base = 'http://localhost:4173'
-const routes = ['/', '/about', '/case-studies', '/case-studies/etery', '/case-studies/genesy', '/case-studies/zenon', '/blog', '/blog/getting-your-data-ai-ready-without-the-big-project', '/blog/buy-build-or-wait-a-simpler-way-to-decide', '/blog/your-tools-already-talk-you-don-t-have-to', '/blog/start-with-the-task-everyone-hates', '/contact']
+const routes = ['/', '/about', '/ai-automation-nairobi', '/case-studies', '/case-studies/etery', '/case-studies/genesy', '/case-studies/zenon', '/blog', '/blog/getting-your-data-ai-ready-without-the-big-project', '/blog/buy-build-or-wait-a-simpler-way-to-decide', '/blog/your-tools-already-talk-you-don-t-have-to', '/blog/start-with-the-task-everyone-hates', '/contact']
 
 const findings = []
 const report = {}
