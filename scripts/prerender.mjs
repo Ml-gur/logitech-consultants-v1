@@ -38,7 +38,8 @@ import { spawn } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { chromium } from 'playwright'
+import { chromium as playwright } from 'playwright-core'
+import chromium from '@sparticuz/chromium'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const sitemapPath = resolve(root, 'public/sitemap.xml')
@@ -96,18 +97,27 @@ async function settleReveals(page) {
 
 /** Choose a chromium binary: env → system → playwright-managed. */
 async function launchBrowser() {
+  if (process.env.VERCEL) {
+    const executablePath = await chromium.executablePath()
+    return await playwright.launch({
+      args: [...chromium.args, '--no-sandbox', '--disable-gpu'],
+      executablePath,
+      headless: true,
+    })
+  }
+
   const candidates = [process.env.PLAYWRIGHT_CHROMIUM_PATH, '/usr/bin/chromium-browser']
   for (const exe of candidates) {
     if (exe) {
       try {
-        return await chromium.launch({ executablePath: exe, args: ['--no-sandbox', '--disable-gpu'] })
+        return await playwright.launch({ executablePath: exe, args: ['--no-sandbox', '--disable-gpu'] })
       } catch {
         // fall through to the next candidate
       }
     }
   }
   // Playwright's own downloaded chromium (npx playwright install chromium).
-  return chromium.launch()
+  return playwright.launch()
 }
 
 function startPreview() {
