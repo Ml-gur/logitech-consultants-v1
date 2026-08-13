@@ -8,6 +8,9 @@ dist/
 playwright-report/
 test-results/
 
+# Git worktrees (isolated feature workspaces)
+.worktrees/
+
 # Local env files (never commit secrets; use .env.example as the template)
 .env
 .env.local
