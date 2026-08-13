@@ -141,7 +141,15 @@ async function main() {
   let browser
   try {
     await waitForServer()
-    browser = await launchBrowser()
+    try {
+      browser = await launchBrowser()
+    } catch (launchErr) {
+      console.warn('\n⚠️ WARNING: Playwright browser could not be launched on this system.')
+      console.warn('Reason:', launchErr.message || launchErr)
+      console.warn('This is expected on unprivileged or restricted environments (like Vercel builds) due to missing native OS libraries.')
+      console.warn('Prerendering is skipped. The site will deploy successfully and run as a fully functional client-side SPA.\n')
+      return
+    }
     const context = await browser.newContext({
       viewport: { width: 1440, height: 900 },
       reducedMotion: 'reduce',
