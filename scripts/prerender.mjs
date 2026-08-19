@@ -141,7 +141,15 @@ async function main() {
   let browser
   try {
     await waitForServer()
-    browser = await launchBrowser()
+    try {
+      browser = await launchBrowser()
+    } catch (launchErr) {
+      console.warn('⚠️ Warning: Failed to launch Playwright Chromium browser for prerendering.')
+      console.warn(launchErr?.message || launchErr)
+      console.warn('Skipping prerender step; client-side SPA build will be deployed.')
+      return
+    }
+
     const context = await browser.newContext({
       viewport: { width: 1440, height: 900 },
       reducedMotion: 'reduce',
