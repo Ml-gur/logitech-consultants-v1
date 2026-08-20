@@ -291,7 +291,7 @@ html.lenis body {
 .lenis.lenis-stopped {
   overflow: hidden;
 }
-.lenis.lenis-smooth iframe {
+.lenis.lenis-smooth iframe:not([src*="dograh-widget"]) {
   pointer-events: none;
 }
 
@@ -337,4 +337,34 @@ body {
 
 footer {
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Ensure Dograh Voice Agent Widget floating button stays visible and interactive on all devices, especially mobile */
+#dograh-widget,
+#dograh-widget-iframe,
+#dograh-widget-container,
+[id*="dograh"],
+iframe[src*="dograh"] {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 2147483647 !important;
+  max-width: 100vw !important;
+}
+
+@media (max-width: 768px) {
+  #dograh-widget,
+  #dograh-widget-iframe,
+  #dograh-widget-container,
+  [id*="dograh"],
+  iframe[src*="dograh"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    z-index: 2147483647 !important;
+    bottom: max(16px, env(safe-area-inset-bottom)) !important;
+    right: max(16px, env(safe-area-inset-right)) !important;
+  }
 }
