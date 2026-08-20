@@ -94,8 +94,22 @@ async function settleReveals(page) {
   return stillHidden
 }
 
-/** Choose a chromium binary: env → system → playwright-managed. */
+/** Choose a chromium binary: sparticuz → env → system → playwright-managed. */
 async function launchBrowser() {
+  // First try @sparticuz/chromium (bundled headless Chromium binary with serverless dependencies)
+  try {
+    const sparticuz = (await import('@sparticuz/chromium')).default
+    const exePath = await sparticuz.executablePath()
+    if (exePath) {
+      return await chromium.launch({
+        executablePath: exePath,
+        args: [...sparticuz.args, '--no-sandbox', '--disable-gpu'],
+      })
+    }
+  } catch {
+    // fall through to standard candidates
+  }
+
   const candidates = [process.env.PLAYWRIGHT_CHROMIUM_PATH, '/usr/bin/chromium-browser']
   for (const exe of candidates) {
     if (exe) {
