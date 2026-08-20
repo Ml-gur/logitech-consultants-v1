@@ -338,3 +338,17 @@ body {
 footer {
   padding-bottom: env(safe-area-inset-bottom);
 }
+
+/* Dograh widget — override body overflow-x:hidden so the fixed-position
+   widget is not clipped on mobile browsers (Safari creates a scroll
+   container from overflow-x:hidden that clips position:fixed children). */
+#dograh-widget-root {
+  position: fixed !important;
+  z-index: 999999 !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  isolation: isolate;
+}
+#dograh-widget-root * {
+  box-sizing: border-box;
+}
