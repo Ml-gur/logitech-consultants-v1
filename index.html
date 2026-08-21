@@ -72,13 +72,21 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- Dograh Widget -->
+    <!-- Dograh Widget — Jane v4 (web-friendly) via public tunnel.
+         Local Docker: http://localhost:8000 + quick-tunnel https://backup-representing-hosting-shine.trycloudflare.com
+         Copy of ui/public/embed/dograh-widget.js is vendored at /public/dograh-widget.js so the script loads
+         from the site origin (works on https://logitechconsultants.com and localhost:5173). The apiEndpoint
+         must be the public tunnel so remote visitors can reach your local Docker API. If the tunnel restarts and
+         the trycloudflare URL changes, run: ./scripts/update-dograh-tunnel.sh (or re-copy the embed code from
+         /workflow/7 → Embed in Dograh UI).
+         Token emb__IpndMeQHvpyCrtLZNNrN-uuvvQZcIrDveO6Y0Ox4YY → workflow 7 Jane v4 (def 27), allowed_domains=null.
+         For PSTN-transfer testing use the old token emb_UTMv5826kG3NSPO5PSD_bPzb6N2J2_ZgWLUp7ql6NNc → workflow 3. -->
     <script>
       (function(d, s, id) {
         var js, fjs = d.getElementsByTagName(s)[0];
         if (d.getElementById(id)) return;
         js = d.createElement(s); js.id = id;
-        js.src = 'http://localhost:3010/embed/dograh-widget.js?token=emb_UTMv5826kG3NSPO5PSD_bPzb6N2J2_ZgWLUp7ql6NNc&environment=local&apiEndpoint=http://localhost:8000';
+        js.src = '/dograh-widget.js?token=emb__IpndMeQHvpyCrtLZNNrN-uuvvQZcIrDveO6Y0Ox4YY&environment=production&apiEndpoint=https://backup-representing-hosting-shine.trycloudflare.com';
         // Details about this visitor, available in your prompts as
         // {{initial_context.page_url}}. Edit these or add your own.
         js.setAttribute('data-dograh-context', JSON.stringify({
