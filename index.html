@@ -72,21 +72,29 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- Dograh Widget — Jane v4 (web-friendly) via public tunnel.
-         Local Docker: http://localhost:8000 + quick-tunnel https://backup-representing-hosting-shine.trycloudflare.com
-         Copy of ui/public/embed/dograh-widget.js is vendored at /public/dograh-widget.js so the script loads
-         from the site origin (works on https://logitechconsultants.com and localhost:5173). The apiEndpoint
-         must be the public tunnel so remote visitors can reach your local Docker API. If the tunnel restarts and
-         the trycloudflare URL changes, run: ./scripts/update-dograh-tunnel.sh (or re-copy the embed code from
-         /workflow/7 → Embed in Dograh UI).
-         Token emb__IpndMeQHvpyCrtLZNNrN-uuvvQZcIrDveO6Y0Ox4YY → workflow 7 Jane v4 (def 27), allowed_domains=null.
-         For PSTN-transfer testing use the old token emb_UTMv5826kG3NSPO5PSD_bPzb6N2J2_ZgWLUp7ql6NNc → workflow 3. -->
-    <script>
+    <!-- Dograh Widget — LOCAL TUNNEL (commented, kept for rollback)
+         Was: Jane Mega 19 via quick-tunnel https://backup-representing-hosting-shine.trycloudflare.com
+         Token emb__IpndMeQHvpyCrtLZNNrN-uuvvQZcIrDveO6Y0Ox4YY → workflow 7 def 36, vendored at /public/dograh-widget.js
+         See scripts/update-dograh-tunnel.sh — uncomment to use local Docker again.
+    <script> // LOCAL TUNNEL - COMMENTED
       (function(d, s, id) {
         var js, fjs = d.getElementsByTagName(s)[0];
         if (d.getElementById(id)) return;
         js = d.createElement(s); js.id = id;
         js.src = '/dograh-widget.js?token=emb__IpndMeQHvpyCrtLZNNrN-uuvvQZcIrDveO6Y0Ox4YY&environment=production&apiEndpoint=https://backup-representing-hosting-shine.trycloudflare.com';
+        js.setAttribute('data-dograh-context', JSON.stringify({ page_url: window.location.href, today: new Date().toISOString().slice(0, 10) }));
+        js.async = true;
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'dograh-widget'));
+    </script>
+    -->
+    <!-- Dograh Widget — CLOUD (app.dograh.com) — ACTIVE -->
+    <script>
+      (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = 'https://app.dograh.com/embed/dograh-widget.js?token=emb_XV9X2N9U2oy1WzIuiwtVHRQlkYQMybFcO60_yKbfwMc&environment=production&apiEndpoint=https://api.dograh.com';
         // Details about this visitor, available in your prompts as
         // {{initial_context.page_url}}. Edit these or add your own.
         js.setAttribute('data-dograh-context', JSON.stringify({
