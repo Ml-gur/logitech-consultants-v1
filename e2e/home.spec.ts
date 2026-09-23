@@ -87,6 +87,72 @@ test('hero: one statement, in one face and one colour', async ({ page }) => {
   expect(new Set([own, ...colours]).size, 'headline is more than one colour').toBe(1)
 })
 
+/**
+ * The hero is the page's one full-bleed screen, and the band along its bottom
+ * edge is where a site of this kind usually starts inventing things: client
+ * marks it does not have, an uptime figure nobody published, a completion rate
+ * nobody measured. This asserts the honest version — facts that can be checked
+ * against the rest of the site — and that the band arrives at them.
+ */
+test('hero: one screen, a band of defensible numbers, no client logos', async ({ page }) => {
+  await seedConsent(page)
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/')
+
+  const hero = page.locator('section#hero')
+  const box = await hero.boundingBox()
+  console.log(`[hero] 1440x900 — height ${box?.height}`)
+  expect(box!.height, 'the hero should be the first screen, not a fragment of it').toBeGreaterThanOrEqual(
+    880,
+  )
+
+  // The four cells, in order: the published first-deployment window, the ten
+  // stages of the deployment model, the six dimensions we measure, and the
+  // number of benchmarks we have made up.
+  await expect(hero.locator('dd')).toHaveText(['4–8 wks', '10', '6', '0'])
+  await expect(hero.locator('dt')).toHaveText([
+    'To a first production deployment',
+    'Stages, discovery to product',
+    'Dimensions we measure',
+    'Benchmarks we invented',
+  ])
+
+  // The row above it names where we build, not who we claim to have worked for.
+  await expect(hero.getByText('Applied AI systems, built in Nairobi')).toBeVisible()
+
+  const text = await hero.innerText()
+  expect(text, 'an unqualified rate is a claim we cannot support').not.toMatch(/\d+(\.\d+)?\s*%/)
+  expect(text, 'no client names in the hero').not.toMatch(/Microsoft|Amazon|Google|Trusted by/i)
+  // Nothing illustrative: the marks are drawn, and a logo wall is not evidence.
+  await expect(hero.locator('img')).toHaveCount(0)
+})
+
+/**
+ * The band is the point of a full-bleed opener: if it falls below the fold, the
+ * first screen is a headline and the section may as well be a banner. It has to
+ * land inside the viewport at laptop and phone widths.
+ */
+test('hero: the band lands on the first screen at laptop and phone widths', async ({ page }) => {
+  await seedConsent(page)
+
+  for (const size of [
+    { width: 1440, height: 900 },
+    { width: 1024, height: 768 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(size)
+    await page.goto('/')
+
+    const band = await page.locator('section#hero dl').boundingBox()
+    const bottom = band!.y + band!.height
+    console.log(`[hero] ${size.width}x${size.height} — band bottom ${Math.round(bottom)}`)
+
+    expect(bottom, `band below the fold at ${size.width}x${size.height}`).toBeLessThanOrEqual(
+      size.height,
+    )
+  }
+})
+
 test('hero: asks for one thing, and has no competing capture form', async ({ page }) => {
   await seedConsent(page)
   await page.goto('/')

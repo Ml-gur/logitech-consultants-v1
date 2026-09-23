@@ -27,6 +27,29 @@ Notable changes to the Naivolabs website and CMS. The format follows
 
 ### Changed
 
+- **The hero is one full-bleed screen, and the four capabilities are two
+  columns.** The hero (`src/components/Hero.tsx`) is the first viewport rather
+  than an inset panel: the lit field and its vignette cover the whole screen, a
+  glass row above the statement says where the company builds instead of
+  borrowing a client-logo wall, and a band of four numbers closes the screen.
+  Every figure is checkable against `src/lib/brand.ts` or the FAQ — the published
+  first-deployment window, the ten stages of the deployment model, the six
+  dimensions every deployment is measured against, and the number of benchmarks
+  the company has invented, which is zero. The band counts up once on load, and
+  `prefers-reduced-motion` shows the final values immediately. The section below
+  it (`src/components/Capabilities.tsx`) follows the same direction in two
+  columns: the claim and a media panel on the left, the four actions as hairline
+  rows on the right, each row still a link to its depth, closed by one outlined
+  action so the page keeps a single filled button. `e2e/home.spec.ts` asserts the
+  band lands inside the first screen at laptop and phone widths, and that the hero
+  carries no unqualified rate and no client names.
+- **The hero can carry a looping background video, and none is bundled.** A file
+  dropped in as `src/components/hero-loop.mp4` (or `.webm`) is picked up, hashed
+  and served from our own origin; the CSS runs it only on wide viewports, in the
+  dark theme, and only when the visitor has not asked for reduced motion. The clip
+  the reference direction uses is a ~14 MB file on a third-party CDN, which would
+  break the per-route transfer budget in `e2e/performance.spec.ts`, download on
+  every phone, and need the production CSP widened to an origin we do not control.
 - **The site has one accent and one typeface, on a near-black canvas.** The
   design system moved to the direction recorded in
   [`ADR-002`](docs/decisions/ADR-002-design-system.md): a near-black canvas
@@ -107,6 +130,9 @@ Notable changes to the Naivolabs website and CMS. The format follows
 
 Removed as unused, superseded or never part of the product:
 
+- `src/components/TrustStrip.tsx` and the `.marquee` styles it shared with the
+  hero. The scrolling phrase band was replaced by the hero's number band, so
+  nothing on the site referenced either.
 - Instrument Serif and its two subset files, `scripts/fetch-fonts.mjs` and the
   `npm run fonts` script. The system uses one grotesk now (ADR-002), so the
   display face, its preloads and the tooling that fetched it had nothing left to

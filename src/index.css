@@ -347,6 +347,71 @@ html.dark {
       radial-gradient(50% 56% at 100% 44%, rgba(112, 132, 186, 0.2) 0%, transparent 60%);
   }
 
+  /* ── Hero backdrop ─────────────────────────────────────────
+     The hero is the page's one full-bleed screen, so the lit field
+     above covers the whole first viewport and two more layers sit
+     on it:
+
+     · a vignette, which pulls the edges and the strip under the
+       fixed header back toward the canvas so the header's own type
+       keeps its measured contrast over the colour field;
+     · an optional looping video, for the file described in
+       src/components/Hero.tsx. It is off on phones and under
+       `prefers-reduced-motion`, and it never runs in the light
+       inversion, where a dark loop under dark copy would break the
+       contrast the token ladder guarantees.
+
+     All three are decorative: aria-hidden, no pointer events. */
+  .hero-backdrop {
+    background-color: var(--color-ink);
+  }
+
+  .hero-vignette {
+    background:
+      radial-gradient(115% 80% at 50% 42%, transparent 44%, rgba(251, 252, 245, 0.9) 100%),
+      linear-gradient(180deg, rgba(251, 252, 245, 0.8) 0%, transparent 22%);
+  }
+  html.dark .hero-vignette {
+    background:
+      radial-gradient(115% 80% at 50% 42%, transparent 38%, rgba(7, 9, 8, 0.92) 100%),
+      linear-gradient(180deg, rgba(7, 9, 8, 0.86) 0%, transparent 26%);
+  }
+
+  .hero-video {
+    display: none;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.45;
+  }
+  @media (min-width: 1024px) {
+    html.dark .hero-video {
+      display: block;
+    }
+  }
+
+  /* ── Glass ──────────────────────────────────────────────────
+     The one translucent surface: the hero's trust row and the band
+     of numbers under it, both of which sit on the lit backdrop
+     rather than on a flat fill. A blur and a hairline edge, no
+     glow — the same restraint as every other surface. */
+  .glass {
+    background: rgba(255, 255, 255, 0.58);
+    border: 1px solid rgba(20, 23, 13, 0.14);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    /* A pane on a pale field needs an edge more than a shadow, but without one
+       it reads as a hole in the light inversion rather than a surface. */
+    box-shadow: 0 16px 34px -28px rgba(20, 23, 13, 0.6);
+  }
+  html.dark .glass {
+    background: rgba(7, 9, 8, 0.52);
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 16px 34px -28px rgba(0, 0, 0, 0.9);
+  }
+
   /* Primary action: lime fill. The only solid fill on a page, and the
      label colour is a token so it stays legible in both themes. */
   .btn-primary {
@@ -480,26 +545,6 @@ html.dark {
     color: var(--color-fog);
   }
 
-  /* ── Marquee ────────────────────────────────────────────────
-     One continuous band of short phrases. The track holds the list
-     twice and translates by exactly -50%, so the loop is seamless
-     with no gap and no measurement in JS.
-
-     `:hover` pauses it — a row of words that cannot be read because
-     it will not stop is decoration, not content. */
-  .marquee {
-    overflow: hidden;
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  }
-  .marquee-track {
-    display: flex;
-    width: max-content;
-    animation: marquee 44s linear infinite;
-  }
-  .marquee:hover .marquee-track {
-    animation-play-state: paused;
-  }
 }
 
 /* Lenis smooth scroll */
@@ -535,20 +580,16 @@ html.lenis body {
   }
 }
 
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .skeleton,
-  .spinner,
-  .marquee-track {
+  .spinner {
     animation: none !important;
+  }
+
+  /* A looping background video is exactly the kind of motion the preference
+     asks us to stop. */
+  .hero-video {
+    display: none !important;
   }
 
   html {
