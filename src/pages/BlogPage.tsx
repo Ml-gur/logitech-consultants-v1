@@ -4,31 +4,34 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useCms } from '../lib/CmsProvider'
 import Seo, { breadcrumbLd } from '../lib/Seo'
+import { SITE, absUrl } from '../lib/brand'
+import { ListSkeleton } from '../components/Loading'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
 export default function BlogPage() {
-  const { blogPosts } = useCms()
+  const { blogPosts, cmsEnabled, cmsLoaded } = useCms()
+  const showSkeleton = cmsEnabled && !cmsLoaded && blogPosts.length === 0
 
   return (
     <section className="relative pt-32">
       <Seo
-        title="Blog — AI Automation Guides"
-        description="Guides and playbooks on AI automation: getting your data AI-ready, buy-build-or-wait decisions, and where automation earns its keep."
+        title="Insights on Production AI"
+        description="Notes on getting AI systems into production: data readiness, buy-build-or-wait decisions, governance, measurement and where intelligence earns its keep."
         path="/blog"
         jsonLd={[
-          breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Blog', path: '/blog' }]),
+          breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Insights', path: '/blog' }]),
           {
             '@context': 'https://schema.org',
             '@type': 'Blog',
-            name: 'Logitech Consultants Blog',
-            url: 'https://logitechconsultants.com/blog',
-            publisher: { '@type': 'Organization', name: 'Logitech Consultants' },
+            name: `${SITE.name} Insights`,
+            url: absUrl('/blog'),
+            publisher: { '@type': 'Organization', name: SITE.name, url: SITE.url },
           },
         ]}
       />
       <div className="relative max-w-[1200px] mx-auto px-6">
         <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
-          Blog
+          Insights
         </motion.p>
 
         <motion.h1
@@ -38,7 +41,7 @@ export default function BlogPage() {
           transition={springReveal(0.08)}
           className="text-[clamp(36px,6vw,72px)] leading-[1.02] tracking-[-0.03em] max-w-[760px] mb-6"
         >
-          Guides and <span className="text-signal">playbooks.</span>
+          Notes from <span className="text-signal">production AI.</span>
         </motion.h1>
 
         <motion.p
@@ -48,10 +51,12 @@ export default function BlogPage() {
           transition={springReveal(0.14)}
           className="text-[18px] text-fog max-w-2xl mb-16"
         >
-          Everything you need to know about building, managing, and scaling visual automation workflows.
+          Written by the people doing the deployment work, the parts that are harder than the demonstration.
         </motion.p>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {showSkeleton && <ListSkeleton count={6} />}
+
+        <div className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-5 ${showSkeleton ? 'hidden' : ''}`}>
           {blogPosts.map((post, i) => (
             <motion.div
               key={post.slug}
@@ -63,7 +68,13 @@ export default function BlogPage() {
               <Link to={`/blog/${post.slug}`} className="group block h-full">
                 <div className="aspect-[4/5] rounded-[20px] overflow-hidden mb-4 bg-[#191919] border border-white/10">
                   {post.image ? (
-                    <img src={post.image} alt={`${post.title} — Logitech Consultants blog`} className="w-full h-full object-cover" />
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-[#2c2c2c] to-[#141414]" />
                   )}

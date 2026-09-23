@@ -1,4 +1,5 @@
 import { test, expect, Page, Browser } from '@playwright/test'
+import { seedConsent } from './consent'
 
 /**
  * Lab performance budgets — Lighthouse-equivalent Web Vitals measured against
@@ -6,7 +7,8 @@ import { test, expect, Page, Browser } from '@playwright/test'
  * playwright-best-practices/performance-testing.md). Runs in the
  * desktop-chromium project. Budgets are Google's "good" Core Web Vitals
  * thresholds plus a resource/bundle budget (ADR-001 premium bar: <170kB gzip
- * JS).
+ * JS for the entry chunk; the shared transfer budget is higher to allow the
+ * below-the-fold lazy chunks).
  *
  * Notes:
  * - Tests in this file run serially so the two perf tests don't contend for
@@ -27,11 +29,14 @@ const BUDGETS = {
   ttfb: 600, // ms
   totalSize: 1.5 * 1024 * 1024, // 1.5MB total transfer
   jsSize: 500 * 1024, // 500KB JS transfer
-  // 30 (was 25): the trusted-by marquee now renders 17 real brand logos
-  // (commit 2b9f10c), up from the 2 template lockups the original 25 budget
-  // assumed. The site logo <img> removal (2026-08-10) keeps the count at 29.
-  imageCount: 30,
+  // 36: the technology strip renders 9 platform logos twice (18 image
+  // requests), the blog grid renders 3 covers, and the deployment-pattern
+  // stack renders 4 — all below the fold. The compressed webp assets keep the
+  // total transfer budget the binding constraint.
+  imageCount: 36,
 }
+
+const ROUTES = ['/', '/about', '/capabilities', '/deployment-patterns', '/blog', '/contact']
 
 /** Install Web Vitals collectors (LCP, CLS, INP event-timing) on every load. */
 async function installVitalsCollectors(page: Page) {
@@ -62,6 +67,7 @@ async function installVitalsCollectors(page: Page) {
 }
 
 test('perf: home meets LCP / INP / CLS budgets', async ({ page }) => {
+  await seedConsent(page)
   await installVitalsCollectors(page)
   await page.goto('/')
   await page.waitForLoadState('networkidle')
@@ -74,14 +80,13 @@ test('perf: home meets LCP / INP / CLS budgets', async ({ page }) => {
   )
 
   // Simulate real interactions to measure INP: FAQ accordion toggle (no nav).
-  // Settle first: the long scroll fires one-shot reveal springs (0.7s) and the
-  // metrics count-ups (1.6s); a click landing mid-animation measures scroll
-  // work instead of the interaction itself (measured 416ms vs 112ms
-  // steady-state in 2026-08-13 redesign).
+  // Settle first: the long scroll fires one-shot reveal springs and the
+  // scroll-driven stack transforms; a click landing mid-animation measures
+  // scroll work instead of the interaction itself.
   await page.getByText('Need answers?').scrollIntoViewIfNeeded()
   await page.waitForTimeout(1900)
   const faqBtn = page
-    .getByRole('button', { name: /01\/ What does Logitech Consultants actually do/i })
+    .getByRole('button', { name: /01\/ What does Naivolabs actually do\?/ })
     .first()
   await faqBtn.click()
   await page.waitForTimeout(250)
@@ -107,11 +112,12 @@ test('perf: home meets LCP / INP / CLS budgets', async ({ page }) => {
 })
 
 test('perf: all routes stay within TTFB / total-size / JS / image budgets', async ({ browser }) => {
-  for (const path of ['/', '/about', '/case-studies', '/blog', '/contact']) {
+  for (const path of ROUTES) {
     // Fresh context per route = cold load with accurate transferSize (the
     // shared page cache zeroes transferSize on repeat visits).
     const context = await browser.newContext({ viewport: { width: 1440, height: 900 } })
     const page = await context.newPage()
+    await seedConsent(page)
     await page.goto(path)
     await page.waitForLoadState('networkidle')
 

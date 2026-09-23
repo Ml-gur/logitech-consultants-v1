@@ -7,47 +7,47 @@ import { revealInitial, revealWhileInView, revealViewport, springReveal } from '
 const tiers = [
   {
     name: 'Pilot',
-    subtitle: 'Start with one high-impact win.',
-    price: '1.995',
-    period: 'monthly',
-    badge: 'Per project',
+    subtitle: 'One deployment, measured properly.',
+    price: '1,995',
+    period: 'engagement',
+    badge: 'Per deployment',
     featured: false,
     features: [
-      'AI readiness audit',
-      '90-day roadmap',
-      '1 workflow automated or 1 AI build',
-      '2–4 week delivery',
-      'Handover docs + 1 workshop',
+      'Discovery and workflow mapping',
+      'One system built and deployed',
+      'Governance controls configured with you',
+      'Baseline and measurement instrumentation',
+      'Handover documentation + a working session',
     ],
   },
   {
     name: 'Partner',
-    subtitle: 'Your AI team, always building.',
-    price: '2.995',
+    subtitle: 'A continuous deployment pipeline.',
+    price: '2,995',
     period: 'monthly',
-    badge: 'Most popular',
+    badge: 'Most common',
     featured: true,
     features: [
       'Everything in Pilot',
-      'Multiple builds per quarter',
-      'Custom agents & integrations',
-      'Bi-weekly strategy reviews',
-      'Priority support (Slack, 24–48h)',
+      'Continuous deployment pipeline',
+      'Knowledge, voice and workflow systems',
+      'Evaluation suite maintained and gated',
+      'Review cadence with your operational owners',
     ],
   },
   {
     name: 'Scale',
-    subtitle: 'Org-wide AI across teams.',
-    price: '5.995',
+    subtitle: 'Intelligence across the organization.',
+    price: '5,995',
     period: 'monthly',
-    badge: 'Per project',
+    badge: 'Per programme',
     featured: false,
     features: [
       'Everything in Partner',
-      'Multi-team rollout',
-      'Security & compliance review',
-      'Dedicated PM + on-call support',
-      'Training program + playbooks/SOPs',
+      'Multi-team rollout and orchestration',
+      'Security and data-protection review',
+      'Dedicated lead + on-call cover',
+      'Internal enablement and documentation set',
     ],
   },
 ]
@@ -73,7 +73,7 @@ export default function Pricing() {
           transition={springReveal(0.06)}
           className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] text-center max-w-[680px] mx-auto mb-4"
         >
-          Pricing that scales with you.
+          Engagement models, not packages.
         </motion.h2>
 
         <motion.p
@@ -83,7 +83,8 @@ export default function Pricing() {
           transition={springReveal(0.1)}
           className="text-[17px] text-fog text-center max-w-[440px] mx-auto mb-16"
         >
-          Start with a focused pilot, grow into an embedded partnership.
+          Start with a single deployment you can measure, and only scale what proves itself. Figures below are
+          indicative and scoped per engagement.
         </motion.p>
 
         <div className="grid md:grid-cols-3 gap-4 items-stretch">

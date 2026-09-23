@@ -1,0 +1,182 @@
+# Naivolabs — production stack (Hetzner single-node)
+#
+#   caddy      reverse proxy, automatic TLS, HTTP/3
+#   site       nginx serving the compiled Vite build
+#   cms        Payload 3 / Next.js admin + REST API
+#   cms-migrate one-shot: applies Payload migrations, then exits
+#   db         PostgreSQL 16 (data on a named volume)
+#
+# Bring up:
+#   cd deploy && cp .env.production.example .env && $EDITOR .env
+#   docker compose --env-file .env up -d --build
+#
+# Ordering guarantee: `depends_on` gates cms behind a healthy db, and cms behind
+# a *successfully completed* cms-migrate. Nothing takes traffic before the
+# schema exists.
+
+name: naivolabs
+
+services:
+  # ---- Edge ---------------------------------------------------------------
+  caddy:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp' # HTTP/3
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN}
+      CMS_DOMAIN: ${CMS_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data # certificates — back this up, it is rate-limit expensive
+      - caddy_config:/config
+      - caddy_logs:/var/log/caddy
+    depends_on:
+      site:
+        condition: service_healthy
+      cms:
+        condition: service_healthy
+    networks: [edge, internal]
+
+  # ---- Marketing site -----------------------------------------------------
+  site:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.site
+      args:
+        # Vite inlines this at build time. Empty = static mode with bundled
+        # content (the site is fully functional without the CMS).
+        VITE_CMS_URL: ${VITE_CMS_URL:-}
+    image: naivolabs-site:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    expose:
+      - '8080'
+    networks: [edge]
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:8080/healthz']
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+  # ---- CMS migrations (one-shot) -----------------------------------------
+  # Payload does not create tables automatically in production. This runs
+  # `payload migrate` against the real database, and cms waits for it to exit 0.
+  cms-migrate:
+    build:
+      context: ../cms
+      dockerfile: ../deploy/Dockerfile.cms
+    image: naivolabs-cms:${IMAGE_TAG:-latest}
+    command: ['npm', 'run', 'migrate']
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [internal]
+    restart: 'no'
+
+  # ---- CMS ----------------------------------------------------------------
+  cms:
+    image: naivolabs-cms:${IMAGE_TAG:-latest}
+    build:
+      context: ../cms
+      dockerfile: ../deploy/Dockerfile.cms
+    restart: unless-stopped
+    expose:
+      - '3000'
+    environment:
+      NODE_ENV: production
+      PORT: '3000'
+      HOSTNAME: 0.0.0.0
+      DATABASE_URL: ${DATABASE_URL}
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      # Leave BLOB_READ_WRITE_TOKEN unset so uploads use the local media volume.
+    volumes:
+      - cms_media:/app/media
+    networks: [edge, internal]
+    depends_on:
+      db:
+        condition: service_healthy
+      cms-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:3000/api/access > /dev/null || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  # ---- Database -----------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      # Kenyan/East African collation is not needed for content ordering, and
+      # C collation keeps index behaviour predictable.
+      POSTGRES_INITDB_ARGS: '--encoding=UTF8 --locale=C'
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks: [internal]
+    # No published port: the database is only reachable from the internal
+    # network. Connect with `docker compose exec db psql -U $POSTGRES_USER`.
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    shm_size: 256mb
+
+  # ---- Backups ------------------------------------------------------------
+  # Dumps the database nightly to the `backups` volume. Copy those off-box —
+  # see deploy/backup.sh and the systemd timer in deploy/systemd/.
+  backup:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      PGHOST: db
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+    volumes:
+      - ./backup.sh:/usr/local/bin/backup.sh:ro
+      - backups:/backups
+    entrypoint: ['/bin/sh', '-c']
+    # Sleep until 02:15 local time, dump, prune, repeat.
+    command:
+      - |
+        while true; do
+          now=$$(date +%H%M)
+          if [ "$$now" = "0215" ]; then /usr/local/bin/backup.sh; fi
+          sleep 60
+        done
+    networks: [internal]
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pg_data:
+  cms_media:
+  caddy_data:
+  caddy_config:
+  caddy_logs:
+  backups:
+
+networks:
+  # Public-facing: caddy, site, cms
+  edge:
+  # Private: db, cms, backup. `internal: true` means no route to the internet
+  # and no NAT — the database cannot reach out even if it is compromised.
+  internal:
+    internal: true

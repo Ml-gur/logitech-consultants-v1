@@ -2,43 +2,14 @@
 
 import { motion } from 'framer-motion'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
+import { COMPETITIVE_LANDSCAPE } from '../lib/brand'
 
-const columns = [
-  {
-    title: 'Freelance',
-    dark: false,
-    items: [
-      'One person, limited capacity',
-      'Narrow skill set, gaps in others',
-      'Slows down when they get busy',
-      'Little process or documentation',
-      'Gone the moment it ships',
-    ],
-  },
-  {
-    title: 'Other Agencies',
-    dark: false,
-    items: [
-      'Generic, pre-built solutions',
-      'Slow, bloated onboarding',
-      'Junior team does the real work',
-      'Locked into their tools',
-      'Handover, then radio silence',
-    ],
-  },
-  {
-    title: 'Working with Us',
-    dark: true,
-    items: [
-      'Senior team across the full AI stack',
-      'Custom-built around your data',
-      '2–4 week pilots with clear metrics',
-      'Fully documented, owned by you',
-      'Ongoing optimization and support',
-    ],
-  },
-]
-
+/**
+ * The position we occupy, stated as a comparison of categories rather than a
+ * competitor list (brand doc §10–§11). The left two columns describe the shape
+ * of the alternatives; the accent column is where Naivolabs sits, the layer
+ * between the platform and the organization's actual work.
+ */
 export default function WhyUs() {
   return (
     <section id="why-us" className="relative">
@@ -50,7 +21,7 @@ export default function WhyUs() {
           transition={springReveal()}
           className="section-label text-center"
         >
-          Why Us
+          Where we sit
         </motion.p>
 
         <motion.h2
@@ -58,9 +29,9 @@ export default function WhyUs() {
           whileInView={revealWhileInView}
           viewport={revealViewport}
           transition={springReveal(0.06)}
-          className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] text-center max-w-[640px] mx-auto mb-4"
+          className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] text-center max-w-[700px] mx-auto mb-4"
         >
-          AI partner, done right.
+          Between the platform and the work.
         </motion.h2>
 
         <motion.p
@@ -68,63 +39,52 @@ export default function WhyUs() {
           whileInView={revealWhileInView}
           viewport={revealViewport}
           transition={springReveal(0.1)}
-          className="text-[17px] text-fog text-center max-w-[440px] mx-auto mb-16"
+          className="text-[17px] text-fog text-center max-w-[520px] mx-auto mb-16"
         >
-          The difference between a quick fix and a system that lasts.
+          Platforms supply capability. Agencies supply bespoke projects. Neither is a governed system running
+          inside your operations.
         </motion.p>
 
-        {/* Three comparison cards — the featured column glows violet */}
         <div className="grid md:grid-cols-3 gap-4">
-          {columns.map((col, i) => (
-            <motion.div
-              key={col.title}
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal(i * 0.08)}
-              className={`rounded-[30px] p-7 flex flex-col ${
-                col.dark
-                  ? 'bg-[#191919] border border-signal/40 shadow-[0_0_32px_rgba(112,132,255,0.19)]'
-                  : 'bg-[#121212] border border-white/10'
-              }`}
-            >
-              <h3 className={`text-xl font-medium mb-8 ${col.dark ? 'text-paper' : 'text-ash'}`}>
-                {col.title}
-              </h3>
+          {COMPETITIVE_LANDSCAPE.map((col, i) => {
+            const accent = col.tone === 'accent'
+            return (
+              <motion.div
+                key={col.title}
+                initial={revealInitial}
+                whileInView={revealWhileInView}
+                viewport={revealViewport}
+                transition={springReveal(i * 0.08)}
+                className={`rounded-[30px] p-7 flex flex-col ${
+                  accent
+                    ? 'bg-[#191919] border border-signal/40 shadow-[0_0_32px_rgba(112,132,255,0.19)]'
+                    : 'bg-[#121212] border border-white/10'
+                }`}
+              >
+                <h3 className={`text-xl font-medium mb-8 ${accent ? 'text-paper' : 'text-ash'}`}>{col.title}</h3>
 
-              <ul className="space-y-4">
-                {col.items.map((item) => (
-                  <li key={item} className="flex items-start gap-3">
-                    <svg
-                      className={`w-4 h-4 mt-1 shrink-0 ${
-                        col.dark ? 'text-signal' : 'text-slate'
-                      }`}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden
-                    >
-                      {col.dark ? (
-                        <path d="M20 6L9 17l-5-5" />
-                      ) : (
-                        <path d="M18 6L6 18M6 6l12 12" />
-                      )}
-                    </svg>
-                    <span
-                      className={`text-sm leading-relaxed ${
-                        col.dark ? 'text-fog' : 'text-ash'
-                      }`}
-                    >
-                      {item}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          ))}
+                <ul className="space-y-4">
+                  {col.items.map((item) => (
+                    <li key={item} className="flex items-start gap-3">
+                      <svg
+                        className={`w-4 h-4 mt-1 shrink-0 ${accent ? 'text-signal' : 'text-slate'}`}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden
+                      >
+                        {accent ? <path d="M20 6L9 17l-5-5" /> : <path d="M18 6L6 18M6 6l12 12" />}
+                      </svg>
+                      <span className={`text-sm leading-relaxed ${accent ? 'text-fog' : 'text-ash'}`}>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            )
+          })}
         </div>
       </div>
     </section>

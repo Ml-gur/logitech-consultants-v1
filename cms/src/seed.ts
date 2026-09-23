@@ -16,8 +16,8 @@ import {
   faqs,
 } from '../../src/data/content'
 
-const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'admin@logitechconsultants.com'
-const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'LogitechAdmin!2026'
+const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'admin@naivolabs.com'
+const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'NaivolabsAdmin!2026'
 
 // Payload generates these from the collection config (see src/payload-types.ts).
 type PostCategory = 'Guides' | 'AI Strategy' | 'Automation'
@@ -96,33 +96,35 @@ async function main() {
     }
   }
 
-  // 2b. Case studies ---------------------------------------------------------
+  // 2b. Deployment patterns --------------------------------------------------
   const { docs: allCaseStudies } = await payload.find({
     collection: 'case-studies',
     limit: 100,
     overrideAccess: true,
   })
 
-  const caseStudiesToSeed = siteCaseStudies.map((cs, i) => ({
+  const patternsToSeed = siteCaseStudies.map((cs, i) => ({
     ...cs,
     order: i + 1,
   }))
 
-  for (const cs of caseStudiesToSeed) {
+  for (const cs of patternsToSeed) {
     const existing = allCaseStudies.find((d) => d.slug === cs.slug)
 
+    // New model fields. `review` is deliberately not seeded: the site does not
+    // render testimonials and we do not want invented quotes in the CMS.
     const data = {
       name: cs.name,
       slug: cs.slug,
       category: cs.category,
       tagline: cs.tagline,
-      year: cs.year,
       timeframe: cs.timeframe,
-      challenge: cs.challenge,
-      build: cs.build,
-      outcome: cs.outcome.map((m) => ({ value: m.value, label: m.label })),
-      review: cs.review,
-      metric: cs.metric,
+      stack: cs.stack.map((item) => ({ item })),
+      problem: cs.problem,
+      approach: cs.approach,
+      integrations: cs.integrations.map((item) => ({ item })),
+      measures: cs.measures.map((m) => ({ metric: m.metric, detail: m.detail })),
+      governance: cs.governance.map((control) => ({ control })),
       order: cs.order,
     }
 
@@ -133,14 +135,14 @@ async function main() {
         data,
         overrideAccess: true,
       })
-      console.log(`  ~ Updated case study: ${cs.slug}`)
+      console.log(`  ~ Updated deployment pattern: ${cs.slug}`)
     } else {
       await payload.create({
         collection: 'case-studies',
         data: { ...data, _status: 'published' },
         overrideAccess: true,
       })
-      console.log(`  + Created case study: ${cs.slug}`)
+      console.log(`  + Created deployment pattern: ${cs.slug}`)
     }
   }
 

@@ -1,0 +1,82 @@
+# Naivolabs — reverse proxy (Caddy 2)
+#
+# Caddy is used over nginx + certbot because TLS is automatic: certificates are
+# issued and renewed on first request, and renewal is not a cron job anyone has
+# to remember. Set SITE_DOMAIN / CMS_DOMAIN / ACME_EMAIL in .env.production.
+#
+# Swap in your email below or via the environment — Let's Encrypt needs a real
+# address to warn you about expiring certificates.
+
+{
+	email {$ACME_EMAIL}
+	# HTTP/3 on by default; compression (zstd + gzip) is automatic.
+	servers {
+		protocols h1 h2 h3
+	}
+}
+
+# ---- Marketing site -------------------------------------------------------
+{$SITE_DOMAIN} {
+	encode zstd gzip
+
+	# Caddy normally strips these for proxied responses; the nginx container
+	# already sets its own, so pass them through untouched.
+	header_down -Server
+
+	reverse_proxy site:8080 {
+		# Only serve a response from an instance that reports healthy.
+		health_uri /healthz
+		health_interval 15s
+		health_timeout 3s
+	}
+
+	# Long-lived asset caching is set by the site container; nothing to add.
+
+	log {
+		output file /var/log/caddy/site.log {
+			roll_size 20MiB
+			roll_keep 5
+		}
+		format json
+	}
+}
+
+# ---- Canonical redirect: www → apex ---------------------------------------
+www.{$SITE_DOMAIN} {
+	redir https://{$SITE_DOMAIN}{uri} permanent
+}
+
+# ---- CMS ------------------------------------------------------------------
+# Separate hostname so the admin panel and REST API never share an origin with
+# the marketing site (cookie isolation, and the site's CSP stays tight).
+{$CMS_DOMAIN} {
+	encode zstd gzip
+	header_down -Server
+
+	# The admin panel is a privileged surface: restrict it to the operators'
+	# network if you do not need public access. Uncomment and set an allow-list.
+	# @admin path /admin*
+	# handle @admin {
+	#     @blocked not remote_ip {$ADMIN_ALLOWED_IPS}
+	#     respond @blocked "Not found" 404
+	#     reverse_proxy cms:3000
+	# }
+
+	reverse_proxy cms:3000 {
+		health_uri /api/access
+		health_interval 15s
+		health_timeout 5s
+	}
+
+	log {
+		output file /var/log/caddy/cms.log {
+			roll_size 20MiB
+			roll_keep 5
+		}
+		format json
+	}
+}
+
+# ---- Health endpoint for external uptime monitors -------------------------
+# Point your monitor at https://SITE_DOMAIN/healthz — answered by the site
+# container, no auth, no logging noise.

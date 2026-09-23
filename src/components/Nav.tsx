@@ -4,12 +4,13 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { cn } from '../utils'
+import Wordmark from './Wordmark'
 
 const navLinks = [
   { label: 'Home', to: '/' },
-  { label: 'AI in Nairobi', to: '/ai-automation-nairobi' },
-  { label: 'Case Studies', to: '/case-studies' },
-  { label: 'Blog', to: '/blog' },
+  { label: 'Capabilities', to: '/capabilities' },
+  { label: 'Deployment patterns', to: '/deployment-patterns' },
+  { label: 'Insights', to: '/blog' },
   { label: 'About', to: '/about' },
 ]
 
@@ -22,6 +23,16 @@ export default function Nav() {
     setMobileOpen(false)
   }, [pathname])
 
+  // Close on Escape (keyboard users should never be trapped in the menu)
+  useEffect(() => {
+    if (!mobileOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [mobileOpen])
+
   return (
     <motion.header
       initial={{ y: -24, opacity: 0 }}
@@ -29,14 +40,15 @@ export default function Nav() {
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className="fixed top-4 inset-x-0 z-50 px-4"
     >
-      {/* Floating nav pill — 60px radius, Carbon fill, 1px white-alpha border */}
+      {/* Floating nav pill, 60px radius, Carbon fill, 1px white-alpha border */}
       <div className="mx-auto max-w-[1100px] rounded-[60px] bg-[#191919] border border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.45)] px-3 sm:px-5 h-14 sm:h-16 flex items-center justify-between">
-        {/* Text wordmark — violet dot replaces the old orange mark */}
-        <Link to="/" className="flex items-center min-h-[44px] pl-2 sm:pl-3" aria-label="Logitech Consultants home">
-          <span className="font-display text-[18px] sm:text-[20px] font-medium leading-none tracking-[-0.02em] text-paper select-none">
-            Logitech<span className="text-signal">.</span>
-            <span className="hidden sm:inline">{" "}Consultants</span>
-          </span>
+        {/* Wordmark, one word, accent on the second half */}
+        <Link
+          to="/"
+          className="flex items-center min-h-[44px] px-2 sm:px-3"
+          aria-label="Naivolabs home"
+        >
+          <Wordmark className="font-display text-[18px] sm:text-[21px] font-medium leading-none" />
         </Link>
 
         {/* Desktop nav */}
@@ -71,7 +83,7 @@ export default function Nav() {
             to="/contact"
             className="ml-3 inline-flex items-center gap-2 px-5 py-3 rounded-[30px] bg-[#405bff] text-white text-sm font-medium transition-colors duration-200 hover:bg-[#3351e6]"
           >
-            Get a demo
+            Book a discovery call
           </Link>
         </nav>
 
@@ -93,7 +105,7 @@ export default function Nav() {
         </button>
       </div>
 
-      {/* Mobile menu — carbon dropdown matching the pill */}
+      {/* Mobile menu, carbon dropdown matching the pill */}
       <motion.div
         id="mobile-menu"
         initial={false}
@@ -128,7 +140,7 @@ export default function Nav() {
               to="/contact"
               className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-[30px] bg-[#405bff] text-white text-sm font-medium"
             >
-              Get a demo
+              Book a discovery call
             </Link>
           </div>
         </nav>

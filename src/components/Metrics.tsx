@@ -1,84 +1,90 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { motion, useInView, useReducedMotion } from 'framer-motion'
-import { springReveal } from '../motion'
+import { motion } from 'framer-motion'
+import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
+import { MEASUREMENT_DIMENSIONS } from '../lib/brand'
 
-const metrics = [
-  { label: 'Average first-year ROI', value: 3, suffix: 'x' },
-  { label: 'Hours saved per month', value: 100, suffix: '+' },
-  { label: 'Less manual work across teams', value: 60, suffix: '%' },
-  { label: 'Client retention rate', value: 98, suffix: '%' },
-]
-
-function CountUp({ value, suffix, started }: { value: number; suffix: string; started: boolean }) {
-  const [display, setDisplay] = useState(0)
-  const reduce = useReducedMotion()
-
-  useEffect(() => {
-    if (!started || reduce) {
-      if (reduce) setDisplay(value)
-      return
-    }
-    const duration = 1600
-    const start = performance.now()
-    let raf = 0
-    const tick = (now: number) => {
-      const p = Math.min(1, (now - start) / duration)
-      const eased = 1 - Math.pow(1 - p, 3)
-      setDisplay(Math.round(value * eased))
-      if (p < 1) raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [started, value, reduce])
-
-  return (
-    <span className="font-display text-[44px] leading-[1em] font-medium tracking-[-0.04em] text-paper tabular-nums">
-      {display}
-      <span className="text-signal">{suffix}</span>
-    </span>
-  )
-}
-
-function MetricCard({ metric, index }: { metric: (typeof metrics)[number]; index: number }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-80px' })
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 40 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={springReveal(index * 0.08)}
-      className="card-dark rounded-[30px] p-6 max-md:p-5"
-    >
-      <div className="mb-5">
-        <CountUp value={metric.value} suffix={metric.suffix} started={inView} />
-      </div>
-
-      {/* Highlighter segments — 1 violet + 3 hairline */}
-      <div className="flex gap-1.5 mb-5">
-        <div className="h-2 flex-1 rounded-full bg-gradient-to-r from-[#405bff] to-[#7084ff]" />
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="h-2 flex-1 rounded-full bg-white/10" />
-        ))}
-      </div>
-
-      <p className="text-sm text-fog leading-snug">{metric.label}</p>
-    </motion.div>
-  )
-}
-
+/**
+ * "What we measure".
+ *
+ * This section previously displayed invented agency statistics (average ROI,
+ * client retention). The brand is built on evidence over claims, so it now
+ * states the dimensions every deployment is instrumented against, targets
+ * agreed before launch and reported against afterwards. Real outcome figures
+ * replace this framing once there are engagements to publish.
+ */
 export default function Metrics() {
   return (
-    <section className="relative">
-      <div className="max-w-[1200px] mx-auto px-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {metrics.map((m, i) => (
-            <MetricCard key={m.label} metric={m} index={i} />
+    <section id="measurement" className="relative">
+      <div className="relative max-w-[1200px] mx-auto px-6 py-24 max-md:py-16">
+        <div className="max-w-[760px] mb-14">
+          <motion.p
+            initial={revealInitial}
+            whileInView={revealWhileInView}
+            viewport={revealViewport}
+            transition={springReveal()}
+            className="section-label"
+          >
+            Measurement
+          </motion.p>
+
+          <motion.h2
+            initial={revealInitial}
+            whileInView={revealWhileInView}
+            viewport={revealViewport}
+            transition={springReveal(0.06)}
+            className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] mb-6"
+          >
+            We agree what success means before we build.
+          </motion.h2>
+
+          <motion.p
+            initial={revealInitial}
+            whileInView={revealWhileInView}
+            viewport={revealViewport}
+            transition={springReveal(0.1)}
+            className="text-[17px] text-fog leading-relaxed"
+          >
+            You will not find invented ROI figures on this page. What we can tell you is exactly which
+            dimensions every deployment is instrumented against, and that the targets for them are agreed with
+            you before the first user touches the system.
+          </motion.p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {MEASUREMENT_DIMENSIONS.map((m, i) => (
+            <motion.div
+              key={m.metric}
+              initial={revealInitial}
+              whileInView={revealWhileInView}
+              viewport={revealViewport}
+              transition={springReveal(i * 0.06)}
+              className="card-dark rounded-[30px] p-6 max-md:p-5 flex flex-col"
+            >
+              {/* Highlighter segments, 1 violet + 3 hairline */}
+              <div className="flex gap-1.5 mb-6">
+                <div className="h-2 flex-1 rounded-full bg-gradient-to-r from-[#405bff] to-[#7084ff]" />
+                {[0, 1, 2].map((s) => (
+                  <div key={s} className="h-2 flex-1 rounded-full bg-white/10" />
+                ))}
+              </div>
+
+              <h3 className="text-[17px] font-medium text-paper mb-2.5">{m.metric}</h3>
+              <p className="text-sm text-fog leading-relaxed">{m.detail}</p>
+            </motion.div>
           ))}
         </div>
+
+        <motion.p
+          initial={revealInitial}
+          whileInView={revealWhileInView}
+          viewport={revealViewport}
+          transition={springReveal(0.12)}
+          className="text-sm text-fog mt-8 max-w-[620px]"
+        >
+          Where a deployment does not meet its agreed target, we say so and either change the approach or stop.
+          Publishing only the wins would make the rest of this page worthless.
+        </motion.p>
       </div>
     </section>
   )

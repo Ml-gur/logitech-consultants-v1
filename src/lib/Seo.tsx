@@ -1,25 +1,20 @@
 'use client'
 
 import { useEffect } from 'react'
+import { SITE, absUrl } from './brand'
 
 /**
  * Per-route SEO head manager (seo-specialist skill).
  *
- * Sets document.title, meta description, canonical, Open Graph, and JSON-LD
- * structured data on every route change. This site is a client-rendered Vite
- * SPA (no SSR), so these tags are applied at runtime — Googlebot renders JS
- * and reads the final DOM. robots.txt / sitemap.xml live in /public (static,
- * served before the SPA fallback) and are generated from the same route list.
+ * Sets document.title, meta description, canonical, Open Graph, Twitter card
+ * and JSON-LD structured data on every route change. This site is a
+ * client-rendered Vite SPA (no SSR), so these tags are applied at runtime —
+ * Googlebot renders JS and reads the final DOM. robots.txt / sitemap.xml live
+ * in /public (static, served before the SPA fallback) and are generated from
+ * the same route list, sourced from the SITE constants in ./brand.
  */
 
-export const SITE = {
-  name: 'Logitech Consultants',
-  url: 'https://logitechconsultants.com',
-  description:
-    'AI automation agency: we find where AI creates real value, build the automations and agents to capture it, and make sure they keep working long after the engagement ends.',
-  image: '/og-image.png',
-  twitter: '@logitechconsult',
-}
+export { SITE }
 
 interface SeoProps {
   title: string
@@ -29,6 +24,8 @@ interface SeoProps {
   type?: string
   /** JSON-LD objects to inject for this route. */
   jsonLd?: object[]
+  /** Keep the page out of search indexes (404 and other non-content routes). */
+  noindex?: boolean
 }
 
 function setMeta(attr: 'name' | 'property', key: string, content: string) {
@@ -63,28 +60,52 @@ function upsertJsonLd(blocks: object[]) {
   }
 }
 
-export default function Seo({ title, description, path = '/', image, type = 'website', jsonLd = [] }: SeoProps) {
+/**
+ * SERP title budget: Google truncates around 60 characters. Combine
+ * "Page | Naivolabs" when it fits; otherwise fall back to the page title
+ * alone rather than shipping a truncated brand suffix.
+ */
+export function formatTitle(title: string): string {
+  if (title === SITE.name) return title
+  const combined = `${title} | ${SITE.name}`
+  return combined.length <= 60 ? combined : title
+}
+
+export default function Seo({
+  title,
+  description,
+  path = '/',
+  image,
+  type = 'website',
+  jsonLd = [],
+  noindex = false,
+}: SeoProps) {
   useEffect(() => {
-    // Keep the title ≤ ~60 chars for SERP display: drop the brand suffix if
-    // combining would exceed the limit (the brand still appears in the
-    // canonical URL and homepage).
-    const combined = title === SITE.name ? title : `${title} | ${SITE.name}`
-    const fullTitle = combined.length <= 60 ? combined : title
+    const fullTitle = formatTitle(title)
     document.title = fullTitle
     setMeta('name', 'description', description)
     setMeta('property', 'og:title', fullTitle)
     setMeta('property', 'og:description', description)
     setMeta('property', 'og:type', type)
-    setMeta('property', 'og:url', SITE.url + path)
-    setMeta('property', 'og:image', SITE.url + (image || SITE.image))
+    setMeta('property', 'og:url', absUrl(path))
+    setMeta('property', 'og:image', image ? absUrl(image) : absUrl(SITE.image))
     setMeta('property', 'og:site_name', SITE.name)
+    setMeta('property', 'og:locale', SITE.locale)
     setMeta('name', 'twitter:card', 'summary_large_image')
     setMeta('name', 'twitter:title', fullTitle)
     setMeta('name', 'twitter:description', description)
-    setMeta('name', 'twitter:image', SITE.url + (image || SITE.image))
-    upsertCanonical(SITE.url + path)
+    setMeta('name', 'twitter:image', image ? absUrl(image) : absUrl(SITE.image))
+    upsertCanonical(absUrl(path))
+
+    // Per-page robots directive (404 and utility routes must not be indexed).
+    // Indexable routes restate the static index.html directive rather than
+    // dropping the tag: removing it would also drop `max-image-preview:large`,
+    // which is what lets Google show a large image alongside the result.
+    if (noindex) setMeta('name', 'robots', 'noindex, follow')
+    else setMeta('name', 'robots', 'index, follow, max-image-preview:large')
+
     if (jsonLd.length) upsertJsonLd(jsonLd)
-  }, [title, description, path, image, type, jsonLd])
+  }, [title, description, path, image, type, jsonLd, noindex])
 
   return null
 }
@@ -98,52 +119,80 @@ export function breadcrumbLd(crumbs: { name: string; path: string }[]) {
       '@type': 'ListItem',
       position: i + 1,
       name: c.name,
-      item: SITE.url + c.path,
+      item: absUrl(c.path),
     })),
   }
 }
 
 /**
- * ProfessionalService entity — injected on the home page.
+ * Organization entity, the sitewide brand node, injected on the home page.
  *
- * Local-business structured data (deep-research priority #4): type
- * ProfessionalService is the agency-correct schema type, with address, geo,
- * opening hours, and the Nairobi/Kenya areaServed that anchors regional
- * relevance for local + AI-answer ranking.
+ * `Organization` (rather than a single local-business type) is correct for an
+ * applied AI systems company with a global audience; the Nairobi address and
+ * areaServed stay attached as real, verifiable facts. `knowsAbout` states the
+ * capability areas so answer engines can place the entity.
  */
-export function siteLd() {
+export function organizationLd() {
   return {
     '@context': 'https://schema.org',
-    '@type': 'ProfessionalService',
+    '@type': 'Organization',
     name: SITE.name,
+    legalName: SITE.legalName,
     url: SITE.url,
-    logo: SITE.url + '/favicon-64.png',
-    email: 'hello@logitechconsultants.com',
-    telephone: '+254112292847',
+    logo: absUrl('/favicon-512.png'),
+    image: absUrl(SITE.image),
+    slogan: SITE.essence,
     description: SITE.description,
+    email: SITE.email,
+    telephone: SITE.phone,
+    foundingDate: '2026',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: '51 Lenana Road',
-      addressLocality: 'Nairobi',
-      addressCountry: 'KE',
-      postalCode: '00100',
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: -1.2864,
-      longitude: 36.7812,
-    },
-    openingHoursSpecification: {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-      opens: '09:00',
-      closes: '17:00',
+      streetAddress: SITE.address.street,
+      addressLocality: SITE.address.city,
+      addressCountry: SITE.address.country,
+      postalCode: SITE.address.postalCode,
     },
     areaServed: [
       { '@type': 'City', name: 'Nairobi' },
       { '@type': 'Country', name: 'Kenya' },
+      { '@type': 'Place', name: 'Worldwide' },
     ],
-    priceRange: '$$',
-    sameAs: [],
+    knowsAbout: [
+      'Applied AI systems',
+      'Voice agents',
+      'Conversational AI',
+      'Knowledge retrieval systems',
+      'Workflow automation',
+      'AI governance and evaluation',
+    ],
+    sameAs: [SITE.social.x, SITE.social.linkedin, SITE.social.youtube, SITE.social.github].filter(Boolean),
+  }
+}
+
+/** Backwards-compatible alias, earlier revisions used a local-business node. */
+export const siteLd = organizationLd
+
+/** WebSite node with SearchAction, for sitelinks search box eligibility. */
+export function websiteLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE.name,
+    url: SITE.url,
+    description: SITE.description,
+    publisher: { '@type': 'Organization', name: SITE.name, url: SITE.url },
+  }
+}
+
+/** Service-level node for a capability area, used on the home page. */
+export function serviceLd(name: string, description: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name,
+    description,
+    provider: { '@type': 'Organization', name: SITE.name, url: SITE.url },
+    areaServed: { '@type': 'Place', name: 'Worldwide' },
   }
 }

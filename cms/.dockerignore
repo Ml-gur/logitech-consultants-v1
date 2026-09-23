@@ -1,0 +1,31 @@
+# Build context exclusions — CMS image (deploy/Dockerfile.cms, context = cms/).
+#
+# `COPY . .` runs after `npm ci`, so a host node_modules would overwrite the
+# modules installed for the container's platform (production targets linux/arm64).
+
+# Version control
+.git
+.gitignore
+
+# Installed + generated locally
+node_modules
+.next
+*.tsbuildinfo
+
+# Local development database + test scratch
+cms.db
+cms.db-journal
+test.env
+tests
+vitest.config.mts
+vitest.setup.ts
+playwright.config.ts
+playwright-report
+test-results
+
+# Docs
+README.md
+
+# Secrets must never reach an image layer.
+.env
+.env.*

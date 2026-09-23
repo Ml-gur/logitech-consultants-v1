@@ -1,0 +1,81 @@
+# Naivolabs CMS (Payload 3 on Next.js) — production image.
+#
+# Build context is the cms/ directory:
+#   docker build -f deploy/Dockerfile.cms -t naivolabs-cms ./cms
+#
+# Notes
+# -----
+# * Payload's admin bundle and Next's server build both need a lot of memory;
+#   --max-old-space-size is raised accordingly.
+# * The image runs `next start` (not standalone) because Payload's admin UI and
+#   REST/GraphQL routes are served by the same Next server. `next start` is
+#   fully supported in production.
+# * Migrations are run as a separate compose service (`cms-migrate`) BEFORE
+#   this container is allowed to take traffic — Payload does not create tables
+#   on its own.
+
+# ---- deps -----------------------------------------------------------------
+FROM node:22-alpine AS deps
+
+WORKDIR /app
+# sharp needs these at build time on musl.
+RUN apk add --no-cache libc6-compat vips-dev build-base python3
+
+COPY package.json package-lock.json ./
+# `npm ci --omit=dev` is not enough: Next/Payload need build-time dev deps.
+RUN npm ci
+
+# ---- build ----------------------------------------------------------------
+FROM node:22-alpine AS build
+
+WORKDIR /app
+RUN apk add --no-cache libc6-compat vips-dev
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+ENV NODE_ENV=production
+ENV NODE_OPTIONS=--max-old-space-size=4096
+# A build-time secret is required for Payload's config to load; the real value
+# is supplied at runtime by compose. This placeholder is never used to sign
+# anything at build time.
+ENV PAYLOAD_SECRET=build-time-placeholder-not-used-at-runtime
+# The build must not require a live database.
+ENV DATABASE_URL=postgres://build:build@localhost:5432/build
+
+RUN npm run build
+
+# ---- runtime --------------------------------------------------------------
+FROM node:22-alpine AS runtime
+
+WORKDIR /app
+RUN apk add --no-cache libc6-compat vips tini
+
+ENV NODE_ENV=production
+ENV NODE_OPTIONS=--max-old-space-size=1024
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+
+# Run as the unprivileged `node` user that the base image already provides.
+COPY --from=build --chown=node:node /app/node_modules ./node_modules
+COPY --from=build --chown=node:node /app/.next ./.next
+COPY --from=build --chown=node:node /app/package.json ./package.json
+COPY --from=build --chown=node:node /app/next.config.* ./
+COPY --from=build --chown=node:node /app/src ./src
+COPY --from=build --chown=node:node /app/tsconfig.json ./tsconfig.json
+
+# Writable directory for local-disk media uploads, mounted as the `cms_media`
+# volume by compose. It is CREATED here rather than copied from the build stage:
+# uploads are runtime data, and `cms/media` is not in the repository, so a
+# `COPY --from=build /app/media` would fail the build outright.
+RUN mkdir -p /app/media && chown -R node:node /app/media
+
+USER node
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:3000/api/access > /dev/null || exit 1
+
+# tini reaps zombies and forwards signals so `docker compose down` is clean.
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["npm", "run", "start"]

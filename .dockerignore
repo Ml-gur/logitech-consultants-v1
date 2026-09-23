@@ -1,0 +1,43 @@
+# Build context exclusions — site image (deploy/Dockerfile.site, context = repo root).
+#
+# Two reasons this file matters:
+#   1. `COPY . .` runs AFTER `npm ci`, so a host node_modules would overwrite the
+#      modules npm just installed for the *container's* platform. The production
+#      target is CAX21 (linux/arm64), so x86 host binaries there would break the
+#      build.
+#   2. Without it, .env files, the dev SQLite database and the git history are
+#      copied into builder layers.
+
+# Version control + CI
+.git
+.gitignore
+.github
+.worktrees
+
+# Installed + generated locally
+node_modules
+dist
+test-results
+playwright-report
+*.tsbuildinfo
+
+# Agent / loop scaffolding and local scratch
+.claude
+.agents
+.superpowers
+.tmp-debug
+docs
+e2e
+capture-sections.mjs
+probe*.mjs
+screenshot-reference.png
+logitech logo.png
+
+# The CMS is its own build context (cms/) — never needed in the site image.
+cms
+
+# Secrets must never reach an image layer.
+.env
+.env.*
+deploy/.env
+deploy/.env.*

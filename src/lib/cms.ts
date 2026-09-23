@@ -7,7 +7,7 @@
  * so it renders instantly and works with zero configuration. When
  * `VITE_CMS_URL` is set at build time (e.g. https://cms-logitech.vercel.app),
  * the site additionally fetches live content from the Payload CMS REST API and
- * swaps it in — edits published in the admin panel appear on the live site on
+ * swaps it in, edits published in the admin panel appear on the live site on
  * the next load, with no redeploy required.
  *
  * Every fetch is wrapped in a try/catch that falls back to the bundled static
@@ -20,7 +20,7 @@ import {
   contactInfo as staticContactInfo,
   faqs as staticFaqs,
 } from '../data/content'
-import type { BlogPost, CaseStudy } from '../data/content'
+import type { BlogPost, CaseStudy, DeploymentPattern } from '../data/content'
 
 export const CMS_URL = (import.meta.env.VITE_CMS_URL as string | undefined)?.replace(/\/+$/, '') ?? ''
 export const cmsEnabled = CMS_URL.length > 0
@@ -86,30 +86,60 @@ function mapPost(doc: CmsBlogPost): BlogPost {
 }
 
 // ---------------------------------------------------------------------------
-// Case studies (same fallback pattern as blog posts)
+// Deployment patterns (same fallback pattern as blog posts)
 // ---------------------------------------------------------------------------
 
-interface CmsCaseStudy {
+/**
+ * CMS shape for a deployment pattern.
+ *
+ * The collection was historically the "case studies" collection with a
+ * challenge/build/outcome/review field set. Those legacy fields are still
+ * accepted here (challenge → problem, build → approach, outcome → measures)
+ * so an un-migrated CMS instance keeps rendering, while the newer field names
+ * are preferred when present. `review` is intentionally dropped: fabricated
+ * testimonials are not rendered anywhere on the site.
+ */
+interface CmsDeploymentPattern {
   id: string
   name: string
   slug: string
   category: string
   tagline: string
-  year: string
-  timeframe: string
-  challenge: string
-  build: string
+  timeframe?: string
+  status?: string
+  stack?: string[]
   image?: { url?: string } | string | null
-  outcome: { value: string; label: string }[]
-  review: { quote: string; name: string; role: string }
-  metric: { value: string; label: string }
+  problem?: string
+  approach?: string
+  integrations?: { item?: string }[] | string[]
+  measures?: { metric?: string; detail?: string }[]
+  governance?: { control?: string }[] | string[]
+  // Legacy field names from the case-studies schema
+  challenge?: string
+  build?: string
+  outcome?: { value: string; label: string }[]
 }
 
-function mapCaseStudy(doc: CmsCaseStudy): CaseStudy {
+/** Accept both `[{ item }]` (Payload array field) and `['x']` shapes. */
+function toStringList(input: unknown): string[] {
+  if (!Array.isArray(input)) return []
+  return input
+    .map((entry) => {
+      if (typeof entry === 'string') return entry
+      if (entry && typeof entry === 'object') {
+        const o = entry as Record<string, unknown>
+        return (o.item ?? o.control ?? o.value) as string | undefined
+      }
+      return undefined
+    })
+    .filter((v): v is string => typeof v === 'string' && v.length > 0)
+}
+
+function mapDeploymentPattern(doc: CmsDeploymentPattern): DeploymentPattern {
   let image = resolveImage(doc.image)
-  // The seed does not upload images to the CMS media library — fall back to
-  // the bundled image for the same slug so known case studies keep their
-  // photos in CMS mode. New ones without an image render the placeholder.
+  // The seed does not upload images to the CMS media library, fall back to
+  // the bundled image for the same slug so known patterns keep their photos in
+  // CMS mode. New ones without an image render the placeholder.
   if (!image) {
     const staticCS = staticCaseStudies.find((c) => c.slug === doc.slug)
     image = staticCS?.image ?? ''
@@ -120,24 +150,41 @@ function mapCaseStudy(doc: CmsCaseStudy): CaseStudy {
     category: doc.category,
     image,
     tagline: doc.tagline,
-    year: doc.year,
-    timeframe: doc.timeframe,
-    challenge: doc.challenge,
-    build: doc.build,
-    outcome: doc.outcome ?? [],
-    review: doc.review ?? { quote: '', name: '', role: '' },
-    metric: doc.metric ?? { value: '', label: '' },
+    timeframe: doc.timeframe ?? 'Scoped per engagement',
+    stack: toStringList(doc.stack),
+    problem: doc.problem ?? doc.challenge ?? '',
+    approach: doc.approach ?? doc.build ?? '',
+    integrations: toStringList(doc.integrations),
+    measures:
+      doc.measures && doc.measures.length > 0
+        ? doc.measures
+            .filter((m) => m?.metric)
+            .map((m) => ({ metric: m.metric as string, detail: m.detail ?? '' }))
+        : (doc.outcome ?? []).map((o) => ({ metric: o.label, detail: o.value })),
+    governance: toStringList(doc.governance),
   }
 }
 
-export async function fetchCaseStudies(): Promise<CaseStudy[]> {
+export async function fetchCaseStudies(): Promise<DeploymentPattern[]> {
   if (!cmsEnabled) return staticCaseStudies
   try {
-    const data = await getJson<{ docs: CmsCaseStudy[] }>('/api/case-studies?limit=100&depth=1&sort=order')
-    const docs = (data.docs ?? []).map(mapCaseStudy)
+    const data = await getJson<{ docs: CmsDeploymentPattern[] }>(
+      '/api/deployment-patterns?limit=100&depth=1&sort=order'
+    )
+    const docs = (data.docs ?? []).map(mapDeploymentPattern)
     return docs.length > 0 ? docs : staticCaseStudies
   } catch {
-    return staticCaseStudies
+    // The collection may still be named `case-studies` on an older CMS
+    // instance, fall back to it before giving up on live content.
+    try {
+      const data = await getJson<{ docs: CmsDeploymentPattern[] }>(
+        '/api/case-studies?limit=100&depth=1&sort=order'
+      )
+      const docs = (data.docs ?? []).map(mapDeploymentPattern)
+      return docs.length > 0 ? docs : staticCaseStudies
+    } catch {
+      return staticCaseStudies
+    }
   }
 }
 
@@ -147,7 +194,7 @@ export async function fetchCaseStudies(): Promise<CaseStudy[]> {
 
 async function getJson<T>(path: string): Promise<T> {
   // Abort after 8s so a hanging CMS never blocks the static fallback swap.
-  // no-store: the site must always reflect freshly published content — a
+  // no-store: the site must always reflect freshly published content, a
   // cached CMS response would silently serve stale data.
   const res = await fetch(`${CMS_URL}${path}`, {
     signal: AbortSignal.timeout(8000),
@@ -189,19 +236,52 @@ export async function fetchFaqs(): Promise<FaqItem[] | null> {
   }
 }
 
-/** POST a contact-form submission to the CMS. Returns true on success. */
+/**
+ * Where contact-form submissions are delivered.
+ *
+ * Two destinations, chosen at build time (Vite inlines both):
+ *
+ *   1. `VITE_INQUIRY_ENDPOINT` — POST the JSON body to this URL. This is the
+ *      seam for an email provider: point it at a serverless function (Vercel,
+ *      Cloudflare Worker) that holds the provider's secret key and sends the
+ *      mail, or at a form-endpoint service that accepts a public key.
+ *   2. `VITE_CMS_URL` — POST to the self-hosted CMS at /api/inquiries, which
+ *      both sends nothing and stores the inquiry.
+ *
+ * If neither is set the submission is refused and the form shows its email
+ * fallback. It never reports success for a message that went nowhere.
+ *
+ * A PRIVATE API KEY MUST NEVER GO HERE. Everything in this file is compiled
+ * into a public JavaScript bundle; `VITE_INQUIRY_ACCESS_KEY` is only for
+ * services that are designed around a public, origin-restricted key.
+ */
+export const INQUIRY_ENDPOINT =
+  (import.meta.env.VITE_INQUIRY_ENDPOINT as string | undefined)?.trim() ?? ''
+
+/** Public access key for form-endpoint services. Never a private API key. */
+const INQUIRY_ACCESS_KEY =
+  (import.meta.env.VITE_INQUIRY_ACCESS_KEY as string | undefined)?.trim() ?? ''
+
+/** POST a contact-form submission. Returns true only on a confirmed delivery. */
 export async function submitInquiry(input: {
   name: string
   email: string
   budget: string
   message: string
 }): Promise<boolean> {
-  if (!cmsEnabled) return false
+  const toCms = !INQUIRY_ENDPOINT && cmsEnabled
+  const endpoint = INQUIRY_ENDPOINT || (toCms ? `${CMS_URL}/api/inquiries` : '')
+  if (!endpoint) return false
+
+  // The CMS path keeps its exact original body; the access key is only added
+  // when a third-party endpoint asked for one.
+  const body = !toCms && INQUIRY_ACCESS_KEY ? { ...input, access_key: INQUIRY_ACCESS_KEY } : input
+
   try {
-    const res = await fetch(`${CMS_URL}/api/inquiries`, {
+    const res = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(input),
+      body: JSON.stringify(body),
       signal: AbortSignal.timeout(8000),
     })
     return res.ok

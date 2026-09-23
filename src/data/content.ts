@@ -1,96 +1,174 @@
-export interface CaseStudy {
+/**
+ * Bundled site content.
+ *
+ * This file is the static fallback the site renders when the CMS is not
+ * configured or unreachable (see src/lib/cms.ts). Content is aligned with the
+ * Naivolabs brand identity foundation: evidence over claims, so we publish
+ * deployment PATTERNS with the dimensions we measure, not invented client
+ * names and metrics. Named references are added as engagements go live.
+ */
+
+export interface DeploymentPattern {
   slug: string
+  /** Pattern name, what we deploy, e.g. "AI Voice Receptionist". */
   name: string
+  /** Primary segment this pattern is built for. */
   category: string
   image: string
   tagline: string
-  year: string
+  /** Typical time from kickoff to first live deployment. */
   timeframe: string
-  challenge: string
-  build: string
-  outcome: { value: string; label: string }[]
-  review: { quote: string; name: string; role: string }
-  metric: { value: string; label: string }
+  /** Which of the four capability actions the pattern spans. */
+  stack: string[]
+  /** The problem, stated at the operational level. */
+  problem: string
+  /** How the system is built and where it sits in the organization. */
+  approach: string
+  /** Systems and channels it connects to. */
+  integrations: string[]
+  /** What we measure, agreed with the client before launch. */
+  measures: { metric: string; detail: string }[]
+  /** Governance controls shipped as part of the system. */
+  governance: string[]
 }
 
-export const caseStudies: CaseStudy[] = [
+export const deploymentPatterns: DeploymentPattern[] = [
   {
-    slug: 'etery',
-    name: 'Etery',
-    category: 'E-commerce',
+    slug: 'ai-voice-receptionist',
+    name: 'AI Voice Receptionist',
+    category: 'Membership organizations',
     image: '/images/M5MY3Wk4Y4dsOCa2vifZ9R6pI.webp',
-    tagline: 'Automating customer support and inventory ops for a high-volume e-commerce brand.',
-    year: '2025',
-    timeframe: '7 Weeks',
-    challenge:
-      "Etery's support team was drowning in repetitive tickets, with customers waiting hours for answers to simple order questions. Inventory counts drifted out of sync across sales channels, causing oversells and refunds. Every spike in orders forced a choice between slower replies and expensive temporary hires.",
-    build:
-      "We deployed an AI support assistant trained on Etery's catalog and policies that resolves common questions instantly and routes the rest to the right agent with full context. Alongside it, an automation keeps inventory synced across every channel in real time and flags discrepancies before they turn into oversells.",
-    outcome: [
-      { value: '60%', label: 'Tickets reduced' },
-      { value: '99.8%', label: 'Inventory accuracy' },
-      { value: 'Under 30s', label: 'First response time' },
+    tagline:
+      'An intelligent first point of contact that answers, understands, retrieves and completes, then hands off to a person when it should.',
+    timeframe: '4–6 weeks to first live deployment',
+    stack: ['Converse', 'Understand', 'Act'],
+    problem:
+      'A small team fields the same questions all day, hours, fees, meeting dates, application status, directions. Calls arrive faster than anyone can answer them, so members wait, calls go unanswered, and the staff who should be doing judgement work spend their day repeating themselves. After hours, the organization simply goes silent.',
+    approach:
+      'We deploy a voice agent grounded in the organization\u2019s own published information and policies. It answers common questions from source documents, asks for the details a request needs, and completes defined actions, logging a request, booking an appointment, sending a document, notifying the right department. Anything outside its scope is transferred to a person with the context already captured, so the caller never repeats themselves.',
+    integrations: [
+      'Existing phone lines and provider',
+      'WhatsApp and messaging channels',
+      'CRM or membership register',
+      'Calendar and booking system',
+      'Document store and policy pages',
     ],
-    review: {
-      quote:
-        'They showed us where AI actually fit our workflow, not just where it sounded impressive. Clear, practical, worth every cent.',
-      name: 'Olivia Reed',
-      role: 'Marketing Director',
-    },
-    metric: { value: '60%', label: 'Tickets reduced' },
+    measures: [
+      { metric: 'Completion rate', detail: 'Requests finished end to end without a person stepping in.' },
+      { metric: 'Time to answer', detail: 'Including after-hours and peak-volume periods.' },
+      { metric: 'Escalation accuracy', detail: 'How often it hands off, and whether that call was right.' },
+      { metric: 'Hours returned', detail: 'Staff time moved off repeat calls and onto member service.' },
+    ],
+    governance: [
+      'Every conversation transcribed, logged and reviewable',
+      'Hard boundaries on what the agent may say or commit to',
+      'Transfer to a named person, with context passed across',
+      'A kill switch the client controls, not us',
+    ],
   },
   {
-    slug: 'genesy',
-    name: 'Genesy',
-    category: 'Fintech',
-    image: '/images/J7KZFcCw0ZrENLKo0wuCy6nASg.webp',
-    tagline: 'Scaling content operations for an AI tools company without scaling the team.',
-    year: '2026',
-    timeframe: '6 Weeks',
-    challenge:
-      "Genesy's sales team was spending the majority of their prospecting time on leads that were never going to convert. Qualification was entirely manual and inconsistent between team members, and the cost of a wasted discovery call was significant given their senior-level involvement in every conversation.",
-    build:
-      "We built an automated qualification pipeline that scores inbound leads against Genesy's ideal client profile, enriches each record with company data, and routes high-fit prospects straight to calendar booking while placing lower-fit leads into a nurture sequence. The sales team now only speaks to pre-qualified opportunities.",
-    outcome: [
-      { value: '4×', label: 'Output Increase' },
-      { value: '67%', label: 'Production Time Cut' },
-      { value: 'Unchanged', label: 'Team Size' },
+    slug: 'institutional-knowledge-agent',
+    name: 'Institutional Knowledge Agent',
+    category: 'Higher education',
+    image: '/images/vl5w99JCKqkuvW49lyswomsyhnY.webp',
+    tagline:
+      'Answers drawn from the institution\u2019s own documents, cited back to the source, scoped to who is asking.',
+    timeframe: '6–8 weeks to first live deployment',
+    stack: ['Understand', 'Act', 'Orchestrate'],
+    problem:
+      'The answer exists, but it lives in a policy PDF, a staff intranet page, a spreadsheet and the memory of one person who is on leave. Staff and students ask the same questions across email, phone and a helpdesk, and someone senior has to go and find the document every single time. When that person leaves, the knowledge leaves with them.',
+    approach:
+      'We build a retrieval layer over the institution\u2019s real sources, then put a governed agent in front of it. Answers come back with the document they came from attached, so a person can check rather than trust. Access follows the role of whoever is asking, a student and a faculty administrator do not see the same corpus. Where an answer implies an action, the agent can raise the request rather than describe it.',
+    integrations: [
+      'Document stores, intranet and shared drives',
+      'Student or staff information system',
+      'Email and helpdesk queues',
+      'Single sign-on for role-scoped access',
     ],
-    review: {
-      quote:
-        'We had a roadmap in weeks, not months of meetings. Finally an AI partner that thinks in outcomes.',
-      name: 'Michael Torres',
-      role: 'Head of Operations',
-    },
-    metric: { value: '4×', label: 'Output Increase' },
+    measures: [
+      { metric: 'Answer groundedness', detail: 'Traceable to a source document, checked against an evaluation set.' },
+      { metric: 'Deflection', detail: 'Questions resolved without a staff member having to intervene.' },
+      { metric: 'Time to first response', detail: 'Across email, phone and walk-in channels.' },
+      { metric: 'Knowledge coverage', detail: 'How much of the real question set the system can answer.' },
+    ],
+    governance: [
+      'Role-scoped retrieval, no cross-boundary bleed',
+      'Every answer cited to its source document',
+      'Maintained evaluation suite run before each release',
+      'Clear labelling where an answer is not from an approved source',
+    ],
   },
   {
-    slug: 'zenon',
-    name: 'Zenon',
-    category: 'SaaS',
+    slug: 'service-request-routing',
+    name: 'Service Request Routing',
+    category: 'Operations-heavy enterprises',
     image: '/images/Tf9L4582eDStTX4KSFaUOoUP5Ys.webp',
-    tagline: 'Automating lead routing and deal workflows for a fast-growing SaaS company.',
-    year: '2026',
-    timeframe: '8 Weeks',
-    challenge:
-      'Zenon was losing deals to slow follow-up, with inbound leads sitting unassigned for hours. Reps spent more time on CRM admin than selling, and handoffs between marketing and sales were inconsistent. The pipeline data was never quite up to date when leadership needed it.',
-    build:
-      'We built an automated lead-routing system that scores and assigns inbound leads to the right rep instantly, with AI drafting the first follow-up. Routine CRM updates and meeting notes are now captured automatically, so reps stay focused on conversations and the pipeline stays accurate in real time.',
-    outcome: [
-      { value: '14h', label: 'Hours Saved Weekly' },
-      { value: '38%', label: 'Faster Deal Closing' },
-      { value: '-90%', label: 'Lead response time' },
+    tagline:
+      'Requests captured, understood and routed to the right queue in the systems of record, with the status visible to the requester.',
+    timeframe: '5–7 weeks to first live deployment',
+    stack: ['Converse', 'Act', 'Orchestrate'],
+    problem:
+      'Requests arrive through every channel at once and land in one shared inbox. Someone reads each one, guesses the right team, retypes the details into the ticketing system and replies to the requester. Requests get misrouted, duplicated or lost between systems, and nobody, including the person who asked, can say where any given request stands.',
+    approach:
+      'We put a single intake layer across the channels the organization already uses. Requests are captured, classified against the organization\u2019s own categories and routed into the systems of record as structured records rather than forwarded emails. The requester gets a reference and a status they can check. Everything that falls outside a confident classification goes to a queue for human triage instead of being guessed at.',
+    integrations: [
+      'Ticketing or case management system',
+      'Email, WhatsApp and web forms',
+      'Existing category and SLA definitions',
+      'Notification and status endpoints',
     ],
-    review: {
-      quote:
-        "Logitech Consultants killed two of our pet projects and saved us a fortune. Honest advice we couldn't get internally.",
-      name: 'Lucas Bennett',
-      role: 'CEO & Founder',
-    },
-    metric: { value: '14h', label: 'Hours Saved Weekly' },
+    measures: [
+      { metric: 'Routing accuracy', detail: 'Requests landing with the team that should own them.' },
+      { metric: 'Manual handling rate', detail: 'Share of requests needing a person to re-enter or reassign.' },
+      { metric: 'Time to assignment', detail: 'From arrival to an owner being accountable.' },
+      { metric: 'Leakage', detail: 'Requests that stall, duplicate or disappear between systems.' },
+    ],
+    governance: [
+      'Confidence thresholds: low-confidence items go to humans by default',
+      'Full audit trail on every automated routing decision',
+      'Approval gates before any action with a financial or contractual effect',
+      'Exception queue that a person owns, reviewed on a fixed cadence',
+    ],
+  },
+  {
+    slug: 'document-intake',
+    name: 'Document Intake & Processing',
+    category: 'Healthcare administration',
+    image: '/images/J7KZFcCw0ZrENLKo0wuCy6nASg.webp',
+    tagline:
+      'Documents received, read, validated and filed into the right system, with anything uncertain flagged for a person.',
+    timeframe: '6–8 weeks to first live deployment',
+    stack: ['Understand', 'Act', 'Orchestrate'],
+    problem:
+      'Forms, referrals, claims and correspondence arrive as scans, photos and attachments in many different layouts. Staff open each one, read it, retype the fields into a system and file the original. Volume swings between quiet and overwhelming, and every transcription is a chance to introduce an error that only surfaces much later.',
+    approach:
+      'We build an intake pipeline that accepts documents from every channel, extracts the fields that matter, validates them against the organization\u2019s own rules, and writes them into the system of record with the original attached. Items that fail validation, or that fall below a confidence threshold, are routed to a person for review instead of being pushed through. Throughput stops being a staffing problem.',
+    integrations: [
+      'Scan, email and upload intake points',
+      'Records or document management system',
+      'Validation rules and reference data',
+      'Downstream workflow or approval process',
+    ],
+    measures: [
+      { metric: 'Extraction accuracy', detail: 'Field-level, measured against a human-checked sample.' },
+      { metric: 'Review rate', detail: 'Share of documents a person still needs to touch.' },
+      { metric: 'Turnaround time', detail: 'From receipt to filed record.' },
+      { metric: 'Rework', detail: 'Corrections required after an automated entry.' },
+    ],
+    governance: [
+      'Confidence thresholds and mandatory human review bands',
+      'Data minimisation: only the fields the process actually needs',
+      'Originals retained and linked to every extracted record',
+      'Access controls aligned to the existing records policy',
+    ],
   },
 ]
 
+/** Backwards-compatible alias, the record shape grew out of the case-study model. */
+export type CaseStudy = DeploymentPattern
+
+/** Convenience export used by the home page section. */
+export const caseStudies = deploymentPatterns
 
 export interface BlogPost {
   slug: string
@@ -110,24 +188,69 @@ export interface BlogPost {
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: 'from-demo-to-production-why-ai-pilots-stall',
+    title: 'From Demo to Production: Why AI Pilots Stall',
+    category: 'AI Strategy',
+    date: 'Sep 18, 2026',
+    image: '/images/WZnkJ0N8GjD8YGH73bVRdcc9tvI.webp',
+    author: 'Marcus Elliot',
+    role: 'AI Strategy Lead',
+    excerpt:
+      'The gap between an impressive AI demonstration and a system an organization can actually depend on is not a model problem. It is a deployment problem.',
+    paragraphs: [
+      'Most organizations can now get a convincing AI demonstration running in a week. Very few can put that same capability in front of real users, in a real workflow, and have it hold up. The distance between the two is not about which model you use. It is about everything around the model.',
+      'A demonstration works because the conditions are perfect: a clean sample, a friendly question, a person watching who can smooth over a wrong answer. Production removes all three.',
+    ],
+    subheads: [
+      {
+        heading: 'Production asks questions a demo never does',
+        paragraphs: [
+          'What happens when the user asks something outside the scope? Who is allowed to see which information? Where does the audit trail live? What does the system do when the upstream API is slow, or when the document it needs has been edited since it was indexed? How do you know it got worse last Tuesday?',
+          'These are not edge cases. They are the normal operating conditions of an organization, and each one needs a decision made deliberately rather than discovered later.',
+        ],
+      },
+      {
+        heading: 'Governance is engineering, not paperwork',
+        paragraphs: [
+          'It is tempting to treat governance as the documentation you write after the build. In practice, the controls that matter are structural: confidence thresholds that route uncertain cases to a person, permission boundaries that follow the role of who is asking, approval gates before anything with a financial or contractual effect, and an audit trail that answers "why did it do that" months later.',
+          'Built in, these are ordinary engineering decisions. Bolted on afterwards, they are a rebuild.',
+        ],
+      },
+      {
+        heading: 'The measure has to exist before launch',
+        paragraphs: [
+          'You cannot tell whether a deployment worked if nobody agreed what "worked" meant beforehand. Completion rate, escalation accuracy, time to first response, groundedness against a source set, cost per completed task, pick the two or three that map to the outcome the sponsor actually cares about, and instrument them before the first user touches the system.',
+          'A system with a baseline and a measure survives scrutiny. One without either becomes an argument about impressions.',
+        ],
+      },
+      {
+        heading: 'The point is completion',
+        paragraphs: [
+          'An answer is not a result. The step that separates a useful system from an interesting one is whether the work moves forward: the booking is made, the record is written, the request is routed, the person is notified. If the system stops at producing text, a human still has to do everything that matters.',
+          'Start with the task that finishes, not the conversation that impresses.',
+        ],
+      },
+    ],
+  },
+  {
     slug: 'getting-your-data-ai-ready-without-the-big-project',
     title: 'Getting Your Data AI-Ready, Without the Big Project',
     category: 'Guides',
     date: 'Jun 24, 2026',
     image: '/images/vl5w99JCKqkuvW49lyswomsyhnY.webp',
-    author: 'Sara Vance',
-    role: 'Client Success Lead',
+    author: 'The Naivolabs team',
+    role: 'Engineering',
     excerpt:
       "There's a myth that before you can use AI, you need a massive data cleanup, a new warehouse, and six months of engineering. For most teams, that's not true.",
     paragraphs: [
       "There's a myth that before you can use AI, you need a massive data cleanup, a new warehouse, and six months of engineering. For most teams, that's not true. You don't need perfect data everywhere. You need usable data in the specific places you're about to apply AI.",
-      "That shift, from boiling the ocean to cleaning one bucket, is what makes the whole thing achievable.",
+      'That shift, from boiling the ocean to cleaning one bucket, is what makes the whole thing achievable.',
     ],
     subheads: [
       {
         heading: 'Start where the AI will actually look',
         paragraphs: [
-          "You don't need every system tidy. You need the data that the automation or agent will touch. If you're qualifying leads, that's your lead records. If you're answering support questions, that's your help docs and past tickets. Scope the data work to the project in front of you, and the task shrinks from overwhelming to manageable.",
+          "You don't need every system tidy. You need the data that the automation or agent will touch. If you're routing requests, that's your request categories and routing rules. If you're answering questions, that's your help docs and past correspondence. Scope the data work to the project in front of you, and the task shrinks from overwhelming to manageable.",
         ],
       },
       {
@@ -193,19 +316,19 @@ export const blogPosts: BlogPost[] = [
     category: 'Automation',
     date: 'Jun 24, 2026',
     image: '/images/Eu8lb04bFCoyCpFuitulq7gxSfM.webp',
-    author: 'Marcus Elliot',
-    role: 'AI Strategy Lead',
+    author: 'The Naivolabs team',
+    role: 'Engineering',
     excerpt:
       'Your CRM, inbox, calendar, and billing system were built to connect. The only missing piece is the glue between them.',
     paragraphs: [
-      'Your CRM, inbox, calendar, and billing system were built to connect. They ship with APIs, webhooks, and integrations designed for exactly this. The only missing piece is the glue between them \u2014 and that glue is automation.',
+      'Your CRM, inbox, calendar, and billing system were built to connect. They ship with APIs, webhooks, and integrations designed for exactly this. The only missing piece is the glue between them \u2014 and that glue is integration work, not a new platform.',
       'Every time someone copies a row from one tool into another, a human is doing work a machine could do in milliseconds. Copy-paste is not a strategy; it is the most expensive manual process most companies still run.',
     ],
     subheads: [
       {
         heading: 'Start with the handoff',
         paragraphs: [
-          'Look for the moment where information changes hands: a lead moves from the form to the CRM, a ticket moves from support to engineering, an invoice moves from the contract to the billing system. That handoff is where automation earns its keep.',
+          'Look for the moment where information changes hands: a request moves from the form to the register, a case moves from service to operations, an invoice moves from the contract to the billing system. That handoff is where integration earns its keep.',
         ],
       },
       {
@@ -228,12 +351,12 @@ export const blogPosts: BlogPost[] = [
     category: 'Automation',
     date: 'May 1, 2026',
     image: '',
-    author: 'Sara Vance',
-    role: 'Client Success Lead',
+    author: 'The Naivolabs team',
+    role: 'Engineering',
     excerpt:
-      'The best first automation is never the impressive one. It\u2019s the tedious one the whole team dreads \u2014 because everyone will feel it working.',
+      'The best first deployment is never the impressive one. It\u2019s the tedious one the whole team dreads \u2014 because everyone will feel it working.',
     paragraphs: [
-      'The best first automation is never the impressive one. It\u2019s the tedious one the whole team dreads \u2014 the weekly report, the data entry, the reconciliation \u2014 because everyone will feel it working from day one.',
+      'The best first deployment is never the impressive one. It\u2019s the tedious one the whole team dreads \u2014 the weekly report, the data entry, the reconciliation \u2014 because everyone will feel it working from day one.',
       'Ask the team what they hate doing. The answers are usually the same: copying data between systems, chasing approvals, formatting the same document differently for every client.',
     ],
     subheads: [
@@ -244,9 +367,9 @@ export const blogPosts: BlogPost[] = [
         ],
       },
       {
-        heading: 'A small win changes how the company thinks about AI',
+        heading: 'A small win changes how the organization thinks about AI',
         paragraphs: [
-          'One live automation that saves an hour a week is worth more than a roadmap of impressive projects that never ship. Start there, and the next project gets easier \u2014 the team has seen it work, and the data to justify it already exists.',
+          'One live deployment that saves an hour a week is worth more than a roadmap of impressive projects that never ship. Start there, and the next project gets easier \u2014 the team has seen it work, and the data to justify it already exists.',
         ],
       },
     ],
@@ -257,72 +380,75 @@ export const blogPosts: BlogPost[] = [
 // fallback when the CMS is unreachable; the live value syncs from the CMS
 // `contact-info` global when VITE_CMS_URL is configured (see src/lib/cms.ts).
 export const contactInfo = {
-  email: 'hello@logitechconsultants.com',
+  email: 'hello@naivolabs.com',
   phone: '+254112292847',
-  address: '51 Lenana Road Nairobi, Nairobi, 00100 Kenya',
+  address: '51 Lenana Road, Nairobi, 00100, Kenya',
 }
 
 // FAQ accordion items (Contact page). Static fallback; the live value syncs
 // from the CMS `faqs` global when VITE_CMS_URL is configured.
-// Question text is stored WITHOUT the "01/" numbering prefix — the FAQ
+// Question text is stored WITHOUT the "01/" numbering prefix, the FAQ
 // component renders the numbered prefix automatically so static and CMS
 // content stay consistent.
 export const faqs = [
   {
-    q: 'What does Logitech Consultants actually do?',
-    a: "We're a full-service AI agency. We find where AI creates value, build the automations, agents, and tools to capture it, then train your team to run them.",
+    q: 'What does Naivolabs actually do?',
+    a: 'We are an applied AI systems company. We design, build and deploy intelligent systems that operate inside your existing environment: voice agents, knowledge systems, and the workflow automation around them. In production, with governance and measurement built in.',
   },
   {
-    q: 'How do I get started?',
-    a: 'Book a free discovery call. We\u2019ll discuss your goals, identify where AI can make an impact, and outline a plan\u2014no commitment required.',
+    q: 'How is this different from buying an AI platform?',
+    a: 'Platforms give you capability. We turn capability into a working system inside your organization: connected to your information, your channels and your systems of record, with the controls your risk and compliance stakeholders will ask about. The platform is a component. The system is the deliverable.',
   },
   {
-    q: 'How long until we see results?',
-    a: 'Most clients see their first automation live within 2 weeks. Our pilot program is designed to deliver a measurable win in 2\u20134 weeks.',
+    q: 'How do engagements start?',
+    a: 'With a discovery call. We map how the work is actually done today and identify where an intelligent system would change an outcome you care about. If we do not think there is a case, we will say so, we would rather decline than deploy something that cannot be measured.',
   },
   {
-    q: 'What if a pilot doesn\u2019t work out?',
-    a: "We build in stages and validate at each step. If a pilot isn't delivering value, we stop and find a better approach. Your investment is focused on what works.",
+    q: 'How long until something is live?',
+    a: 'Most first deployments reach production in four to eight weeks, depending on how many systems we need to integrate with. We aim to have a working system in front of real users early, then improve it against measurement rather than polish it in private.',
   },
   {
-    q: 'Do we need technical staff on our side?',
-    a: 'No. We handle the technical build. Your team just needs to know their workflows, and we train them to run the systems we build.',
+    q: 'Who owns the system and the data?',
+    a: 'You do. The system runs in your environment or on infrastructure you control, the code and configuration are documented and handed over, and your data stays yours. We do not build dependencies that lock you to us.',
   },
   {
-    q: 'Who owns the systems and data?',
-    a: 'You own everything. Our builds are fully documented, run on your infrastructure, and never lock you into proprietary tools.',
+    q: 'How do you handle governance and risk?',
+    a: 'Governance is part of the build, not a document written afterwards: role-scoped access, confidence thresholds that route uncertain cases to a person, approval gates before any action with a financial or contractual effect, and an audit trail on every automated decision.',
   },
   {
-    q: 'What tools and models do you work with?',
-    a: 'We work across all major AI platforms, LLMs, and automation tools. We choose the right stack for your specific use case, not a one-size-fits-all solution.',
+    q: 'What happens if it does not work?',
+    a: 'We build in stages and validate at each one. If a stage is not delivering a measurable improvement, we stop and say so rather than pressing on. Every deployment also produces reusable templates and evaluation suites, so even a discontinued path leaves you with something.',
+  },
+  {
+    q: 'Do you work outside Kenya?',
+    a: 'Yes. We build from Africa, where operating conditions are demanding. The problems we solve are not geographically limited. Organizations everywhere need better ways to serve people, use information and operate.',
   },
 ]
 
 export const aboutValues = [
-  { title: 'Results Over Hype', description: 'Outcomes you can measure, not vague AI promises.' },
-  { title: 'Built to Last', description: 'Systems that keep working long after we hand off.' },
-  { title: 'Radical Clarity', description: 'You always know what we\u2019re doing, why, and what\u2019s next.' },
-  { title: 'Your Stack, Your Rules', description: 'We work inside your tools, never around or against them.' },
-  { title: 'Speed With Judgment', description: 'Fast delivery, without cutting the corners that matter.' },
-  { title: 'Partners, Not Vendors', description: 'Invested in your long-term growth, not just the project.' },
+  { title: 'Evidence over hype', description: 'We say what we can prove, and say plainly when we cannot prove something yet.' },
+  { title: 'Finish the work', description: 'An impressive demonstration is not the same as a useful system.' },
+  { title: 'Earn trust', description: 'Trust is built through engineering, governance and behaviour, not positioning.' },
+  { title: 'Build from reality', description: 'We design around how organizations actually operate, not how the org chart says they do.' },
+  { title: 'Make every deployment count', description: 'Every engagement should leave behind reusable knowledge or technology.' },
+  { title: 'Think beyond borders', description: 'Our origin is African. Our ambition is global.' },
 ]
 
 export const team = [
-  { name: 'John', role: 'Automation Architect' },
-  { name: 'Samuel', role: 'AI Strategy Lead' },
-  { name: 'Kenei', role: 'Client Success Lead' },
-  { name: 'Emmanuel', role: 'Implementation Engineer' },
+  { name: 'John', role: 'Systems Architect' },
+  { name: 'Samuel', role: 'Applied AI Lead' },
+  { name: 'Kenei', role: 'Client Outcomes' },
+  { name: 'Alphonce', role: 'Integration Engineer' },
+  { name: 'Ndeke', role: 'Knowledge Systems Engineer' },
 ]
 
-// Careers — reserved for future job advertisements. The section is currently
+// Careers, reserved for future job advertisements. The section is currently
 // hidden from the site (AboutPage no longer renders it); re-enable by adding
 // the section back and mapping over this array.
 export const careers = [
-  { title: 'Growth Strategist', dept: 'Strategy', type: 'Remote', hours: 'Part-time' },
-  { title: 'Client Success Manager', dept: 'Operations', type: 'Remote', hours: 'Full-time' },
-  { title: 'Solutions Architect', dept: 'Engineering', type: 'Remote', hours: 'Part-time' },
-  { title: 'AI Workflow Specialist', dept: 'Operations', type: 'Remote', hours: 'Full-time' },
-  { title: 'Automation Engineer', dept: 'Engineering', type: 'Remote', hours: 'Full-time' },
+  { title: 'Applied AI Engineer', dept: 'Engineering', type: 'Nairobi / Remote', hours: 'Full-time' },
+  { title: 'Integration Engineer', dept: 'Engineering', type: 'Nairobi / Remote', hours: 'Full-time' },
+  { title: 'Solutions Architect', dept: 'Engineering', type: 'Nairobi', hours: 'Full-time' },
+  { title: 'Deployment Lead', dept: 'Delivery', type: 'Nairobi / Remote', hours: 'Full-time' },
+  { title: 'Evaluation & Governance Engineer', dept: 'Engineering', type: 'Nairobi / Remote', hours: 'Full-time' },
 ]
-
-

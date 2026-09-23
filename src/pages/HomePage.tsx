@@ -1,78 +1,54 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import Lenis from 'lenis'
-import Seo, { siteLd } from '../lib/Seo'
+import Seo, { organizationLd, websiteLd } from '../lib/Seo'
+import { CAPABILITIES } from '../lib/brand'
 import Hero from '../components/Hero'
 import LogoMarquee from '../components/LogoMarquee'
 import TabbedFeatures from '../components/TabbedFeatures'
-import CodeIntegration from '../components/CodeIntegration'
 import Metrics from '../components/Metrics'
-import CaseStudies from '../components/CaseStudies'
-import Testimonials from '../components/Testimonials'
-import WhyUs from '../components/WhyUs'
-import Process from '../components/Process'
-import ResourceCards from '../components/ResourceCards'
-import Pricing from '../components/Pricing'
+import DeploymentPatterns from '../components/DeploymentPatterns'
+import Principles from '../components/Principles'
+import Blog from '../components/Blog'
 import FAQ from '../components/FAQ'
 
+/**
+ * Home, deliberately minimal.
+ *
+ * The page answers four questions and stops: what we are (Hero), what we
+ * build (capabilities), what we hold ourselves to (measurement, principles),
+ * and what a deployment looks like (the pattern stack). Everything else the
+ * brand has to say lives one level down, where a reader who wants depth is
+ * already going:
+ *   - governance + the ten-stage deployment model → /capabilities
+ *   - positioning + the company story            → /about
+ *   - engagement models (pricing)                → hidden for now (see below)
+ *
+ * The above-the-fold CTA lives in Hero. Smooth scrolling is mounted once in
+ * Layout (src/lib/useLenis), so scroll-driven sections read one scroll source.
+ */
 export default function HomePage() {
-  const lenisRef = useRef<Lenis | null>(null)
-
-  const [reducedMotion, setReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setReducedMotion(mq.matches)
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
-
-  useEffect(() => {
-    if (reducedMotion) return
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-    })
-
-    lenisRef.current = lenis
-
-    function raf(time: number) {
-      lenis.raf(time)
-      requestAnimationFrame(raf)
-    }
-
-    requestAnimationFrame(raf)
-
-    return () => {
-      lenis.destroy()
-    }
-  }, [reducedMotion])
-
   return (
     <>
       <Seo
-        title="AI Automation Agency"
-        description="AI automation agency: we find where AI creates real value, build the automations and agents to capture it, and keep them working long after handoff."
+        title="Applied AI Systems for Organizations"
+        description="An applied AI systems company. Naivolabs designs, builds and deploys governed intelligent systems that work inside real organizations, measured."
         path="/"
-        jsonLd={[siteLd()]}
+        jsonLd={[organizationLd(), websiteLd()]}
       />
       <Hero />
       <LogoMarquee />
       <TabbedFeatures />
-      <CodeIntegration />
       <Metrics />
-      <CaseStudies />
-      <Testimonials />
-      <WhyUs />
-      <Process />
-      <ResourceCards />
-      <Pricing />
+      <DeploymentPatterns />
+      <Principles />
+      <Blog />
       <FAQ />
+      {/* Capability anchors keep deep links like /#capabilities meaningful */}
+      <div className="sr-only" aria-hidden>
+        {CAPABILITIES.map((c) => (
+          <span key={c.id} id={c.id} />
+        ))}
+      </div>
     </>
   )
 }

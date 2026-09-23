@@ -1,6 +1,17 @@
+# https://naivolabs.com/robots.txt
+# Generated alongside public/sitemap.xml — keep both in sync with the route
+# table in src/main.tsx and the canonical origin in src/lib/brand.ts.
+
 User-agent: *
 Allow: /
 
-# CMS admin panel is never exposed on this origin; nothing else to block.
+# Utility and non-content routes are excluded here as well as being marked
+# noindex in the page head, so crawlers do not waste budget on them.
+Disallow: /case-studies
+Disallow: /*?utm_
+Disallow: /*?email=
 
-Sitemap: https://logitechconsultants.com/sitemap.xml
+# The CMS admin panel is NOT served from this origin (it is a separate
+# application in cms/), so there is nothing else to block here.
+
+Sitemap: https://naivolabs.com/sitemap.xml

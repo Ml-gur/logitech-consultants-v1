@@ -1,12 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import FAQ from '../components/FAQ'
 import Seo, { breadcrumbLd } from '../lib/Seo'
 import { useCms } from '../lib/CmsProvider'
 import { cmsEnabled, submitInquiry } from '../lib/cms'
+import { SITE } from '../lib/brand'
+import { Spinner } from '../components/Loading'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
+
+type Field = 'name' | 'email' | 'organization' | 'interest' | 'message'
+
+const ENGAGEMENTS = ['Pilot deployment', 'Partner (ongoing)', 'Scale programme', 'Not sure yet']
 
 export default function ContactPage() {
   const { contactInfo, faqs } = useCms()
@@ -17,59 +24,125 @@ export default function ContactPage() {
     { label: 'Address', value: contactInfo.address, href: null },
   ]
 
-  // Contact email/phone links need a full 44px tap target on touch devices —
-  // the label above already supplies breathing room, so extend the hit area
-  // with padded focus space (same technique as the footer links).
+  // The hero's email capture hands off to this page with `?email=…` (and the
+  // deployment-pattern CTAs can pass `?interest=…`). Prefill rather than drop
+  // it, being asked for an address you just typed is the fastest way to lose
+  // an enquiry.
+  const [searchParams] = useSearchParams()
+  const handedOffEmail = (searchParams.get('email') ?? '').trim()
+  const handedOffInterest = (searchParams.get('interest') ?? '').trim()
+  const prefilledEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(handedOffEmail) ? handedOffEmail : ''
+  const prefilledInterest = (ENGAGEMENTS as readonly string[]).includes(handedOffInterest)
+    ? handedOffInterest
+    : ''
+  const [handoffNotice, setHandoffNotice] = useState(!!prefilledEmail)
 
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [budget, setBudget] = useState('')
-  const [message, setMessage] = useState('')
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [values, setValues] = useState<Record<Field, string>>({
+    name: '',
+    email: prefilledEmail,
+    organization: '',
+    interest: prefilledInterest,
+    message: '',
+  })
+
+  // Once the visitor starts editing, the "we filled this in" note has done its
+  // job and should stop drawing attention.
+  useEffect(() => {
+    if (!handoffNotice) return
+    const t = setTimeout(() => setHandoffNotice(false), 15_000)
+    return () => clearTimeout(t)
+  }, [handoffNotice])
+  const [errors, setErrors] = useState<Partial<Record<Field, string>>>({})
   const [sent, setSent] = useState(false)
-  const [submitFailed, setSubmitFailed] = useState(false)
+  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
 
-  const validate = () => {
-    const next: Record<string, string> = {}
-    if (!name.trim()) next.name = 'Please enter your name'
-    if (!email.trim()) next.email = 'Please enter your email'
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) next.email = 'Enter a valid email address'
-    if (!budget) next.budget = 'Please choose a budget'
-    if (!message.trim()) next.message = 'Please write a short message'
+  const set = (field: Field) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setValues((v) => ({ ...v, [field]: e.target.value }))
+    // Clear the field's error as soon as the visitor starts fixing it.
+    setErrors((prev) => (prev[field] ? { ...prev, [field]: undefined } : prev))
+    if (status === 'error') setStatus('idle')
+    if (handoffNotice) setHandoffNotice(false)
+  }
+
+  // Field order for the error summary and focus management, the same order the
+  // fields are rendered in.
+  const FIELD_ORDER: Field[] = ['name', 'email', 'interest', 'message']
+  const FIELD_IDS: Record<Field, string> = {
+    name: 'name',
+    email: 'email',
+    organization: 'organization',
+    interest: 'interest',
+    message: 'message',
+  }
+
+  /** Returns the first invalid field, so submit can move focus to it. */
+  const validate = (): Field | null => {
+    const next: Partial<Record<Field, string>> = {}
+    if (!values.name.trim()) next.name = 'Please enter your name.'
+    if (!values.email.trim()) next.email = 'Please enter your email address.'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email))
+      next.email = 'Enter a valid email address, for example jane@organization.org.'
+    if (!values.interest) next.interest = 'Please choose what you are interested in.'
+    if (!values.message.trim()) next.message = 'Please tell us briefly what you are trying to solve.'
+    else if (values.message.trim().length < 20)
+      next.message = 'A little more detail helps, 20 characters or more.'
     setErrors(next)
-    return Object.keys(next).length === 0
+    return FIELD_ORDER.find((f) => next[f]) ?? null
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitFailed(false)
-    if (!validate()) return
+    const firstInvalid = validate()
+    if (firstInvalid) {
+      // Move focus to the first invalid field so keyboard and screen-reader
+      // users are taken to the problem rather than left at the submit button.
+      // Looked up by id rather than by `[aria-invalid="true"]`: the attribute
+      // only lands on the DOM after React commits the state update, so a query
+      // here would run against the previous render and find nothing.
+      document.getElementById(FIELD_IDS[firstInvalid])?.focus()
+      return
+    }
 
+    setStatus('loading')
     if (cmsEnabled) {
-      const ok = await submitInquiry({ name, email, budget, message })
+      const ok = await submitInquiry({
+        name: values.name,
+        email: values.email,
+        budget: values.interest,
+        message: `${values.organization ? `Organization: ${values.organization}\n\n` : ''}${values.message}`,
+      })
       if (!ok) {
-        setSubmitFailed(true)
+        setStatus('error')
         return
       }
+    } else {
+      // No CMS configured, simulate the round trip so the button state is real.
+      await new Promise((r) => setTimeout(r, 500))
     }
+    setStatus('idle')
     setSent(true)
   }
 
   const fieldClasses = (hasError: boolean) =>
     `w-full px-5 py-3.5 rounded-[10px] bg-[#191919] border text-base text-paper placeholder:text-slate focus:outline-none focus:ring-2 transition-colors ${
       hasError
-        ? 'border-[#7084ff] focus:ring-[#7084ff]/30'
+        ? 'border-error focus:ring-error/30'
         : 'border-steel focus:border-signal focus:ring-signal/20'
     }`
+
+  const errorCount = Object.values(errors).filter(Boolean).length
 
   return (
     <section className="relative pt-32">
       <Seo
-        title="Contact Us"
-        description="Book a free discovery call with Logitech Consultants. We'll identify where AI can make an impact in your business and outline a plan — no commitment required."
+        title="Book a Discovery Call"
+        description="Talk to Naivolabs about putting an intelligent system to work in your organization. A 30-minute call, an honest assessment, and a clear next step."
         path="/contact"
         jsonLd={[
-          breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Contact', path: '/contact' }]),
+          breadcrumbLd([
+            { name: 'Home', path: '/' },
+            { name: 'Contact', path: '/contact' },
+          ]),
           {
             '@context': 'https://schema.org',
             '@type': 'FAQPage',
@@ -82,8 +155,8 @@ export default function ContactPage() {
           {
             '@context': 'https://schema.org',
             '@type': 'ContactPage',
-            name: 'Contact Logitech Consultants',
-            url: 'https://logitechconsultants.com/contact',
+            name: `Contact ${SITE.name}`,
+            url: `${SITE.url}/contact`,
             email: contactInfo.email,
             telephone: contactInfo.phone,
             address: { '@type': 'PostalAddress', streetAddress: contactInfo.address },
@@ -96,44 +169,44 @@ export default function ContactPage() {
         </motion.p>
 
         <motion.h1
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal(0.08)}
-          className="text-[clamp(40px,6vw,80px)] leading-[1.02] tracking-[-0.03em] max-w-[640px] mb-6"
+          initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.08)}
+          className="text-[clamp(40px,6vw,80px)] leading-[1.02] tracking-[-0.03em] max-w-[700px] mb-6"
         >
-          Get in <span className="text-signal">touch.</span>
+          Tell us what is <span className="text-signal">not working.</span>
         </motion.h1>
 
         <motion.p
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal(0.14)}
-          className="text-[18px] text-fog max-w-[520px] leading-relaxed mb-16"
+          initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.14)}
+          className="text-[18px] text-fog max-w-[560px] leading-relaxed mb-16"
         >
-          Have questions or need support? Our team is here to help you every step of the way.
+          The best first call is about a specific problem: a queue that never clears, information nobody can
+          find, a handoff that keeps breaking. We will tell you honestly whether an intelligent system is the
+          answer.
         </motion.p>
 
         <div className="grid lg:grid-cols-[1fr_420px] gap-16">
           {/* Form */}
           <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.1)}>
             {sent ? (
-              <div className="rounded-[30px] border border-signal/30 bg-[#191919] p-10 text-center shadow-[0_0_40px_rgba(112,132,255,0.12)]">
+              <div
+                role="status"
+                className="rounded-[30px] border border-signal/30 bg-[#191919] p-10 text-center shadow-[0_0_40px_rgba(112,132,255,0.12)]"
+              >
                 <div className="w-12 h-12 rounded-full bg-signal/15 text-signal flex items-center justify-center mx-auto mb-5">
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
                     <path d="M20 6L9 17l-5-5" />
                   </svg>
                 </div>
                 <h2 className="font-display text-2xl font-medium text-paper mb-2">Message sent</h2>
-                <p className="text-sm text-fog">Thanks {name.trim() || 'there'}. We&rsquo;ll get back to you within one business day.</p>
+                <p className="text-sm text-fog">
+                  Thanks {values.name.trim() || 'there'}. We&rsquo;ll get back to you within one business day,
+                  usually sooner.
+                </p>
                 <button
                   onClick={() => {
                     setSent(false)
-                    setName('')
-                    setEmail('')
-                    setBudget('')
-                    setMessage('')
+                    setValues({ name: '', email: '', organization: '', interest: '', message: '' })
+                    setErrors({})
                   }}
                   className="btn-ghost mt-8 px-6 py-3 text-sm"
                 >
@@ -142,6 +215,26 @@ export default function ContactPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} noValidate className="space-y-6">
+                {/* Error summary, announced once, links to nothing that needs
+                    a click because focus already moves to the first field. */}
+                <p aria-live="polite" className="sr-only">
+                  {errorCount > 0
+                    ? `${errorCount} ${errorCount === 1 ? 'field needs' : 'fields need'} attention before sending.`
+                    : ''}
+                </p>
+
+                {/* Confirms the hero hand-off so the visitor knows why the
+                    email field is already filled in. */}
+                {handoffNotice && (
+                  <p
+                    role="status"
+                    className="rounded-[16px] border border-signal/30 bg-signal/5 px-4 py-3 text-sm text-fog"
+                  >
+                    We carried your email across from the last page, add your name and what you are trying to
+                    solve, and that is the whole form.
+                  </p>
+                )}
+
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-ash mb-2">
@@ -150,86 +243,151 @@ export default function ContactPage() {
                     <input
                       id="name"
                       type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      autoComplete="name"
+                      value={values.name}
+                      onChange={set('name')}
                       placeholder="Jane Smith"
                       aria-invalid={!!errors.name}
+                      aria-describedby={errors.name ? 'name-error' : undefined}
                       className={fieldClasses(!!errors.name)}
                     />
-                    {errors.name && <p className="text-xs text-signal mt-1.5">{errors.name}</p>}
+                    {errors.name && (
+                      <p id="name-error" className="text-xs text-error mt-1.5" role="alert">
+                        {errors.name}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-ash mb-2">
-                      Your email <span className="text-signal" aria-hidden="true">*</span>
+                      Work email <span className="text-signal" aria-hidden="true">*</span>
                     </label>
                     <input
                       id="email"
                       type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="jane@company.com"
+                      autoComplete="email"
+                      value={values.email}
+                      onChange={set('email')}
+                      placeholder="jane@organization.org"
                       aria-invalid={!!errors.email}
+                      aria-describedby={errors.email ? 'email-error' : undefined}
                       className={fieldClasses(!!errors.email)}
                     />
-                    {errors.email && <p className="text-xs text-signal mt-1.5">{errors.email}</p>}
+                    {errors.email && (
+                      <p id="email-error" className="text-xs text-error mt-1.5" role="alert">
+                        {errors.email}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="organization" className="block text-sm font-medium text-ash mb-2">
+                      Organization
+                    </label>
+                    <input
+                      id="organization"
+                      type="text"
+                      autoComplete="organization"
+                      value={values.organization}
+                      onChange={set('organization')}
+                      placeholder="Optional"
+                      className={fieldClasses(false)}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="interest" className="block text-sm font-medium text-ash mb-2">
+                      Where you are <span className="text-signal" aria-hidden="true">*</span>
+                    </label>
+                    <select
+                      id="interest"
+                      value={values.interest}
+                      onChange={set('interest')}
+                      aria-invalid={!!errors.interest}
+                      aria-describedby={errors.interest ? 'interest-error' : undefined}
+                      className={`${fieldClasses(!!errors.interest)} appearance-none ${values.interest ? '' : 'text-fog'}`}
+                    >
+                      <option value="" disabled className="bg-[#191919] text-paper">
+                        Select an option
+                      </option>
+                      {ENGAGEMENTS.map((p) => (
+                        <option key={p} value={p} className="bg-[#191919] text-paper">
+                          {p}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.interest && (
+                      <p id="interest-error" className="text-xs text-error mt-1.5" role="alert">
+                        {errors.interest}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="budget" className="block text-sm font-medium text-ash mb-2">
-                    Budget <span className="text-signal" aria-hidden="true">*</span>
-                  </label>
-                  <select
-                    id="budget"
-                    value={budget}
-                    onChange={(e) => setBudget(e.target.value)}
-                    aria-invalid={!!errors.budget}
-                    className={`${fieldClasses(!!errors.budget)} appearance-none ${budget ? '' : 'text-fog'}`}
-                  >
-                    <option value="" disabled className="bg-[#191919] text-paper">
-                      Select plan
-                    </option>
-                    {['Pilot', 'Partner', 'Scale'].map((p) => (
-                      <option key={p} value={p} className="bg-[#191919] text-paper">
-                        {p}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.budget && <p className="text-xs text-signal mt-1.5">{errors.budget}</p>}
-                </div>
-
-                <div>
                   <label htmlFor="message" className="block text-sm font-medium text-ash mb-2">
-                    Message <span className="text-signal" aria-hidden="true">*</span>
+                    What are you trying to solve? <span className="text-signal" aria-hidden="true">*</span>
                   </label>
                   <textarea
                     id="message"
                     rows={5}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Tell us about your project..."
+                    value={values.message}
+                    onChange={set('message')}
+                    placeholder="The workflow, the volume, and what it costs you today."
                     aria-invalid={!!errors.message}
+                    aria-describedby={errors.message ? 'message-error' : 'message-help'}
                     className={`${fieldClasses(!!errors.message)} resize-y`}
                   />
-                  {errors.message && <p className="text-xs text-signal mt-1.5">{errors.message}</p>}
+                  {errors.message ? (
+                    <p id="message-error" className="text-xs text-error mt-1.5" role="alert">
+                      {errors.message}
+                    </p>
+                  ) : (
+                    <p id="message-help" className="text-xs text-fog mt-1.5">
+                      No confidential details needed at this stage.
+                    </p>
+                  )}
                 </div>
 
-                {submitFailed && (
-                  <p className="text-xs text-signal">
-                    Something went wrong sending your message. Please try again, or email{' '}
-                    <a href={`mailto:${contactInfo.email}`} className="underline">
-                      {contactInfo.email}
-                    </a>
-                    .
-                  </p>
+                {status === 'error' && (
+                  <div role="alert" className="rounded-[16px] border border-error/50 bg-error/5 p-4">
+                    <p className="text-sm text-error">
+                      We couldn&rsquo;t send your message just now. Please try again, or email{' '}
+                      <a href={`mailto:${contactInfo.email}`} className="underline">
+                        {contactInfo.email}
+                      </a>
+                      .
+                    </p>
+                  </div>
                 )}
 
                 <button
                   type="submit"
-                  className="btn-primary w-full sm:w-auto px-8 py-4 text-sm"
+                  disabled={status === 'loading'}
+                  className="btn-primary w-full sm:w-auto px-8 py-4 text-sm disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  Send your message
+                  {status === 'loading' ? (
+                    <>
+                      <Spinner />
+                      Sending…
+                    </>
+                  ) : (
+                    <>
+                      Send your message
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                        <path d="M6 3l5 5-5 5" />
+                      </svg>
+                    </>
+                  )}
                 </button>
+
+                <p className="text-xs text-fog">
+                  We use your details only to reply to this enquiry, see the{' '}
+                  <Link to="/privacy" className="underline hover:text-paper">
+                    privacy policy
+                  </Link>
+                  .
+                </p>
               </form>
             )}
           </motion.div>
@@ -240,10 +398,7 @@ export default function ContactPage() {
               <div key={info.label} className="rounded-[24px] bg-[#191919] border border-white/10 p-6">
                 <div className="text-xs uppercase tracking-[0.14em] text-fog mb-2">{info.label}</div>
                 {info.href ? (
-                  <a
-                    href={info.href}
-                    className="text-base font-medium text-paper hover:text-signal transition-colors break-all block py-3 -my-3"
-                  >
+                  <a href={info.href} className="text-base font-medium text-paper hover:text-signal transition-colors break-all block py-3 -my-3">
                     {info.value}
                   </a>
                 ) : (
@@ -251,10 +406,17 @@ export default function ContactPage() {
                 )}
               </div>
             ))}
+
+            <div className="rounded-[24px] bg-[#191919] border border-white/10 p-6">
+              <div className="text-xs uppercase tracking-[0.14em] text-fog mb-2">Response time</div>
+              <p className="text-sm text-ash leading-relaxed">
+                We reply within one business day, East Africa Time (UTC+3). If it is urgent, call the number
+                above.
+              </p>
+            </div>
           </motion.div>
         </div>
 
-        {/* FAQs */}
         <FAQ />
       </div>
     </section>

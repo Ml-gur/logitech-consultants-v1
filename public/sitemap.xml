@@ -1,68 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Naivolabs sitemap.
+
+  Generated from the route table in src/main.tsx and the canonical origin in
+  src/lib/brand.ts. Regenerate whenever a route is added or renamed:
+    - every primary route
+    - every deployment pattern
+    - every published insight
+    - the legal pages (indexable, low priority)
+  Excluded: /case-studies (legacy redirects), 404, and anything marked noindex.
+-->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://logitechconsultants.com/</loc>
+    <loc>https://naivolabs.com/</loc>
+    <lastmod>2026-09-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://logitechconsultants.com/about</loc>
+    <loc>https://naivolabs.com/capabilities</loc>
+    <lastmod>2026-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://naivolabs.com/deployment-patterns</loc>
+    <lastmod>2026-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://naivolabs.com/deployment-patterns/ai-voice-receptionist</loc>
+    <lastmod>2026-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://logitechconsultants.com/ai-automation-nairobi</loc>
+    <loc>https://naivolabs.com/deployment-patterns/institutional-knowledge-agent</loc>
+    <lastmod>2026-09-21</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://logitechconsultants.com/case-studies</loc>
+    <loc>https://naivolabs.com/deployment-patterns/service-request-routing</loc>
+    <lastmod>2026-09-21</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://logitechconsultants.com/case-studies/etery</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://naivolabs.com/deployment-patterns/document-intake</loc>
+    <lastmod>2026-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://logitechconsultants.com/case-studies/genesy</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://naivolabs.com/ai-automation-nairobi</loc>
+    <lastmod>2026-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://logitechconsultants.com/case-studies/zenon</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://naivolabs.com/about</loc>
+    <lastmod>2026-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://logitechconsultants.com/blog</loc>
+    <loc>https://naivolabs.com/blog</loc>
+    <lastmod>2026-09-21</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://logitechconsultants.com/blog/getting-your-data-ai-ready-without-the-big-project</loc>
+    <loc>https://naivolabs.com/blog/from-demo-to-production-why-ai-pilots-stall</loc>
+    <lastmod>2026-09-18</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://logitechconsultants.com/blog/buy-build-or-wait-a-simpler-way-to-decide</loc>
+    <loc>https://naivolabs.com/blog/getting-your-data-ai-ready-without-the-big-project</loc>
+    <lastmod>2026-06-24</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://logitechconsultants.com/blog/your-tools-already-talk-you-don-t-have-to</loc>
+    <loc>https://naivolabs.com/blog/buy-build-or-wait-a-simpler-way-to-decide</loc>
+    <lastmod>2026-06-24</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://logitechconsultants.com/blog/start-with-the-task-everyone-hates</loc>
+    <loc>https://naivolabs.com/blog/your-tools-already-talk-you-don-t-have-to</loc>
+    <lastmod>2026-06-24</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://logitechconsultants.com/contact</loc>
+    <loc>https://naivolabs.com/blog/start-with-the-task-everyone-hates</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://naivolabs.com/contact</loc>
+    <lastmod>2026-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://naivolabs.com/privacy</loc>
+    <lastmod>2026-09-21</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://naivolabs.com/terms</loc>
+    <lastmod>2026-09-21</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
   </url>
 </urlset>

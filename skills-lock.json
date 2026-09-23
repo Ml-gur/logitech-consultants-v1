@@ -1,11 +1,71 @@
 {
   "version": 1,
   "skills": {
+    "ai-memory-durable-pages": {
+      "source": "akitaonrails/ai-memory",
+      "sourceType": "github",
+      "skillPath": "crates/ai-memory-core/src/routing_skills/ai-memory-durable-pages/SKILL.md",
+      "computedHash": "c8556f8cd90814b0b368147c47f3be5b297e9d6a0eba85779b4389b4cd8ad835"
+    },
+    "ai-memory-handoff": {
+      "source": "akitaonrails/ai-memory",
+      "sourceType": "github",
+      "skillPath": "crates/ai-memory-core/src/routing_skills/ai-memory-handoff/SKILL.md",
+      "computedHash": "453605e81202dc7832d279135f766d0d6b4fc963a2ee5c858abf39bbb28fbd83"
+    },
+    "ai-memory-learning-maintenance": {
+      "source": "akitaonrails/ai-memory",
+      "sourceType": "github",
+      "skillPath": "crates/ai-memory-core/src/routing_skills/ai-memory-learning-maintenance/SKILL.md",
+      "computedHash": "c6f95c2c3298b6e3f28470b9bff79758e7a71e0c058097af6d79db256ab6ceac"
+    },
+    "ai-memory-messaging": {
+      "source": "akitaonrails/ai-memory",
+      "sourceType": "github",
+      "skillPath": "crates/ai-memory-core/src/routing_skills/ai-memory-messaging/SKILL.md",
+      "computedHash": "2dfce4dfb2c4a22e187925e511100a81d35a0fae5dcd95d81ac8d0f93d9ab2b4"
+    },
+    "ai-memory-retrieval": {
+      "source": "akitaonrails/ai-memory",
+      "sourceType": "github",
+      "skillPath": "crates/ai-memory-core/src/routing_skills/ai-memory-retrieval/SKILL.md",
+      "computedHash": "5b7cfa6e38b64970280a2333f5c114f47098bf8969d25ebc5364db5fea8eef6d"
+    },
+    "ai-memory-routing-install": {
+      "source": "akitaonrails/ai-memory",
+      "sourceType": "github",
+      "skillPath": "crates/ai-memory-core/src/routing_skills/ai-memory-routing-install/SKILL.md",
+      "computedHash": "059efc33b95ca36f53513f7d868397cf4a993916e02474fcbbbc583d1d8abb41"
+    },
+    "brand-guidelines": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/brand-guidelines/SKILL.md",
+      "computedHash": "e48840db6ea772ceecdb68b4e50f8cc77e2534b7580aeaf4a6fe6ee7bd845d7d"
+    },
+    "canvas-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/canvas-design/SKILL.md",
+      "computedHash": "3fa7ea60170023ad8268bf9fd734ea75dd404279a2ef8ddf5abaa1102ad8e5f4"
+    },
     "content-optimization": {
       "source": "kostja94/marketing-skills",
       "sourceType": "github",
       "skillPath": "skills/seo/content/content-optimization/SKILL.md",
       "computedHash": "bc1b64cdd23120a2e20a817552133b2b760ae24cf6535b1abb7f2b3be4550537"
+    },
+    "doc-coauthoring": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/doc-coauthoring/SKILL.md",
+      "computedHash": "b964e4c3ffe13f66f76dd7919073e60c7aec622cd8a8363bb36323188100cf8e"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "89496d5dd00f4810205f351759594fc2742bf8eea85a2f2b2d1de59f4bd91576"
     },
     "image-optimization": {
       "source": "aj-geddes/useful-ai-prompts",
@@ -66,6 +126,12 @@
       "sourceType": "github",
       "skillPath": "skills/content/visual-content/SKILL.md",
       "computedHash": "448ce5819574c9120dece89031c805c028551f573d3118f263100238a7bbe796"
+    },
+    "webapp-testing": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/webapp-testing/SKILL.md",
+      "computedHash": "ad5b1fc52807e9afa4635e59218a026b164dc58b6c3f41b0f7c644dcd6ccf572"
     }
   }
 }

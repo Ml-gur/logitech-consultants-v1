@@ -1,11 +1,278 @@
 # Changelog
 
-All notable changes to the AIthor clone are recorded here.
+All notable changes to the Naivolabs are recorded here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added
+- **Deployed to the shared host** (`77.42.30.150`, `/var/www/naivolabs`,
+  <https://naivolabs.com>) and documented it in
+  `deploy/SHARED-HOST-DEPLOY.md`. The compiled static build was uploaded with
+  rsync; the server needs no runtime (it has no Node.js, npm or PHP) and DNS and
+  TLS were already configured by the host operator. Verified live: the app
+  boots, client-side routing works, `/assets/`, `/fonts/`, `/images/`,
+  `robots.txt`, `sitemap.xml`, the favicon set and `og-image.png` all resolve,
+  the rendered copy satisfies the one-word brand rule, zero console errors, and
+  no horizontal overflow at 390px. `scripts/live-smoke.mjs` re-checks this
+  against the live origin.
+  - **One server change is required** and was handed to the operator rather than
+    applied (the account has no sudo): the vhost's `try_files $uri $uri/ =404`
+    has no SPA fallback, so every deep link 404s on direct request or refresh —
+    which also makes every URL in `sitemap.xml` except `/` a 404 to a crawler.
+    `deploy/nginx/naivolabs.com.conf` plus a security-header snippet is the
+    ready-to-install replacement, with the Certbot blocks left untouched. The
+    same change adds a `www` → apex 301 (the site was served on both
+    hostnames). Verified against a real nginx binary serving the actual build:
+    `nginx -t` passes, deep links return 200, `www` returns 301, and every
+    response carries exactly one `Cache-Control`.
+- **The contact form is ready for an email provider** (operator: "we will
+  connect with an email provider so it should be ready for that connection").
+  `submitInquiry()` now posts to `VITE_INQUIRY_ENDPOINT` when it is set, with an
+  optional public `VITE_INQUIRY_ACCESS_KEY` sent as `access_key`, falling back to
+  the CMS and then to refusing the submission (the form shows its email
+  fallback). No private key can reach this code path: everything in the bundle
+  is public, so provider secrets belong in the serverless function the endpoint
+  points at. Verified both ways: with the variables set, Vite bakes them into
+  the bundle; unset, the branch is compiled away and the output is byte-for-byte
+  the previous build.
+  - The Payload CMS **cannot** run on this host: no Node.js, no systemd access,
+    and Payload 3 has no MySQL/MariaDB adapter, so the provisioned MariaDB
+    `naivolabs_db` cannot back it. The site therefore ships in static mode, and
+    the contact form has no backend (it surfaces the email fallback) until a CMS
+    is hosted elsewhere.
+
+### Fixed
+- **The Hetzner Docker stack could not build its CMS image.**
+  `deploy/Dockerfile.cms` ran `COPY --from=build /app/media ./media`, but
+  `cms/media` is not in the repository, so the build failed outright with
+  `"/app/media": not found`. The directory is runtime data; it is now created in
+  the runtime stage (which is what the `cms_media` volume mounts). Verified by
+  building the site image and serving it.
+- **Security headers never reached the HTML document** in `deploy/nginx.conf`.
+  nginx does not inherit `add_header` into a block that defines its own, and
+  every location set a `Cache-Control` header, so the CSP and the
+  nosniff/frame/referrer headers applied to assets only. They now live in
+  `deploy/nginx-security-headers.conf`, re-included wherever a location sets its
+  own header. Verified against a running container: the document, `/index.html`,
+  the SPA fallback and `/healthz` all carry the CSP.
+- **`robots.txt` and `sitemap.xml` were served as `application/octet-stream`**
+  (a `types { }` block cleared the type map). Now `text/plain` and
+  `application/xml`; `site.webmanifest` likewise gets its real type on the
+  shared host.
+- **`deploy/deploy.sh` aborted on a first deploy**: the pre-release backup ran
+  `docker compose exec` against a stack that was not running yet, which fails
+  under `set -e`. It is now skipped when the stack is not up.
+- **`.dockerignore` was missing entirely**, so both image builds copied the host
+  `node_modules/` over the modules `npm ci` had just installed for the
+  container's platform (production targets linux/arm64) and dragged `.env` files,
+  the dev SQLite database and the git history into builder layers. Added for both
+  contexts: the site build context went from the whole repository to 2.2 MB with
+  no `.env` or `node_modules` in it.
+- **The app stripped `max-image-preview:large` on every indexable route**
+  (`src/lib/Seo.tsx` removed the `robots` meta tag on any non-noindex page,
+  discarding the directive that lets Google show a large image beside the
+  result). Indexable routes now restate the directive instead. Verified on the
+  live origin: `robots: index, follow, max-image-preview:large`.
+- Doc corrections: `deploy/README.md` told operators to run
+  `npm run migrate:create`, a script that does not exist (the real command is
+  `npm run payload -- migrate:create`); `cms/.env.example` pointed media uploads
+  at `/app/cms/media` rather than the mounted `/app/media`.
+
+### Changed
+- **Rebrand: the company is now Naivolabs, and Naivolabs is one word**
+  (2026-09-21, operator: "change our brand identity to 'Naivolabs', naivolabs is
+  one word"). The brand identity foundation document (v1.0, 21 September 2026)
+  was the brief; everything below follows from it.
+  - **`src/lib/brand.ts` is the single source of truth**: canonical name, URL
+    (`https://naivolabs.com`), category, essence, brand idea, mission, vision,
+    purpose, promise, contact details, social profiles, the four capability
+    actions, the ten-stage deployment model, the flywheel, differentiators,
+    values, principles, segments, the competitive landscape and the measurement
+    dimensions. A domain or name change is now a one-line edit that propagates
+    to index.html, canonical URLs, structured data, robots.txt and sitemap.xml.
+  - `src/components/Wordmark.tsx` renders the name as one word with the accent
+    on the second half, so it can never render as "Naivo Labs". An E2E test
+    asserts that "Naivo Labs" and "NaivoLabs" appear nowhere in rendered copy
+    on any page.
+  - Every user-facing surface rebranded: nav, footer, `index.html` head and
+    JSON-LD baseline, robots.txt, sitemap.xml, the web manifest, the OG card,
+    the CMS admin branding, and the contact details (hello@naivolabs.com).
+
+### Changed
+- **Site content rebuilt from the brand identity foundation** (same request).
+  The previous content carried invented client names, invented ROI figures and
+  a logo wall of companies that had never been customers. The brand's first
+  principle is "never make a claim we cannot support", so the content was
+  reframed around what is actually true today.
+  - **Case studies became deployment patterns.** `/case-studies` and
+    `/case-studies/:slug` now redirect to `/deployment-patterns`. Each pattern
+    (AI Voice Receptionist, Institutional Knowledge Agent, Service Request
+    Routing, Document Intake) states the problem, the approach, the systems it
+    connects to, the governance controls shipped with it, and the measurement
+    dimensions agreed before launch. No client names, no borrowed logos.
+    Operator decision recorded during the build: "reframe as deployment
+    patterns".
+  - **Testimonials were replaced by the seven brand principles**, rendered as a
+    static grid where all seven are readable at once (an earlier revision
+    marqueed them past the reader; the operator flagged that the section was
+    moving automatically and unreadable).
+  - **Invented statistics were replaced by the measurement dimensions** every
+    deployment is instrumented against, with an explicit note that no ROI
+    figures are published and that misses are reported too.
+  - **The logo wall was replaced by a technology strip** that says what it
+    actually is (the platforms we build on), not who we claim as clients.
+  - New pages and sections from the brand platform: `/capabilities` (the four
+    actions: converse, understand, act, orchestrate), governance, the
+    deployment model, positioning (where Naivolabs sits between the platform
+    and the organization's work), the `ai-automation-nairobi` pillar, and the
+    About page's purpose/mission/vision/origin narrative.
+
+### Changed
+- **Home page reduced to a minimal set** (operator: "ensure our homepage is not
+  too clouded with lots of information, its minimalistic yet communicates about
+  our brand perfectly"). The home page now carries eight sections and stops:
+  hero, technology strip, capabilities, measurement, the deployment-pattern
+  stack, principles, insights, FAQ. The depth moved one level down instead of
+  being deleted: governance and the ten-stage deployment model now live on
+  `/capabilities`, positioning lives on `/about`. An E2E test asserts the home
+  page renders exactly those eight sections and none of the moved ones.
+- **Pricing is hidden for now** (operator: "comment on the pricing section so
+  that you hide it for now from our website we will add it later").
+  `src/components/Pricing.tsx` is kept intact and the render site in
+  `HomePage.tsx` is commented out, with a note explaining how to re-enable it. A
+  test asserts no price figures appear on the public page, so re-enabling the
+  section is a deliberate act rather than an accident.
+- **Contact page title, and the team list**: Emmanuel was replaced by Alphonce
+  (Integration Engineer) and Ndeke was added as Knowledge Systems Engineer
+  (operator instruction).
+
+### Added
+- **Custom 404 page** (`src/pages/NotFoundPage.tsx`): names the requested path,
+  offers four real destinations, and is explicitly `noindex, follow` so soft
+  404s never enter the index while link equity still flows through.
+- **Privacy policy and terms & conditions** (`/privacy`, `/terms`) on a shared
+  `LegalPage` shell with a sticky table of contents and per-clause anchors,
+  written against the Kenya Data Protection Act 2019 and the GDPR. Both linked
+  from the footer.
+- **Cookie consent banner** (`src/components/CookieBanner.tsx` +
+  `src/lib/cookieConsent.ts`): accept-all and reject-non-essential offered at
+  equal prominence, per-category controls, a versioned localStorage record, a
+  footer "Cookie preferences" control that re-opens it in preference mode, and
+  consent seeded before any analytics could load.
+- **Per-page meta title and description** on every route, plus canonical, Open
+  Graph, Twitter card and JSON-LD (Organization, WebSite, BreadcrumbList,
+  BlogPosting, FAQPage, ContactPage, ItemList, AboutPage). An E2E test walks
+  every route and asserts each title is unique and within the ~60 character SERP
+  budget, and each description is unique and within the display window.
+- **Favicon set + web manifest**: `favicon.svg` as the primary, 16/32/48/64 PNG
+  fallbacks, a 180 PNG apple-touch-icon, 192/512 manifest icons, and a real
+  multi-size `favicon.ico` (PNG-in-ICO, written by the generator so browsers,
+  feed readers and link-preview bots that request `/favicon.ico` by convention
+  get a 200). `public/site.webmanifest` names the app and carries the theme
+  colour.
+- **Regenerated Open Graph card** (`public/og-image.png`, verified 1200x630)
+  and a matching set of brand assets written by
+  `scripts/generate-brand-assets.mjs`.
+- **`public/robots.txt` and `public/sitemap.xml`** as real static files (the SPA
+  rewrite would otherwise serve HTML for both), sourced from the route list and
+  the SITE constants.
+- **Stacked panels on scroll for the deployment patterns**
+  (`src/components/DeploymentStack.tsx`): each panel pins below the floating nav
+  and recedes as the next slides over it, driven by scroll position rather than
+  a timer, so it is reversible and tracks the finger exactly. The pitch is set
+  per breakpoint through CSS custom properties so the stack works at 320px as
+  well as 1440px, and `MotionConfig reducedMotion="user"` leaves the panels
+  plainly laid out for anyone who asks for reduced motion.
+- **Loading states** (`src/components/Loading.tsx`): a route-level skeleton for
+  lazy chunks, card/pattern/list skeletons for CMS fetches, an inline button
+  spinner, and a single screen-reader announcement per region rather than one
+  per placeholder bar.
+- **Form error states end to end**: inline per-field messages wired through
+  `aria-invalid` and `aria-describedby`, a polite summary that announces how
+  many fields need attention, focus moved to the first invalid field, errors
+  clearing as soon as the visitor starts fixing them, a real pending state on
+  the submit button, and a recoverable send failure that offers the email
+  address as a fallback.
+- **App-wide smooth scrolling** (`src/lib/useLenis.ts`): Lenis mounted once in
+  `Layout` instead of inside the home page, so inner pages and the scroll-driven
+  stack read one scroll source. Respects `prefers-reduced-motion` by not
+  starting at all.
+- **Hetzner deployment stack** (`deploy/`): Dockerfiles for the site and the
+  CMS, `docker-compose.yml` (site, CMS, Postgres, Caddy with automatic TLS),
+  an nginx config, a Caddyfile, a production env template, a backup script with
+  systemd timer units, a cloud-init file, and a deploy script. Plus
+  `docs/research/hetzner-deployment.md` (the sizing, architecture and backup
+  decisions) and `deploy/README.md` (the runbook). Operator decision recorded
+  during the build: "include CMS on Hetzner".
+- **Grammar of the codebase documented for agents**: `AGENTS.md` updated,
+  `.ai-memory.toml` added for the `ai-memory` skill, and `.gitignore` extended.
+- **Screenshot set** (`docs/screenshots/`) captured from the production build at
+  desktop, mobile portrait and mobile landscape, kept as a reference for how the
+  site should look and for verifying the shared-link card.
+
+### Fixed
+- **`position: sticky` was silently broken site-wide**
+  (`src/index.css`). `overflow-x: hidden` on `html` and `body` turns both into
+  scroll containers, which makes every sticky descendant resolve against a box
+  that never scrolls. The deployment-pattern stack therefore never pinned: the
+  panels scrolled away instead of stacking. Changed to `overflow-x: clip`, which
+  clips the same overflow without creating a scroll container. This also
+  un-breaks the legal pages' sticky table of contents. Verified by measuring the
+  pin line and the recede width in a real browser, and now covered by tests at
+  desktop and phone widths.
+- **Contact form focus management did nothing.** Submit looked up
+  `[aria-invalid="true"]` in the DOM, but that attribute only lands after React
+  commits the state update, so the query always ran against the previous render
+  and found nothing. Focus now moves by field id, derived from the same
+  validation pass that produced the errors.
+- **The hero's email hand-off was dropped.** The hero sends visitors to
+  `/contact?email=…`; the contact page ignored the parameter, so people were
+  asked for the address they had just typed. The value is now prefilled (and
+  ignored if it is not a valid address), with a short note explaining why the
+  field is already filled, carrying `?interest=` too.
+- **Meta descriptions over the SERP display limit** on the home, about and
+  Nairobi pages (161 to 174 characters). All trimmed under 160 while keeping the
+  sentence intact.
+- **E2E console-error assertions failed for environmental reasons.** The site
+  loads a third-party voice widget that fetches its configuration from an origin
+  the test runner cannot always reach. Those errors are now filtered by origin
+  (`e2e/console-noise.ts`) so the assertion still fails on anything the site
+  itself is responsible for.
+
+### Changed
+- **Copy pass for human-like prose** (2026-09-21, operator: "invoke the
+  humanprose skill to ensure the content don't sound like its ai generated and
+  does not contain buzzwords"; skill: `human-like-prose`). All 152 em dashes in
+  user-facing copy were removed, replaced with commas or colons as the sentence
+  required, and the copy was checked against the skill's prohibited-vocabulary
+  list (the site was already free of that vocabulary, so no substitutions were
+  needed there). Titles, alt text and screen-reader strings were treated as copy
+  too, not just body text.
+
+### Changed
+- **E2E suite rebuilt around the new site** (`e2e/`): 100% of the old suite
+  asserted the previous brand's content (client names, price points, old section
+  titles, the testimonials marquee). Specs now cover: every route's H1 and
+  per-route SEO, JSON-LD, nav and footer navigation, every "Book a discovery
+  call" CTA across five pages, the one-word brand rule, the custom 404 and its
+  `noindex`, legacy redirects, the cookie banner's decide/persist/re-open cycle,
+  static robots.txt and sitemap.xml, the favicon set, the hero's above-the-fold
+  CTA at three viewports, the capability tabs, the scroll-driven stack (pin line
+  and recede width), the principles grid (all seven readable, nothing moving),
+  positioning, pricing-hidden, the FAQ, form validation, error, pending and
+  success states, the email hand-off, mobile menu, touch targets, mobile input
+  sizing, landscape orientations, and the accessibility of every route. All 20
+  visual goldens were regenerated for the new design; the two stale
+  `public/og-image.txt` / template leftovers were removed.
+
+### Notes
+- **Outstanding before launch:** the Dograh voice widget in `index.html` still
+  points at the previous brand's workflow token (flagged in a TODO next to the
+  embed). It needs re-pointing at the Naivolabs agent, or removing.
+- Preview locally with `npm run dev` (or `npm run build && npm run preview`).
 
 ### Added
 - **Full SEO + content optimization pass** (2026-08-13, operator: "push to

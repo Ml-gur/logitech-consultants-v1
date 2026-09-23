@@ -15,10 +15,20 @@ test-results/
 .env
 .env.local
 .env.*.local
+deploy/.env
+deploy/.env.local
 
-# Raw logo source (optimized copy lives in public/images/logitech-logo.png)
+# CMS local development database + uploaded media
+cms/cms.db
+cms/cms.db-journal
+cms/media/
+
+# Raw logo sources (the optimized copies in public/ are what ship)
 logitech logo.png
 
 # TypeScript incremental build cache
 *.tsbuildinfo
 *.tsbuildinfo.*
+
+# Debug / tmp artifacts
+.tmp-debug/

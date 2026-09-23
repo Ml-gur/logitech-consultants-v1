@@ -46,8 +46,8 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     meta: {
-      titleSuffix: ' — Logitech Consultants CMS',
-      description: 'Content management for logitechconsultants.com',
+      titleSuffix: ' — Naivolabs CMS',
+      description: 'Content management for naivolabs.com',
     },
   },
   collections: [Users, Media, BlogPosts, CaseStudies, Inquiries],
@@ -75,6 +75,10 @@ export default buildConfig({
     // On Vercel (serverless) the filesystem is read-only, so uploads must go
     // to Vercel Blob storage. Locally (SQLite dev), Payload's default local
     // file storage is used and this plugin is skipped.
+    // Vercel Blob is used when the token is present (the original Vercel
+    // deployment). On the Hetzner deployment BLOB_READ_WRITE_TOKEN is unset and
+    // Payload's local disk storage is used instead, with the `uploads` volume
+    // mounted at /app/cms/media — see deploy/docker-compose.yml.
     ...(process.env.BLOB_READ_WRITE_TOKEN
       ? [
           vercelBlobStorage({

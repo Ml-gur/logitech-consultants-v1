@@ -1,0 +1,54 @@
+# Naivolabs — off-box backup (host-level, runs the in-container script)
+#
+# The `backup` compose service already dumps nightly to the `backups` volume.
+# This timer copies that volume's contents off the server, which is the part
+# that actually protects against disk or host loss.
+#
+# Install:
+#   sudo cp naivolabs-backup.{service,timer} /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now naivolabs-backup.timer
+#   systemctl list-timers naivolabs-backup.timer
+
+[Unit]
+Description=Copy Naivolabs database dumps off-box (Hetzner Storage Box / S3)
+After=docker.service network-online.target
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/srv/naivolabs/deploy
+User=deploy
+Group=deploy
+
+# Read destinations/credentials from the same file the stack uses.
+EnvironmentFile=/srv/naivolabs/deploy/.env
+
+# `docker compose cp` out of the running backup container, then upload. The
+# credential for the destination lives in the deploy user's ~/.ssh/config or
+# ~/.aws/credentials, not in this unit.
+ExecStart=/bin/bash -c '\
+  set -euo pipefail; \
+  cd /srv/naivolabs/deploy; \
+  STAGE=$(mktemp -d); \
+  CID=$(docker compose ps -q backup); \
+  docker cp "$$CID:/backups/." "$$STAGE/"; \
+  if [ -n "${OFFSITE_CMD:-}" ]; then \
+    for f in "$$STAGE"/naivolabs-*.dump; do \
+      [ -e "$$f" ] || continue; \
+      FILE="$$f" sh -c "$$OFFSITE_CMD"; \
+    done; \
+  else \
+    echo "OFFSITE_CMD not set — dumps remain on this host only" >&2; \
+    exit 1; \
+  fi; \
+  rm -rf "$$STAGE"; \
+  echo "off-box backup complete"'
+
+# Never leave a half-started backup holding the timer.
+TimeoutStartSec=30min
+Nice=10
+
+[Install]
+WantedBy=multi-user.target

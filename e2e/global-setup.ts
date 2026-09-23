@@ -5,27 +5,28 @@ import { chromiumLaunchOptions } from './chromium-options'
  * Global setup: warm the served app before any test runs.
  *
  * The suite serves the production build via `vite preview` (see
- * playwright.config.ts), so there is no on-demand compilation anymore. This
- * warm-up still pays for browser-level one-time costs (font loading, cache
- * priming, full render passes on every route) so the first test of each
- * worker starts against a settled page.
+ * playwright.config.ts), so there is no on-demand compilation. This warm-up
+ * pays for browser-level one-time costs (font loading, cache priming, full
+ * render passes on every route) so the first test of each worker starts
+ * against a settled page.
  *
- * Historical note: this was originally written because `vite dev` compiles
- * modules on demand, and parallel workers hitting a cold server produced
- * intermittent "element not found" failures that moved between runs
- * (documented in STATE.md as "flaky on server timing"). The dev server is
- * no longer used for E2E; the warm-up remains as cheap insurance.
+ * The route list mirrors the real route table (src/main.tsx) — update it when
+ * routes are added so the first worker never pays the cold cost mid-test.
  */
 export default async function globalSetup() {
   const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:4173'
   const routes = [
     '/',
     '/about',
-    '/case-studies',
+    '/capabilities',
+    '/deployment-patterns',
+    '/deployment-patterns/ai-voice-receptionist',
     '/blog',
+    '/blog/from-demo-to-production-why-ai-pilots-stall',
     '/contact',
-    '/case-studies/etery',
-    '/blog/getting-your-data-ai-ready-without-the-big-project',
+    '/privacy',
+    '/terms',
+    '/ai-automation-nairobi',
   ]
 
   const browser = await chromium.launch(chromiumLaunchOptions)

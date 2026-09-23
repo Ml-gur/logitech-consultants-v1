@@ -1,1 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="478" height="478" fill="none"><rect width="478" height="478" fill="#151619" rx="100"/><g clip-path="url(#a)"><path fill="#F0F0F0" d="M367 367H239L111 239h128zm0-128H239L111 111h128z"/></g><defs><clipPath id="a"><path fill="#fff" d="M111 111h256v256H111z"/></clipPath></defs></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Naivolabs">
+  <title>Naivolabs</title>
+  <defs>
+    <linearGradient id="naivolabs-mark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#405bff"/>
+      <stop offset="1" stop-color="#7084ff"/>
+    </linearGradient>
+  </defs>
+  <!-- Gradient tile -->
+  <rect width="512" height="512" rx="116" fill="url(#naivolabs-mark)"/>
+  <!-- The N: two stems and a diagonal, drawn to stay legible at 16px -->
+  <g fill="#ffffff">
+    <rect x="138" y="134" width="50" height="244" rx="15"/>
+    <rect x="324" y="134" width="50" height="244" rx="15"/>
+    <path d="M138 134h52l184 244h-52z"/>
+  </g>
+</svg>

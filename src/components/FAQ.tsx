@@ -39,7 +39,7 @@ export default function FAQ() {
             </motion.h2>
           </div>
 
-          {/* Right column — stacked carbon radius-24 cards */}
+          {/* Right column, stacked carbon radius-24 cards */}
           <div className="flex flex-col gap-3">
             {faqs.map((faq, i) => (
               <motion.div
@@ -59,7 +59,7 @@ export default function FAQ() {
                   <span className="text-[16px] font-medium text-paper leading-snug">
                     {numbered(i, faq.q)}
                   </span>
-                  {/* Accent plus icon — Signal Violet, rotates 45deg when open */}
+                  {/* Accent plus icon, Signal Violet, rotates 45deg when open */}
                   <motion.svg
                     animate={{ rotate: openIndex === i ? 45 : 0 }}
                     transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
@@ -74,7 +74,7 @@ export default function FAQ() {
                     <path d="M7 1v12M1 7h12" />
                   </motion.svg>
                 </button>
-                {/* Answer — conditional render (the rotating plus provides the
+                {/* Answer, conditional render (the rotating plus provides the
                     motion cue; no JS height tween keeps the toggle cheap for
                     INP) */}
                 {openIndex === i && (

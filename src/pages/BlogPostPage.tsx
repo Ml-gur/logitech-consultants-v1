@@ -4,27 +4,23 @@ import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useCms } from '../lib/CmsProvider'
 import Seo, { breadcrumbLd } from '../lib/Seo'
+import { SITE, absUrl } from '../lib/brand'
+import NotFoundPage from './NotFoundPage'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
 export default function BlogPostPage() {
   const { slug } = useParams()
-  const { blogPosts } = useCms()
+  const { blogPosts, cmsEnabled, cmsLoaded } = useCms()
   const post = blogPosts.find((p) => p.slug === slug)
   const others = blogPosts.filter((p) => p.slug !== slug)
 
-  if (!post) {
-    return (
-      <section className="relative pt-32">
-      <Seo title="Article Not Found" description="This article could not be found." path="/blog" />
-        <div className="max-w-[1200px] mx-auto px-6 text-center py-24">
-          <h1 className="text-4xl font-medium mb-4">Article not found</h1>
-          <Link to="/blog" className="text-sm text-fog hover:text-paper transition-colors">
-            ← Back to blog
-          </Link>
-        </div>
-      </section>
-    )
-  }
+  // While a configured CMS is still fetching, an unknown slug is not yet a
+  // 404, render the route fallback instead of a premature not-found page.
+  if (!post && cmsEnabled && !cmsLoaded) return null
+
+  // A real miss uses the branded 404 (correct status semantics for the router,
+  // noindex, and a recovery path) rather than a bare inline message.
+  if (!post) return <NotFoundPage />
 
   const dateIso = (d: string) => {
     const dt = new Date(d + ' UTC')
@@ -53,8 +49,8 @@ export default function BlogPostPage() {
             image: post.image || undefined,
             datePublished: dateIso(post.date),
             author: { '@type': 'Person', name: post.author, jobTitle: post.role },
-            publisher: { '@type': 'Organization', name: 'Logitech Consultants' },
-            mainEntityOfPage: `https://logitechconsultants.com/blog/${post.slug}`,
+            publisher: { '@type': 'Organization', name: SITE.name, url: SITE.url },
+            mainEntityOfPage: absUrl(`/blog/${post.slug}`),
           },
         ]}
       />
@@ -64,7 +60,7 @@ export default function BlogPostPage() {
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M10 3l-5 5 5 5" />
             </svg>
-            All articles
+            All insights
           </Link>
         </motion.div>
 
@@ -89,7 +85,13 @@ export default function BlogPostPage() {
           className="rounded-[20px] overflow-hidden mb-12 aspect-[16/9] bg-[#191919] border border-white/10"
         >
           {post.image ? (
-            <img src={post.image} alt={`${post.title} — Logitech Consultants blog`} className="w-full h-full object-cover" />
+            <img
+              src={post.image}
+              alt={post.title}
+              fetchPriority="high"
+              decoding="async"
+              className="w-full h-full object-cover"
+            />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#2c2c2c] to-[#141414]" />
           )}
@@ -149,7 +151,13 @@ export default function BlogPostPage() {
                 <Link to={`/blog/${o.slug}`} className="group block h-full">
                   <div className="aspect-[4/5] rounded-[20px] overflow-hidden mb-4 bg-[#191919] border border-white/10">
                     {o.image ? (
-                      <img src={o.image} alt={`${o.title} — Logitech Consultants blog`} className="w-full h-full object-cover" />
+                      <img
+                        src={o.image}
+                        alt={o.title}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-[#2c2c2c] to-[#141414]" />
                     )}
