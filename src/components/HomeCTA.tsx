@@ -1,108 +1,42 @@
-'use client'
-
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
+import { SITE } from '../lib/brand'
 
+/**
+ * Closing call to action.
+ *
+ * One panel, one button. The gradient wash and the second competing CTA are
+ * gone: a page should end by asking for the one thing it wants.
+ */
 export default function HomeCTA() {
   return (
-    <section className="relative">
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
-
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-24 sm:py-32">
-        <div
-          className="relative rounded-[32px] overflow-hidden p-10 sm:p-16 lg:p-20"
-          style={{
-            background: 'linear-gradient(135deg, rgba(61,85,240,0.18) 0%, rgba(124,145,255,0.08) 50%, rgba(8,8,16,0.8) 100%)',
-            border: '1px solid rgba(124,145,255,0.2)',
-          }}
+    <section className="border-t border-hairline">
+      <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-8 sm:py-28">
+        <motion.div
+          className="grid gap-8 md:grid-cols-[1.4fr_1fr] md:items-end md:gap-16"
         >
-          {/* Background radial */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'radial-gradient(ellipse 70% 80% at 20% 50%, rgba(61,85,240,0.2) 0%, transparent 65%)',
-            }}
-            aria-hidden
-          />
-
-          <div className="relative grid lg:grid-cols-[1fr_auto] gap-10 items-center">
-            <div>
-              <motion.p
-                initial={revealInitial}
-                whileInView={revealWhileInView}
-                viewport={revealViewport}
-                transition={springReveal()}
-                className="section-label"
-              >
-                Ready to deploy
-              </motion.p>
-
-              <motion.h2
-                initial={revealInitial}
-                whileInView={revealWhileInView}
-                viewport={revealViewport}
-                transition={springReveal(0.06)}
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 400,
-                  fontSize: 'clamp(32px, 5vw, 64px)',
-                  lineHeight: 1.05,
-                  letterSpacing: '-0.025em',
-                  color: 'var(--color-paper)',
-                  marginBottom: '16px',
-                }}
-              >
-                Start with a real problem,
-                <br />
-                <em style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--color-signal)' }}>
-                  not a demo.
-                </em>
-              </motion.h2>
-
-              <motion.p
-                initial={revealInitial}
-                whileInView={revealWhileInView}
-                viewport={revealViewport}
-                transition={springReveal(0.1)}
-                className="text-[16px] max-w-[520px] leading-relaxed"
-                style={{ color: 'var(--color-fog)' }}
-              >
-                A discovery call costs an hour. We scope the work honestly: what we can build, what we'll measure, and what it will cost to get to production.
-              </motion.p>
-            </div>
-
-            <motion.div
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal(0.14)}
-              className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0"
-            >
-              <Link
-                to="/contact"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-[14px] font-medium rounded-full text-white transition-all duration-200 whitespace-nowrap"
-                style={{ background: 'var(--color-voltage)', minHeight: '52px' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-voltage-hover)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'var(--color-voltage)')}
-              >
-                Book a discovery call
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                  <path d="M6 3l5 5-5 5" />
-                </svg>
-              </Link>
-              <Link
-                to="/blog"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-[14px] font-medium rounded-full transition-all duration-200 whitespace-nowrap"
-                style={{ border: '1px solid rgba(124,145,255,0.3)', color: 'var(--color-signal)', minHeight: '52px' }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(124,145,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(124,145,255,0.5)' }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(124,145,255,0.3)' }}
-              >
-                Read our insights
-              </Link>
-            </motion.div>
+          <div>
+            <h2 className="max-w-[24ch] text-[clamp(30px,4.8vw,54px)] leading-[1.05]">
+              Start with a real problem, not a demonstration.
+            </h2>
+            <p className="mt-5 max-w-[52ch] text-[16px] leading-relaxed text-fog">
+              A discovery call takes an hour. We will tell you what we can build, what we would measure, and
+              what it would take to reach production — or that there is no case yet.
+            </p>
           </div>
-        </div>
+
+          <div className="flex flex-col gap-4 md:items-start">
+            <Link to="/contact" className="btn-primary w-full px-7 py-4 text-[15px] sm:w-auto">
+              Book a discovery call
+            </Link>
+            <p className="text-[13px] text-fog">
+              Or write to{' '}
+              <a href={`mailto:${SITE.email}`} className="link-quiet">
+                {SITE.email}
+              </a>
+            </p>
+          </div>
+        </motion.div>
       </div>
     </section>
   )

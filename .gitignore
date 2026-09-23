@@ -23,9 +23,6 @@ cms/cms.db
 cms/cms.db-journal
 cms/media/
 
-# Raw logo sources (the optimized copies in public/ are what ship)
-logitech logo.png
-
 # TypeScript incremental build cache
 *.tsbuildinfo
 *.tsbuildinfo.*

@@ -1,16 +1,16 @@
-'use client'
-
 import { useState, type ReactNode } from 'react'
 import { motion } from 'framer-motion'
-import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
-/* ---------- Syntax colors (Dracula-inspired, design.md) ----------
-   keywords #66d9ef · strings #a6e22e · literals #f92672 · comments #6d6e71 */
+/* ---------- Syntax colors ----------
+   Deliberately minimal — keywords in lime, strings in the success green,
+   everything else in the body greys. A rainbow code theme (the previous
+   Dracula palette) turned the one genuinely technical moment on the site into
+   a colour clash with everything around it. */
 
-const K = (s: string) => <span key={s} className="text-[#66d9ef]">{s}</span> // keyword
-const S = (s: string) => <span key={s} className="text-[#a6e22e]">{s}</span> // string
-const P = (s: string) => <span key={s} className="text-[#f92672]">{s}</span> // literal
-const C = (s: string) => <span key={s} className="text-[#8a8c8e]">{s}</span> // comment
+const K = (s: string) => <span key={s} className="text-lime">{s}</span> // keyword
+const S = (s: string) => <span key={s} className="text-success">{s}</span> // string
+const P = (s: string) => <span key={s} className="text-ash">{s}</span> // literal
+const C = (s: string) => <span key={s} className="text-fog">{s}</span> // comment
 
 interface Sample {
   lang: string
@@ -166,30 +166,18 @@ export default function Governance() {
           {/* Left, copy + controls */}
           <div className="min-w-0">
             <motion.p
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal()}
               className="section-label"
             >
               Governance
             </motion.p>
 
             <motion.h2
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal(0.06)}
               className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] mb-6"
             >
               Governance you can read.
             </motion.h2>
 
             <motion.p
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal(0.1)}
               className="text-[17px] text-fog leading-relaxed max-w-[480px] mb-10"
             >
               The controls that make an AI system deployable belong in the system, declared next to the agent
@@ -197,16 +185,12 @@ export default function Governance() {
             </motion.p>
 
             <motion.ul
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal(0.14)}
               className="space-y-4 mb-10"
             >
               {controls.map((f) => (
                 <li key={f} className="flex items-start gap-3">
                   <svg
-                    className="w-5 h-5 mt-0.5 shrink-0 text-signal"
+                    className="w-5 h-5 mt-0.5 shrink-0 text-lime"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -223,10 +207,6 @@ export default function Governance() {
             </motion.ul>
 
             <motion.a
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal(0.18)}
               href="#process"
               className="btn-ghost px-6 py-3 text-sm"
             >
@@ -239,20 +219,11 @@ export default function Governance() {
 
           {/* Right, policy / SDK / CLI sample */}
           <motion.div
-            initial={revealInitial}
-            whileInView={revealWhileInView}
-            viewport={revealViewport}
-            transition={springReveal(0.1)}
             className="relative min-w-0"
           >
-            <div
-              className="absolute -inset-6 rounded-[40px] pointer-events-none"
-              style={{ background: 'radial-gradient(55% 55% at 40% 50%, rgba(64,91,255,0.2) 0%, transparent 70%)' }}
-              aria-hidden
-            />
-            <div className="relative rounded-[16px] bg-[#191919] border border-white/10 overflow-hidden shadow-[0_0_32px_rgba(112,132,255,0.12)]">
+            <div className="relative rounded-panel bg-carbon border border-hairline overflow-hidden">
               {/* Tabs + copy button */}
-              <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-white/5">
+              <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-hairline">
                 <div className="flex items-center gap-4" role="tablist" aria-label="Governance sample">
                   {samples.map((s, i) => (
                     <button
@@ -274,7 +245,7 @@ export default function Governance() {
                 >
                   {copied ? (
                     <>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="text-[#a6e22e]" aria-hidden>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="text-success" aria-hidden>
                         <path d="M20 6L9 17l-5-5" />
                       </svg>
                       Copied
@@ -293,11 +264,11 @@ export default function Governance() {
 
               {/* Code, scrollable, keyboard-focusable (a11y) */}
               <div
-                className="overflow-x-auto focus-visible:outline focus-visible:outline-1 focus-visible:outline-signal focus-visible:outline-offset-[-1px]"
+                className="overflow-x-auto focus-visible:outline focus-visible:outline-1 focus-visible:outline-lime focus-visible:outline-offset-[-1px]"
                 tabIndex={0}
                 aria-label={`${sample.lang} governance sample`}
               >
-                <pre className="px-5 py-4 font-mono text-[13px] leading-[1.65] text-[#f8f8f2] min-w-max">
+                <pre className="px-5 py-4 font-mono text-[13px] leading-[1.65] text-ash min-w-max">
                   <code>
                     {sample.lines.map((line, i) => (
                       <span key={i}>

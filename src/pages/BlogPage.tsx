@@ -1,12 +1,9 @@
-'use client'
-
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useCms } from '../lib/CmsProvider'
 import Seo, { breadcrumbLd } from '../lib/Seo'
 import { SITE, absUrl } from '../lib/brand'
 import { ListSkeleton } from '../components/Loading'
-import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
 export default function BlogPage() {
   const { blogPosts, cmsEnabled, cmsLoaded } = useCms()
@@ -30,25 +27,17 @@ export default function BlogPage() {
         ]}
       />
       <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
-        <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
+        <motion.p className="section-label">
           Insights
         </motion.p>
 
         <motion.h1
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal(0.08)}
           className="text-[clamp(36px,6vw,72px)] leading-[1.02] tracking-[-0.03em] max-w-[760px] mb-6"
         >
-          Notes from <span className="text-signal">production AI.</span>
+          Notes from <span className="text-lime">production AI.</span>
         </motion.h1>
 
         <motion.p
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal(0.14)}
           className="text-[18px] text-fog max-w-2xl mb-16"
         >
           Written by the people doing the deployment work, the parts that are harder than the demonstration.
@@ -60,13 +49,9 @@ export default function BlogPage() {
           {blogPosts.map((post, i) => (
             <motion.div
               key={post.slug}
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal(i * 0.08)}
             >
               <Link to={`/blog/${post.slug}`} className="group block h-full">
-                <div className="aspect-[4/5] rounded-[20px] overflow-hidden mb-4 bg-[#191919] border border-white/10">
+                <div className="aspect-[4/5] rounded-panel overflow-hidden mb-4 bg-carbon border border-hairline">
                   {post.image ? (
                     <img
                       src={post.image}
@@ -76,15 +61,15 @@ export default function BlogPage() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-[#2c2c2c] to-[#141414]" />
+                    <div className="w-full h-full bg-graphite" />
                   )}
                 </div>
                 <div className="flex items-center gap-3 text-xs text-fog mb-2">
-                  <span className="font-medium text-signal">{post.category}</span>
+                  <span className="font-medium text-lime">{post.category}</span>
                   <span className="w-1 h-1 rounded-full bg-white/15" />
                   <span>{post.date}</span>
                 </div>
-                <h3 className="font-display text-lg font-medium text-paper group-hover:text-signal transition-colors">
+                <h3 className="font-sans text-lg font-medium text-paper group-hover:text-lime transition-colors">
                   {post.title}
                 </h3>
                 <p className="text-sm text-fog mt-2 leading-relaxed line-clamp-2">{post.excerpt}</p>

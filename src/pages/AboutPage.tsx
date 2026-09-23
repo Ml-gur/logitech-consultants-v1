@@ -1,5 +1,3 @@
-'use client'
-
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { aboutValues, team } from '../data/content'
@@ -15,7 +13,6 @@ import {
 } from '../lib/brand'
 import FAQ from '../components/FAQ'
 import WhyUs from '../components/WhyUs'
-import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
 export default function AboutPage() {
   return (
@@ -41,22 +38,20 @@ export default function AboutPage() {
       />
       <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
         {/* Hero */}
-        <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
+        <motion.p className="section-label">
           About us
         </motion.p>
         <motion.h1
-          initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.08)}
           className="text-[clamp(40px,6vw,80px)] leading-[1.02] tracking-[-0.03em] max-w-[820px] mb-6"
         >
-          Intelligence <span className="text-signal">at work.</span>
+          Intelligence <span className="text-lime">at work.</span>
         </motion.h1>
         <motion.p
-          initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.14)}
           className="text-[18px] text-fog max-w-[620px] leading-relaxed mb-10"
         >
           {DEFINITIONS.external}
         </motion.p>
-        <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.2)} className="flex flex-wrap gap-4 items-center">
+        <motion.div className="flex flex-wrap gap-4 items-center">
           <Link to="/contact" className="btn-primary px-7 py-3.5 text-sm">
             Book a discovery call
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -77,8 +72,7 @@ export default function AboutPage() {
           ].map((t, i) => (
             <motion.div
               key={t.k}
-              initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.08)}
-              className="rounded-[24px] bg-[#191919] border border-white/10 p-6"
+              className="rounded-panel bg-carbon border border-hairline p-6"
             >
               <p className="text-[15px] font-medium text-paper mb-2">{t.k}</p>
               <p className="text-sm text-fog leading-relaxed">{t.v}</p>
@@ -95,23 +89,21 @@ export default function AboutPage() {
           ].map((block, i) => (
             <motion.div
               key={block.label}
-              initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.08)}
-              className="rounded-[30px] bg-[#191919] border border-white/10 p-7"
+              className="rounded-panel bg-carbon border border-hairline p-7"
             >
-              <p className="text-xs uppercase tracking-[0.14em] text-fog mb-5">{block.label}</p>
-              <p className="font-display text-[19px] leading-snug text-paper">{block.body}</p>
+              <p className="text-[13px] text-fog mb-5">{block.label}</p>
+              <p className="font-sans text-[19px] leading-snug text-paper">{block.body}</p>
             </motion.div>
           ))}
         </div>
 
         {/* Why we exist */}
         <div className="pt-24">
-          <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
+          <motion.p className="section-label">
             Why we exist
           </motion.p>
           <motion.p
-            initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.08)}
-            className="font-display text-[clamp(24px,3.5vw,40px)] font-medium leading-snug tracking-[-0.02em] max-w-[900px]"
+            className="font-sans text-[clamp(24px,3.5vw,40px)] font-medium leading-snug tracking-[-0.02em] max-w-[900px]"
           >
             Organizations do not simply need more AI. They need AI connected to the work that matters, the calls
             that go unanswered, the information nobody can find, the requests that get lost between systems, the
@@ -122,11 +114,10 @@ export default function AboutPage() {
         {/* Internal definition, the harder version */}
         <div className="pt-16">
           <motion.div
-            initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()}
-            className="rounded-[30px] border border-signal/30 bg-[#191919] p-8 sm:p-10 max-w-[900px]"
+            className="rounded-panel border border-lime-soft bg-carbon p-8 sm:p-10 max-w-[900px]"
           >
-            <p className="text-xs uppercase tracking-[0.14em] text-fog mb-4">The internal version</p>
-            <p className="font-display text-[clamp(20px,2.6vw,30px)] font-medium leading-snug text-paper">
+            <p className="text-[13px] text-fog mb-4">The internal version</p>
+            <p className="font-sans text-[clamp(20px,2.6vw,30px)] font-medium leading-snug text-paper">
               {DEFINITIONS.internal}
             </p>
             <p className="text-sm text-fog leading-relaxed mt-5">
@@ -138,11 +129,10 @@ export default function AboutPage() {
 
         {/* Values */}
         <div className="pt-24">
-          <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
+          <motion.p className="section-label">
             Our values
           </motion.p>
           <motion.h2
-            initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
             className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] mb-16"
           >
             What we will not trade away.
@@ -152,10 +142,9 @@ export default function AboutPage() {
             {aboutValues.map((v, i) => (
               <motion.div
                 key={v.title}
-                initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.06)}
-                className="card-dark rounded-[24px] p-7"
+                className="card-dark p-7"
               >
-                <div className="w-8 h-[3px] rounded-full bg-gradient-to-r from-[#405bff] to-[#7084ff] mb-6" />
+                <div className="w-8 h-[3px] rounded-full bg-lime mb-6" />
                 <h3 className="text-lg font-medium mb-3">{v.title}</h3>
                 <p className="text-sm text-fog leading-relaxed">{v.description}</p>
               </motion.div>
@@ -165,11 +154,10 @@ export default function AboutPage() {
 
         {/* Principles */}
         <div className="pt-24">
-          <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
+          <motion.p className="section-label">
             Brand principles
           </motion.p>
           <motion.h2
-            initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
             className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] max-w-[680px] mb-14"
           >
             Rules, not aspirations.
@@ -179,10 +167,9 @@ export default function AboutPage() {
             {PRINCIPLES.map((p, i) => (
               <motion.div
                 key={p.title}
-                initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.05)}
-                className="flex items-start gap-4 rounded-[20px] bg-[#191919] border border-white/10 p-5"
+                className="flex items-start gap-4 rounded-panel bg-carbon border border-hairline p-5"
               >
-                <span className="font-mono text-xs text-signal mt-1 tabular-nums shrink-0">
+                <span className="font-mono text-xs text-lime mt-1 tabular-nums shrink-0">
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <span className="text-[15px] text-ash leading-relaxed">{p.title}</span>
@@ -193,18 +180,17 @@ export default function AboutPage() {
 
         {/* Africa-to-world */}
         <div className="pt-24">
-          <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
+          <motion.p className="section-label">
             Built from Africa
           </motion.p>
           <motion.h2
-            initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
             className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] max-w-[760px] mb-8"
           >
             Origin, insight and capability, not a limitation.
           </motion.h2>
 
           <div className="grid lg:grid-cols-2 gap-12 max-w-[1000px]">
-            <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.1)} className="space-y-5">
+            <motion.div className="space-y-5">
               <p className="text-[17px] text-fog leading-relaxed">
                 We build from Africa because it gives us an environment where technology has to work across real
                 constraints: diverse languages, mobile-first communication, fragmented systems and organizational
@@ -217,7 +203,7 @@ export default function AboutPage() {
               </p>
             </motion.div>
 
-            <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.14)} className="space-y-5">
+            <motion.div className="space-y-5">
               <p className="text-[17px] text-paper leading-relaxed">
                 Our ambition is not &ldquo;AI for Africa&rdquo;. It is technology built from African realities
                 that can work anywhere.
@@ -232,11 +218,10 @@ export default function AboutPage() {
 
         {/* Segments */}
         <div className="pt-24">
-          <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
+          <motion.p className="section-label">
             Who we serve
           </motion.p>
           <motion.h2
-            initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
             className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] mb-14"
           >
             The environments we go deep in.
@@ -246,8 +231,7 @@ export default function AboutPage() {
             {SEGMENTS.map((s, i) => (
               <motion.div
                 key={s.name}
-                initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.06)}
-                className="rounded-[24px] bg-[#191919] border border-white/10 p-6"
+                className="rounded-panel bg-carbon border border-hairline p-6"
               >
                 <h3 className="text-[17px] font-medium mb-3">{s.name}</h3>
                 <p className="text-sm text-fog leading-relaxed">{s.detail}</p>
@@ -258,45 +242,36 @@ export default function AboutPage() {
 
         {/* Team */}
         <div className="pt-24">
-          <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
+          <motion.p className="section-label">
             Our team
           </motion.p>
           <motion.h2
-            initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
             className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] mb-16"
           >
             Small, senior, and on the deployment.
           </motion.h2>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {team.map((member, i) => {
-              const palettes = [
-                { from: '#0ea5e9', to: '#0284c7', ring: 'rgba(14,165,233,0.25)' },
-                { from: '#f59e0b', to: '#b45309', ring: 'rgba(245,158,11,0.25)' },
-                { from: '#8b5cf6', to: '#6d28d9', ring: 'rgba(139,92,246,0.25)' },
-                { from: '#f43f5e', to: '#be123c', ring: 'rgba(244,63,94,0.25)' },
-                { from: '#10b981', to: '#047857', ring: 'rgba(16,185,129,0.25)' },
-              ]
-              const p = palettes[i % palettes.length]
-              return (
+            {/* One treatment for every person. The previous revision gave each
+                member their own gradient (sky, amber, violet, rose, emerald) —
+                five accent colours on a page that is supposed to have one, and
+                a colour-coding that carried no information because it does not
+                repeat anywhere else on the site. */}
+            {team.map((member, i) => (
               <motion.div
                 key={member.name}
-                initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.08)}
-                className="rounded-[24px] bg-[#191919] border border-white/10 p-7 transition-all duration-300"
-                style={{ '--ring': p.ring } as React.CSSProperties}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = p.ring; (e.currentTarget as HTMLElement).style.boxShadow = `0 0 24px ${p.ring}` }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.10)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none' }}
+                className="card-dark p-7"
               >
                 <div
-                  className="w-14 h-14 rounded-full text-white flex items-center justify-center text-lg font-semibold mb-5"
-                  style={{ background: `linear-gradient(135deg, ${p.from}, ${p.to})` }}
+                  className="mb-5 flex h-14 w-14 items-center justify-center rounded-full border border-lime-soft bg-smoke font-sans text-[19px] text-lime"
+                  aria-hidden
                 >
                   {member.name.split(' ').map((n) => n[0]).join('')}
                 </div>
                 <h3 className="text-lg font-medium mb-1">{member.name}</h3>
                 <p className="text-sm text-fog">{member.role}</p>
               </motion.div>
-            )})}
+            ))}
 
           </div>
         </div>

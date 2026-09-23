@@ -1,26 +1,24 @@
-'use client'
-
 /**
  * CMS API client.
  *
- * The site ships with the full static content bundled (see src/data/content.ts)
- * so it renders instantly and works with zero configuration. When
- * `VITE_CMS_URL` is set at build time (e.g. https://cms-logitech.vercel.app),
- * the site additionally fetches live content from the Payload CMS REST API and
- * swaps it in, edits published in the admin panel appear on the live site on
- * the next load, with no redeploy required.
+ * The site ships with its full content bundled (see src/data/content.ts), so it
+ * renders instantly and works with zero configuration. When `VITE_CMS_URL` is
+ * set at build time (for example https://cms.naivolabs.com) the site also
+ * fetches live content from the Payload REST API and swaps it in, so an edit
+ * published in the admin panel appears on the live site on the next load
+ * without a redeploy.
  *
- * Every fetch is wrapped in a try/catch that falls back to the bundled static
- * data, so a CMS outage never breaks the site.
+ * Every fetch is wrapped in a try/catch that falls back to the bundled data,
+ * with an 8-second timeout, so a CMS outage or a slow CMS never breaks a page.
  */
 
 import {
   blogPosts as staticPosts,
-  caseStudies as staticCaseStudies,
+  deploymentPatterns as staticDeploymentPatterns,
   contactInfo as staticContactInfo,
   faqs as staticFaqs,
 } from '../data/content'
-import type { BlogPost, CaseStudy, DeploymentPattern } from '../data/content'
+import type { BlogPost, DeploymentPattern } from '../data/content'
 
 export const CMS_URL = (import.meta.env.VITE_CMS_URL as string | undefined)?.replace(/\/+$/, '') ?? ''
 export const cmsEnabled = CMS_URL.length > 0
@@ -66,8 +64,7 @@ function mapPost(doc: CmsBlogPost): BlogPost {
   let image = resolveImage(doc.image)
   // The seed does not upload images to the CMS media library, so posts carry no
   // CMS image. Fall back to the bundled image for the same slug so known posts
-  // render their photos even in CMS mode. New posts without any image render
-  // the gradient placeholder (components handle the empty string).
+  // keep their cover in CMS mode; a post with no image renders the empty-state.
   if (!image) {
     const staticPost = staticPosts.find((p) => p.slug === doc.slug)
     image = staticPost?.image ?? ''
@@ -114,7 +111,8 @@ interface CmsDeploymentPattern {
   integrations?: { item?: string }[] | string[]
   measures?: { metric?: string; detail?: string }[]
   governance?: { control?: string }[] | string[]
-  // Legacy field names from the case-studies schema
+  /* Superseded field names, still present on rows created before the
+     deployment-pattern field set existed. Read-only fallbacks. */
   challenge?: string
   build?: string
   outcome?: { value: string; label: string }[]
@@ -137,12 +135,12 @@ function toStringList(input: unknown): string[] {
 
 function mapDeploymentPattern(doc: CmsDeploymentPattern): DeploymentPattern {
   let image = resolveImage(doc.image)
-  // The seed does not upload images to the CMS media library, fall back to
-  // the bundled image for the same slug so known patterns keep their photos in
-  // CMS mode. New ones without an image render the placeholder.
+  // The seed does not upload images to the CMS media library, so fall back to
+  // the bundled image for the same slug. A pattern with no image at all
+  // renders the empty-state.
   if (!image) {
-    const staticCS = staticCaseStudies.find((c) => c.slug === doc.slug)
-    image = staticCS?.image ?? ''
+    const bundled = staticDeploymentPatterns.find((p) => p.slug === doc.slug)
+    image = bundled?.image ?? ''
   }
   return {
     slug: doc.slug,
@@ -165,26 +163,18 @@ function mapDeploymentPattern(doc: CmsDeploymentPattern): DeploymentPattern {
   }
 }
 
-export async function fetchCaseStudies(): Promise<DeploymentPattern[]> {
-  if (!cmsEnabled) return staticCaseStudies
+export async function fetchDeploymentPatterns(): Promise<DeploymentPattern[]> {
+  if (!cmsEnabled) return staticDeploymentPatterns
   try {
+    // The collection slug is `case-studies` in the CMS even though the site
+    // calls them deployment patterns — see docs/decisions/ADR-005-cms.md.
     const data = await getJson<{ docs: CmsDeploymentPattern[] }>(
-      '/api/deployment-patterns?limit=100&depth=1&sort=order'
+      '/api/case-studies?limit=100&depth=1&sort=order'
     )
     const docs = (data.docs ?? []).map(mapDeploymentPattern)
-    return docs.length > 0 ? docs : staticCaseStudies
+    return docs.length > 0 ? docs : staticDeploymentPatterns
   } catch {
-    // The collection may still be named `case-studies` on an older CMS
-    // instance, fall back to it before giving up on live content.
-    try {
-      const data = await getJson<{ docs: CmsDeploymentPattern[] }>(
-        '/api/case-studies?limit=100&depth=1&sort=order'
-      )
-      const docs = (data.docs ?? []).map(mapDeploymentPattern)
-      return docs.length > 0 ? docs : staticCaseStudies
-    } catch {
-      return staticCaseStudies
-    }
+    return staticDeploymentPatterns
   }
 }
 
@@ -291,4 +281,4 @@ export async function submitInquiry(input: {
 }
 
 // Static fallbacks, exported for the provider's initial state.
-export { staticPosts, staticCaseStudies, staticContactInfo, staticFaqs }
+export { staticPosts, staticDeploymentPatterns, staticContactInfo, staticFaqs }

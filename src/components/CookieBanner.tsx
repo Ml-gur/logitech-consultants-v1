@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Link } from 'react-router-dom'
@@ -78,7 +76,7 @@ export default function CookieBanner() {
             role="region"
             aria-label="Cookie consent"
             tabIndex={-1}
-            className="mx-auto max-w-[1100px] rounded-[24px] bg-[#191919] border border-white/10 shadow-[0_-8px_40px_rgba(0,0,0,0.5)] p-5 sm:p-6 outline-none"
+            className="mx-auto max-w-[1100px] rounded-panel bg-carbon border border-hairline shadow-lift p-5 sm:p-6 outline-none"
           >
             <div className="flex flex-col lg:flex-row lg:items-start gap-5">
               <div className="flex-1 min-w-0">
@@ -86,7 +84,7 @@ export default function CookieBanner() {
                 <p className="text-sm text-fog leading-relaxed">
                   We use strictly necessary cookies to run the site. With your permission we would also like to
                   use analytics cookies to understand which pages are useful. We do not sell data. Read the{' '}
-                  <Link to="/privacy" className="text-signal underline underline-offset-2 hover:text-paper">
+                  <Link to="/privacy" className="text-lime underline underline-offset-2 hover:text-paper">
                     privacy policy
                   </Link>
                   .
@@ -109,7 +107,7 @@ export default function CookieBanner() {
                             type="checkbox"
                             checked
                             disabled
-                            className="mt-1 w-4 h-4 accent-[#7084ff]"
+                            className="mt-1 w-4 h-4 accent-lime"
                             aria-describedby="cookie-necessary-help"
                           />
                           <span>
@@ -125,7 +123,7 @@ export default function CookieBanner() {
                             type="checkbox"
                             checked={prefs.analytics}
                             onChange={(e) => setPrefs((p) => ({ ...p, analytics: e.target.checked }))}
-                            className="mt-1 w-4 h-4 accent-[#7084ff]"
+                            className="mt-1 w-4 h-4 accent-lime"
                           />
                           <span>
                             <span className="text-paper font-medium">Analytics</span>
@@ -140,7 +138,7 @@ export default function CookieBanner() {
                             type="checkbox"
                             checked={prefs.marketing}
                             onChange={(e) => setPrefs((p) => ({ ...p, marketing: e.target.checked }))}
-                            className="mt-1 w-4 h-4 accent-[#7084ff]"
+                            className="mt-1 w-4 h-4 accent-lime"
                           />
                           <span>
                             <span className="text-paper font-medium">Marketing</span>

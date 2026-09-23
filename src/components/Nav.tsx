@@ -1,197 +1,149 @@
-'use client'
-
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '../utils'
 import Wordmark from './Wordmark'
+import ThemeToggle from './ThemeToggle'
 
 const navLinks = [
   { label: 'Capabilities', to: '/capabilities' },
-  { label: 'Deployments', to: '/deployment-patterns' },
+  { label: 'Deployment patterns', to: '/deployment-patterns' },
   { label: 'Insights', to: '/blog' },
   { label: 'About', to: '/about' },
 ]
 
+/**
+ * Site header.
+ *
+ * A floating bar rather than a full-bleed one: the wordmark sits left, the
+ * links sit in a centred pill of their own, and the one action sits right. The
+ * pill is absolutely centred, so the wordmark and the CTA can be different
+ * widths without dragging the links off centre.
+ *
+ * The surfaces use the `ink` and `carbon` tokens, so they follow the theme with
+ * no `dark:` branch, and gain a solid ground and a hairline once the page moves
+ * — quieter and cheaper to render than a floating blurred pill following the
+ * scroll. The CTA is outlined rather than filled: there is one solid fill per
+ * screen, and on the home page it belongs to the hero.
+ */
 export default function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const { pathname } = useLocation()
 
-  useEffect(() => { setMobileOpen(false) }, [pathname])
+  useEffect(() => setMobileOpen(false), [pathname])
 
   useEffect(() => {
     if (!mobileOpen) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMobileOpen(false) }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileOpen(false)
+    }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [mobileOpen])
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
+    const onScroll = () => setScrolled(window.scrollY > 12)
+    onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   return (
-    <motion.header
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed top-0 inset-x-0 z-50"
-      style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}
+    <header
+      className={cn(
+        'fixed inset-x-0 top-0 z-50 transition-colors duration-300',
+        scrolled ? 'border-b border-hairline bg-ink/85 backdrop-blur-md' : 'border-b border-transparent bg-transparent'
+      )}
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
-      <div className="px-3 sm:px-5">
-        {/* Floating nav pill */}
-        <div
-          className="nav-pill mx-auto max-w-[1100px] rounded-full flex items-center justify-between transition-all duration-300"
-          style={{
-            height: '60px',
-            paddingLeft: '12px',
-            paddingRight: '12px',
-            background: scrolled ? 'rgba(18,18,26,0.92)' : 'rgba(18,18,26,0.75)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: scrolled
-              ? '1px solid rgba(255,255,255,0.12)'
-              : '1px solid rgba(255,255,255,0.07)',
-            boxShadow: scrolled ? '0 8px 32px rgba(0,0,0,0.5)' : '0 4px 20px rgba(0,0,0,0.3)',
-          }}
+      <div className="relative mx-auto flex h-[68px] max-w-[1200px] items-center justify-between gap-3 px-4 sm:px-6">
+        <Link
+          to="/"
+          className="flex min-h-[44px] items-center py-2 text-[21px] leading-none text-paper sm:text-[23px]"
+          aria-label="Naivolabs home"
         >
-          {/* Wordmark */}
-          <Link
-            to="/"
-            className="flex items-center min-h-[44px] px-2"
-            aria-label="Naivolabs home"
-          >
-            <Wordmark className="font-display text-[18px] sm:text-[20px] font-medium leading-none" />
-          </Link>
+          <Wordmark />
+        </Link>
 
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-0.5" aria-label="Primary">
-            {navLinks.map((link) => (
-              <NavLink
-                key={link.label}
-                to={link.to}
-                className={({ isActive }) =>
-                  cn(
-                    'relative text-[13px] font-medium py-3 px-4 rounded-full transition-colors duration-200',
-                    isActive
-                      ? 'text-white'
-                      : 'text-[var(--color-ash)] hover:text-white'
-                  )
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    {link.label}
-                    {isActive && (
-                      <motion.span
-                        layoutId="nav-indicator"
-                        className="absolute left-4 right-4 -bottom-0.5 h-px rounded-full"
-                        style={{ background: 'var(--color-signal)' }}
-                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                  </>
-                )}
-              </NavLink>
-            ))}
-
-            <Link
-              to="/contact"
-              className="ml-2 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-white text-[13px] font-medium transition-all duration-200"
-              style={{ background: 'var(--color-voltage)' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-voltage-hover)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'var(--color-voltage)')}
+        <nav
+          className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-0.5 rounded-pill border border-hairline bg-carbon/80 p-1 backdrop-blur-md lg:flex"
+          aria-label="Primary"
+        >
+          {navLinks.map((link) => (
+            <NavLink
+              key={link.label}
+              to={link.to}
+              className={({ isActive }) =>
+                cn(
+                  'flex min-h-[44px] items-center rounded-pill px-4 text-[14px] transition-colors duration-200',
+                  isActive ? 'bg-veil-strong text-paper' : 'text-fog hover:text-paper'
+                )
+              }
             >
-              Book a call
-            </Link>
-          </nav>
+              {link.label}
+            </NavLink>
+          ))}
+        </nav>
 
-          {/* Mobile hamburger */}
+        <div className="flex items-center gap-1.5">
+          <ThemeToggle />
+          <Link to="/contact" className="btn-ghost hidden px-5 py-2.5 text-[14px] lg:inline-flex">
+            Book a discovery call
+          </Link>
           <button
-            className="md:hidden flex items-center justify-center rounded-full transition-colors duration-200"
-            style={{ width: '44px', height: '44px', color: 'var(--color-ash)' }}
-            onClick={() => setMobileOpen(!mobileOpen)}
+            type="button"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-ash transition-colors duration-200 hover:bg-veil hover:text-paper lg:hidden"
+            onClick={() => setMobileOpen((v) => !v)}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              {mobileOpen
-                ? <path d="M18 6L6 18M6 6l12 12" />
-                : <path d="M3 8h18M3 16h18" />
-              }
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden>
+              {mobileOpen ? <path d="M18 6L6 18M6 6l12 12" /> : <path d="M3 8h18M3 16h18" />}
             </svg>
           </button>
         </div>
       </div>
 
-      {/* Mobile menu drawer */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div
+          <motion.nav
             id="mobile-menu"
-            initial={{ opacity: 0, scale: 0.96, y: -8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: -8 }}
-            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            className="md:hidden absolute inset-x-0 mt-2 px-3 sm:px-5"
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            aria-label="Mobile"
+            className="border-t border-hairline bg-ink lg:hidden"
           >
-            <nav
-              className="mx-auto max-w-[1100px] rounded-[24px] flex flex-col overflow-hidden"
-              style={{
-                background: 'rgba(18,18,26,0.97)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
-              }}
-              aria-label="Mobile"
-            >
-              {/* Nav links */}
-              <div className="px-4 py-3">
-                {navLinks.map((link, i) => (
-                  <NavLink
-                    key={link.label}
-                    to={link.to}
-                    className={({ isActive }) =>
-                      cn(
-                        'flex items-center justify-between py-4 text-[15px] font-medium transition-colors duration-200',
-                        i < navLinks.length - 1 ? 'border-b' : '',
-                        isActive ? 'text-white' : 'text-[var(--color-ash)] hover:text-white'
-                      )
-                    }
-                    style={{ borderColor: 'rgba(255,255,255,0.06)' }}
-                  >
-                    {link.label}
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-signal)', opacity: 0.7 }}>
-                      <path d="M6 3l5 5-5 5" />
-                    </svg>
-                  </NavLink>
-                ))}
-              </div>
-
-              {/* CTA row */}
-              <div className="px-4 pt-2 pb-4">
-                <Link
-                  to="/contact"
-                  className="flex items-center justify-center gap-2 w-full py-4 rounded-full text-white text-[14px] font-medium transition-all duration-200"
-                  style={{ background: 'var(--color-voltage)' }}
+            <div className="mx-auto max-w-[1200px] px-5 py-4 sm:px-6">
+              {navLinks.map((link, i) => (
+                <NavLink
+                  key={link.label}
+                  to={link.to}
+                  className={({ isActive }) =>
+                    cn(
+                      'flex min-h-[52px] items-center justify-between text-[17px] transition-colors duration-200',
+                      i < navLinks.length - 1 ? 'border-b border-hairline' : '',
+                      isActive ? 'text-lime' : 'text-ash'
+                    )
+                  }
                 >
-                  Book a discovery call
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  {link.label}
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate" aria-hidden>
                     <path d="M6 3l5 5-5 5" />
                   </svg>
-                </Link>
-              </div>
-            </nav>
-          </motion.div>
+                </NavLink>
+              ))}
+
+              <Link to="/contact" className="btn-primary mt-5 w-full px-6 py-3.5 text-[15px]">
+                Book a discovery call
+              </Link>
+            </div>
+          </motion.nav>
         )}
       </AnimatePresence>
-    </motion.header>
+    </header>
   )
 }

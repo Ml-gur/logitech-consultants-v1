@@ -1,11 +1,13 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './test'
 import { seedConsent } from './consent'
 import { ownConsoleErrors } from './console-noise'
+import { horizontalOverflow } from './layout'
 
 /**
  * Mobile tests (Pixel 7 project): hamburger menu, zero horizontal overflow on
- * every route, 44px touch targets, the deployment-pattern stack at phone width,
- * and the mobile form ergonomics (16px inputs so iOS never zooms on focus).
+ * every route and in landscape, 44px touch targets, the deployment-pattern
+ * stack at phone width, and mobile form ergonomics (16px inputs so iOS never
+ * zooms on focus).
  */
 
 const ROUTES = [
@@ -59,10 +61,7 @@ test('mobile: no horizontal overflow at 390px on every route', async ({ page }) 
 
   for (const path of ROUTES) {
     await page.goto(path)
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    )
-    expect(overflow, `overflow on ${path}`).toBe(0)
+    expect(await horizontalOverflow(page), `overflow on ${path}`).toBe(0)
   }
 })
 
@@ -80,10 +79,7 @@ test('mobile: no horizontal overflow when the phone is rotated to landscape', as
     await page.setViewportSize(size)
     for (const path of ['/', '/capabilities', '/deployment-patterns', '/about', '/contact']) {
       await page.goto(path)
-      const overflow = await page.evaluate(
-        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-      )
-      expect(overflow, `overflow on ${path} at ${size.width}x${size.height}`).toBe(0)
+    expect(await horizontalOverflow(page), `overflow on ${path} at ${size.width}x${size.height}`).toBe(0)
     }
   }
 })
@@ -94,20 +90,23 @@ test('mobile: the hero CTA is still reachable in landscape', async ({ page }) =>
   await page.goto('/')
 
   // Scope to the hero: an unscoped `getByRole(...).first()` resolves to the
-  // floating nav pill's CTA, so the regression this guards against (a
-  // fixed-height hero clipping the hero CTA in landscape) was never measured.
-  const cta = page.locator('section#home').getByRole('link', { name: 'Book a discovery call' })
+  // nav's CTA, so the regression this guards against (a fixed-height hero
+  // clipping the hero CTA in landscape) was never measured.
+  const cta = page.locator('section#hero').getByRole('link', { name: 'Book a discovery call' })
   await expect(cta).toBeVisible()
   const box = await cta.boundingBox()
   // Never clipped or zero-height, which is what a fixed-height hero produces
   // in landscape.
   expect(box!.height, 'landscape: hero CTA height').toBeGreaterThanOrEqual(44)
 
-  // The nav pill's CTA keeps its 44px touch target in landscape as well.
+  // A landscape phone is below the nav's breakpoint, so it gets the menu
+  // button. That control keeps its 44px target too — it is the only way to
+  // reach the other pages from here.
   // Rounded: at a 2.625 device scale factor a 44px box measures back as
   // 43.999996, which is float noise, not a short target.
-  const navCta = await page.locator('header').getByRole('link', { name: 'Book a discovery call' }).boundingBox()
-  expect(Math.round(navCta!.height), 'landscape: nav CTA height').toBeGreaterThanOrEqual(44)
+  const menuButton = await page.getByRole('button', { name: 'Open menu' }).boundingBox()
+  expect(Math.round(menuButton!.height), 'landscape: menu button height').toBeGreaterThanOrEqual(44)
+  expect(Math.round(menuButton!.width), 'landscape: menu button width').toBeGreaterThanOrEqual(44)
 })
 
 test('mobile: no console errors', async ({ page }) => {
@@ -132,42 +131,45 @@ test('mobile: the hero CTA is reachable without scrolling', async ({ page }) => 
   expect(box!.y + box!.height).toBeLessThanOrEqual(page.viewportSize()!.height)
 })
 
-test('mobile: capability tab control fits the viewport at every common width', async ({ page }) => {
+test('mobile: the capability rows fit the viewport at every common width', async ({ page }) => {
   await seedConsent(page)
 
   for (const width of [320, 360, 390, 412, 768, 1024]) {
     await page.setViewportSize({ width, height: 900 })
     await page.goto('/')
 
-    const tablist = page.getByRole('tablist', { name: 'Capabilities' })
-    await tablist.scrollIntoViewIfNeeded()
-    await expect(tablist, `tablist visible at ${width}px`).toBeVisible()
+    const section = page.locator('section#capabilities')
+    await section.scrollIntoViewIfNeeded()
+    await expect(section, `capabilities visible at ${width}px`).toBeVisible()
 
-    const box = await tablist.boundingBox()
-    expect(box, `tablist box at ${width}px`).not.toBeNull()
-    expect(box!.x, `tablist left edge at ${width}px`).toBeGreaterThanOrEqual(0)
-    expect(box!.x + box!.width, `tablist right edge at ${width}px`).toBeLessThanOrEqual(width + 1)
-
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    const box = await section.boundingBox()
+    expect(box, `capabilities box at ${width}px`).not.toBeNull()
+    expect(box!.x, `capabilities left edge at ${width}px`).toBeGreaterThanOrEqual(-1)
+    expect(box!.x + box!.width, `capabilities right edge at ${width}px`).toBeLessThanOrEqual(
+      width + 1,
     )
-    expect(overflow, `doc overflow at ${width}px`).toBe(0)
+
+    expect(await horizontalOverflow(page), `doc overflow at ${width}px`).toBe(0)
   }
 })
 
-test('mobile: all four capability tabs render and switch on tap', async ({ page }) => {
+test('mobile: all four capability rows render and link to their depth', async ({ page }) => {
   await seedConsent(page)
   await page.goto('/')
 
-  const tablist = page.getByRole('tablist', { name: 'Capabilities' })
-  await tablist.scrollIntoViewIfNeeded()
+  const section = page.locator('section#capabilities')
+  await section.scrollIntoViewIfNeeded()
 
   for (const name of ['Converse', 'Understand', 'Act', 'Orchestrate']) {
-    await expect(tablist.getByRole('tab', { name })).toBeVisible()
+    const row = section.getByRole('link', { name: new RegExp(`^${name}`) })
+    await expect(row).toBeVisible()
+    // Each row is a full-height target on a phone, not a small inline link.
+    const box = await row.boundingBox()
+    expect(box!.height, `${name} row height`).toBeGreaterThanOrEqual(44)
   }
 
-  await tablist.getByRole('tab', { name: 'Orchestrate' }).tap()
-  await expect(page.getByRole('tabpanel')).toContainText('Systems that connect intelligence to larger workflows.')
+  await section.getByRole('link', { name: /^Orchestrate/ }).tap()
+  await expect(page).toHaveURL(/\/capabilities#orchestrate$/)
 })
 
 test('mobile: the deployment-pattern stack holds at phone width', async ({ page }) => {
@@ -255,10 +257,7 @@ test('mobile: the cookie banner is usable and dismissible at phone width', async
   await reject.tap()
   await expect(banner).toBeHidden()
 
-  const overflow = await page.evaluate(
-    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-  )
-  expect(overflow).toBe(0)
+  expect(await horizontalOverflow(page)).toBe(0)
 })
 
 test('mobile: form inputs are 16px so iOS does not zoom, with 44px targets', async ({ page }) => {
@@ -279,13 +278,18 @@ test('mobile: form inputs are 16px so iOS does not zoom, with 44px targets', asy
 
 test('mobile: FAQ accordion works on touch', async ({ page }) => {
   await seedConsent(page)
-  await page.goto('/')
-  await page.getByText('Need answers?').scrollIntoViewIfNeeded()
+  await page.goto('/capabilities')
+  await page.locator('section#faq').scrollIntoViewIfNeeded()
 
-  const firstButton = page.getByRole('button', { name: /01\/ What does Naivolabs actually do\?/ }).first()
+  const firstButton = page.getByRole('button', { name: 'What does Naivolabs actually do?' })
   await expect(firstButton).toBeVisible()
+
+  const box = await firstButton.boundingBox()
+  expect(box!.height, 'FAQ question touch target').toBeGreaterThanOrEqual(44)
+
   await firstButton.tap()
   await expect(page.getByText(/We are an applied AI systems company/i)).toBeVisible()
+  await expect(firstButton).toHaveAttribute('aria-expanded', 'true')
 })
 
 test('mobile: footer legal and cookie links are tappable', async ({ page }) => {

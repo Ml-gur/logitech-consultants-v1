@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './test'
 import { seedConsent } from './consent'
 
 /**
@@ -103,10 +103,10 @@ test('contact cards show the Naivolabs details, and the FAQ block renders below'
   await expect(main.getByText(/east africa time/i)).toBeVisible()
 
   await expect(page.getByRole('heading', { name: 'Need answers?' })).toBeVisible()
-  await expect(page.getByRole('button', { name: /01\/ What does Naivolabs actually do\?/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'What does Naivolabs actually do?' })).toBeVisible()
 })
 
-test('contact form prefills the email handed over by the hero capture', async ({ page }) => {
+test('contact form prefills an email and interest passed in the link', async ({ page }) => {
   await seedConsent(page)
   await page.goto('/contact?email=jane%40organization.org')
 

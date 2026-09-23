@@ -1,7 +1,4 @@
-'use client'
-
 import { motion } from 'framer-motion'
-import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 import { DEPLOYMENT_MODEL, FLYWHEEL_PRINCIPLE } from '../lib/brand'
 
 /**
@@ -47,30 +44,18 @@ export default function Process() {
         <div className="grid lg:grid-cols-[1fr_560px] gap-16 max-lg:gap-12">
           <div className="max-lg:mb-4">
             <motion.p
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal()}
               className="section-label"
             >
               How we deploy
             </motion.p>
 
             <motion.h2
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal(0.06)}
               className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] mb-6"
             >
               From real work to reusable product.
             </motion.h2>
 
             <motion.p
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal(0.1)}
               className="text-[17px] text-fog max-w-md leading-relaxed mb-10"
             >
               Ten stages, run the same way every time. Each one is designed so that what we learn is kept, as
@@ -80,14 +65,10 @@ export default function Process() {
 
             {/* Flywheel principle */}
             <motion.div
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal(0.14)}
-              className="rounded-[24px] bg-[#191919] border border-signal/30 p-6 max-w-md"
+              className="rounded-panel bg-carbon border border-lime-soft p-6 max-w-md"
             >
-              <p className="text-xs uppercase tracking-[0.14em] text-fog mb-3">Operating principle</p>
-              <p className="font-display text-[20px] leading-snug text-paper">{FLYWHEEL_PRINCIPLE}</p>
+              <p className="text-[13px] text-fog mb-3">Operating principle</p>
+              <p className="font-sans text-[20px] leading-snug text-paper">{FLYWHEEL_PRINCIPLE}</p>
             </motion.div>
           </div>
 
@@ -96,20 +77,16 @@ export default function Process() {
             {phases.map((phase, i) => (
               <motion.div
                 key={phase.title}
-                initial={revealInitial}
-                whileInView={revealWhileInView}
-                viewport={revealViewport}
-                transition={springReveal(i * 0.08)}
-                className="card-dark rounded-[24px] p-6"
+                className="card-dark p-6"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-medium uppercase tracking-[0.12em] text-fog">{phase.phase}</span>
-                  {/* Step bars, N violet bars, N = phase number */}
+                  <span className="text-[13px] font-medium text-fog">{phase.phase}</span>
+                  {/* Step bars: N lime bars, N = phase number */}
                   <span className="flex items-center gap-1.5" aria-hidden>
                     {Array.from({ length: i + 1 }).map((_, b) => (
                       <span
                         key={b}
-                        className="h-3 w-[3px] rounded-full bg-gradient-to-b from-[#7084ff] to-[#405bff]"
+                        className="h-3 w-[3px] rounded-full bg-lime"
                       />
                     ))}
                   </span>
@@ -120,7 +97,7 @@ export default function Process() {
                 <ol className="space-y-3">
                   {phase.steps.map((step) => (
                     <li key={step.step} className="flex items-start gap-3">
-                      <span className="font-mono text-[11px] text-signal mt-1 tabular-nums shrink-0">
+                      <span className="font-mono text-[11px] text-lime mt-1 tabular-nums shrink-0">
                         {step.n}
                       </span>
                       <span className="min-w-0">

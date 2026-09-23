@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  site:
+    name: Site — typecheck, build, E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Production build
+        run: npm run build
+
+      # Install the *bundled* Chromium rather than using the runner's system
+      # browser, so CI and a developer laptop render with the same build: visual
+      # goldens and font rasterisation differ between Chromium versions, and a
+      # runner image bump would otherwise silently change every capture.
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E suite
+        run: npm run test:e2e
+        env:
+          CI: true
+
+      - name: Upload the report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  cms:
+    name: CMS — build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: cms/package-lock.json
+
+      - name: Install dependencies
+        working-directory: cms
+        run: npm ci
+
+      - name: Production build
+        working-directory: cms
+        run: npm run build
+        env:
+          # Payload's config loads at build time and needs these to be present.
+          # Neither is used to sign or reach anything during a build.
+          PAYLOAD_SECRET: build-time-placeholder
+          DATABASE_URL: postgres://build:build@localhost:5432/build

@@ -1,104 +1,118 @@
-# Logitech Consultants CMS
+# Naivolabs CMS
 
-Headless content management for the logitechconsultants.com website, built on
-[Payload CMS 3](https://payloadcms.com) (Next.js + SQLite/Postgres).
+Content management for naivolabs.com, built on
+[Payload CMS 3](https://payloadcms.com) (Next.js + Postgres).
 
-Manages exactly the content the site syncs live:
+It manages exactly what the site syncs live:
 
-| Collection / Global | Purpose | Public API |
+| Collection / global | Purpose | Public access |
 |---|---|---|
-| `blog-posts` | Blog articles (title, slug, category, date, image, author, excerpt, paragraphs) with draft/publish | `GET /api/blog-posts` (published only) |
-| `media` | Uploaded images (Vercel Blob in prod, local files in dev) | `GET /api/media` |
-| `inquiries` | Contact-form submissions from the website | `POST /api/inquiries` (public) |
-| `contact-info` (global) | Email / phone / address shown on /contact | `GET /api/globals/contact-info` |
-| `faqs` (global) | FAQ accordion items on /contact | `GET /api/globals/faqs` |
+| `blog-posts` | Articles: title, slug, category, date, image, author, role, excerpt, paragraphs. Draft/publish. | published only |
+| `case-studies` | Deployment patterns. Labeled "Deployment patterns" in the admin. | published only |
+| `media` | Uploaded images | read |
+| `inquiries` | Contact-form submissions | create only |
+| `contact-info` (global) | Email, phone, address shown on `/contact` | read |
+| `faqs` (global) | Ordered Q/A items | read |
+
+Writes require a signed-in admin user. Everything the site reads is public
+content, so the site holds no API key.
+
+> **The deployment-pattern collection is still slugged `case-studies`.**
+> Renaming a Payload collection renames its database table and needs a
+> migration. The admin labels, the field set and the site's client all use the
+> deployment-pattern model; only the slug is historical. See
+> [`../docs/decisions/ADR-005-cms.md`](../docs/decisions/ADR-005-cms.md).
 
 ## Local development
 
 ```bash
 npm install
-npm run dev            # http://localhost:3100/admin (login with the seeded admin)
-npm run seed           # import the site's existing content + create the admin user
+npm run dev        # http://localhost:3100/admin
+npm run seed       # import the bundled site content + create the admin user
 ```
 
-Seeding is idempotent — rerun any time to refresh posts/contact/FAQs from
-`../src/data/content.ts`. Credentials: `SEED_ADMIN_EMAIL` /
-`SEED_ADMIN_PASSWORD` env vars (defaults printed by the seed).
+Local dev uses SQLite (`cms.db`, gitignored) and Payload's push-mode, so the
+schema is created automatically and migrations are never run against it.
 
-Then point the site at it:
+Seeding is idempotent — it updates by slug rather than duplicating, so rerun it
+any time to refresh posts, patterns, contact details and FAQs from
+`../src/data/content.ts`. The admin credentials come from `SEED_ADMIN_EMAIL` and
+`SEED_ADMIN_PASSWORD` (see `.env.example`).
+
+Then point the site at it, from the repository root:
 
 ```bash
-# from the repo root
 VITE_CMS_URL=http://localhost:3100 npm run dev
 ```
 
-The site fetches live content with a graceful fallback to the bundled static
-data, so the CMS can be down without breaking the site.
+The site fetches live content and falls back to its bundled data if the CMS is
+unreachable, so the CMS can be down without breaking the site.
 
 ## Access control
 
-- **Public read** — published blog posts, media, contact-info, faqs.
-- **Admin write** — all create/update/delete require a logged-in admin
-  (`/admin`, Users collection).
-- **Inquiries** — anyone may `POST`; only admins can read/list/delete.
+- **Public read** — published blog posts and deployment patterns, media,
+  contact-info, faqs.
+- **Admin write** — every create, update and delete requires a signed-in admin
+  user (`/admin`, `users` collection).
+- **Inquiries** — anyone may `POST`; only admins can read, list or delete.
 
-## Vercel deployment
+## Production
 
-The CMS deploys as its own Vercel project (separate from the site). Next.js
-framework preset is auto-detected.
+The CMS runs as a container in the same Docker Compose stack as the site, on the
+same Hetzner server — not on a serverless platform, and not on a separate host.
 
-Environment variables (Vercel Project Settings → Environment Variables):
-
-| Variable | Value |
-|---|---|
-| `DATABASE_URL` | Serverless Postgres connection string, e.g. a [Neon](https://neon.tech) database (`postgres://…`). SQLite is dev-only. |
-| `PAYLOAD_SECRET` | Long random string (one-time; keep stable across deploys). |
-| `BLOB_READ_WRITE_TOKEN` | Vercel Blob token — enables media uploads in the admin panel (serverless filesystems are read-only). |
-| `CORS_ORIGINS` | Comma-separated site origins, e.g. `https://logitechconsultants.com` (plus `http://localhost:3000` for local testing against the deployed CMS). |
-
-#### Automatic migrations (recommended)
-
-A GitHub Action (`.github/workflows/cms-migrate.yml`) runs `npm run migrate`
-against the production database automatically on every push to `main` that
-changes `cms/` — the schema is always ready when the CMS deploy starts. Add
-these repository secrets (Settings → Secrets and variables → Actions):
-
-| Secret | Value |
-|---|---|
-| `CMS_DATABASE_URL` | The production `postgres://…` connection string |
-| `CMS_PAYLOAD_SECRET` | Must match the Vercel `PAYLOAD_SECRET` above |
-
-Optionally set `VERCEL_CMS_DEPLOY_HOOK_URL` (a Vercel Deploy Hook for the CMS
-project) and the workflow will trigger the CMS deploy **after** migrations
-succeed — strict migrate-then-deploy ordering. For that strict ordering, also
-add an **Ignored Build Step** to the CMS Vercel project that skips git-triggered
-builds (deploy via the hook only); otherwise each push triggers both Vercel's
-auto-deploy and the hook deploy.
-
-#### Manual migration (first deploy / fallback)
-
-If you prefer to migrate by hand, run the database migration **first** to
-create the schema (Payload does not auto-create tables in production — the
-committed migrations in `src/migrations/` define it):
-
-```bash
-# from cms/
-DATABASE_URL=<prod-postgres-url> PAYLOAD_SECRET=<prod-secret> npm run migrate
+```
+cms.naivolabs.com ──► Caddy ──► cms (Next.js, :3000) ──► db (Postgres 16, internal network)
 ```
 
-> Note: `npm run migrate` targets the **production Postgres** database. Local
-> dev (SQLite) auto-creates the schema via Payload's push-mode, so migrations
-> are never run against the dev database.
+It is on its own hostname rather than a path on the site's origin, so admin
+session cookies never share an origin with the marketing site and the site's CSP
+stays tight. Media uploads go to the `cms_media` volume rather than an object
+store, which is the only reason the earlier serverless plan needed a blob
+provider.
 
-Then run the seed once against production to load the initial content and admin
-user:
+The full runbook, including DNS, secrets, first-run admin creation, backups and
+rollback, is [`../deploy/README.md`](../deploy/README.md).
+
+### Environment
+
+Set in `deploy/.env` on the server (template: `deploy/.env.production.example`).
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | `postgres://user:password@db:5432/naivolabs` — host is the compose service name |
+| `PAYLOAD_SECRET` | long random string; must stay stable across deploys or sessions invalidate |
+| `CORS_ORIGINS` | the exact site origin(s), e.g. `https://naivolabs.com` (scheme + host, no trailing slash) |
+| `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` | the database these credentials belong to |
+
+`CORS_ORIGINS` must match exactly. A missing origin is the usual cause of a
+contact form that returns 500 in production while working locally.
+
+### Migrations
+
+Payload does not create tables on its own in production: the schema comes from
+the committed files in `src/migrations/`.
+
+Releases handle this automatically — the `cms-migrate` one-shot container runs
+`npm run migrate` and the CMS container waits for it to exit successfully
+(`depends_on: condition: service_completed_successfully`). After changing a
+collection:
 
 ```bash
-# from cms/
-DATABASE_URL=<prod-postgres-url> PAYLOAD_SECRET=<prod-secret> \
-SEED_ADMIN_EMAIL=admin@logitechconsultants.com SEED_ADMIN_PASSWORD=<choose-strong-password> \
-npm run seed
+npm run payload -- migrate:create    # generates a dated migration file — COMMIT IT
 ```
 
-Build the site with `VITE_CMS_URL` pointing at the deployed CMS
-(e.g. `https://your-cms-project.vercel.app`) so it syncs live content.
+Never edit a migration that has already run in production; add another one.
+
+To migrate by hand against a production database:
+
+```bash
+DATABASE_URL=<prod-url> PAYLOAD_SECRET=<prod-secret> npm run migrate
+```
+
+### Tests
+
+```bash
+npm run test:int     # vitest integration tests
+npm run test:e2e     # Playwright, admin + frontend
+```

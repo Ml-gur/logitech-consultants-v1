@@ -1,5 +1,3 @@
-'use client'
-
 import { useRef } from 'react'
 import { MotionConfig, motion, useScroll, useTransform, type MotionValue } from 'framer-motion'
 import type { DeploymentPattern } from '../data/content'

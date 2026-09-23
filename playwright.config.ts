@@ -2,12 +2,18 @@ import { defineConfig, devices } from '@playwright/test'
 import { chromiumLaunchOptions } from './e2e/chromium-options'
 
 /**
- * Playwright E2E config for the Logitech Consultants (aithor-clone) site.
- * Uses the system Chromium binary (no browser download needed — see
- * README "Testing" section). Serves the production build via `vite preview`
- * on port 4173 — static files mean no cold-start compile races (the
- * `vite dev` on-demand compilation was intermittently flaky under parallel
- * workers; see e2e/global-setup.ts for the original diagnosis).
+ * Playwright E2E config for naivolabs.com.
+ *
+ * The suite runs against the production build, served statically on port 4173,
+ * rather than the dev server. `vite dev` compiles routes on demand, which raced
+ * under parallel workers and produced failures that did not reproduce against a
+ * real build. The trade-off is a build per run; `reuseExistingServer: false`
+ * guarantees it is never a stale one.
+ *
+ * Chromium: the launch options in e2e/chromium-options.ts point at a system
+ * binary so no browser download is needed. Set `PLAYWRIGHT_CHROMIUM_PATH` to
+ * override, or run `npx playwright install chromium` on a machine that does not
+ * have one.
  */
 export default defineConfig({
   testDir: './e2e',
@@ -15,9 +21,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  // Pin to 2 workers: the historically verified-green config (STATE.md notes
-  // higher counts were flaky). The suite serves a static production build, so
-  // route loads are deterministic; CI still runs single-worker.
+  // Two workers locally, one under CI. The specs are independent, but the
+  // performance budgets are sensitive to CPU contention, so a shared runner
+  // measures one route at a time.
   workers: process.env.CI ? 1 : 2,
   reporter: [['list'], ['html', { open: 'never' }]],
   timeout: 30_000,
@@ -37,6 +43,12 @@ export default defineConfig({
     baseURL: 'http://localhost:4173',
     // System Chromium (shared with the global-setup warm-up).
     launchOptions: chromiumLaunchOptions,
+    // The site is dark-first, so the suite runs the dark theme by default and
+    // exercises the resting state. Without this, Chromium's default light
+    // preference would resolve every run to the light inversion and the
+    // canonical design would never be the one under test. Set
+    // PW_COLOR_SCHEME=light to run the same suite against the inversion.
+    colorScheme: process.env.PW_COLOR_SCHEME === 'light' ? 'light' : 'dark',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },

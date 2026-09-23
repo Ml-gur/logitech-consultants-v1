@@ -1,5 +1,11 @@
-// Live smoke test against the shared-host deployment (naivolabs.com).
-// Read-only: loads the public site, exercises client-side routing, reports.
+// Live smoke test against a deployed origin (default https://naivolabs.com).
+//
+// Read-only: it loads the public site, exercises client-side routing, reads the
+// head the way a crawler does, fetches the share image and measures horizontal
+// overflow at 390px. Run it after every release:
+//
+//   node scripts/live-smoke.mjs
+//   LIVE_BASE=https://staging.naivolabs.com node scripts/live-smoke.mjs
 import { chromium } from '@playwright/test'
 
 const BASE = process.env.LIVE_BASE || 'https://naivolabs.com'
@@ -33,7 +39,9 @@ results.push(`body text head: ${JSON.stringify((await page.locator('body').inner
 await page.screenshot({ path: '/tmp/live-home.png', fullPage: false })
 
 const body = await page.locator('body').innerText().catch(() => '')
-for (const bad of ['Naivo Labs', 'NaivoLabs', 'Logitech', 'AIthor']) {
+// Brand-name guard: the name is one word, and stale copy from earlier drafts
+// must never reach production.
+for (const bad of ['Naivo Labs', 'NaivoLabs', 'Naivo ', 'Logitech', 'AIthor']) {
   if (body.includes(bad)) results.push(`COPY PROBLEM: rendered copy contains "${bad}"`)
 }
 

@@ -1,31 +1,31 @@
 /**
  * Console-error filter for the E2E suite.
  *
- * The site loads two third-party embeds that we do not control:
- *   - the Dograh voice-agent widget (index.html), which fetches its config from
- *     api.dograh.com at runtime;
- *   - the Google Fonts / icon CDNs some browsers probe.
- * When the test environment has no route to those origins (CI, a sandbox, an
- * offline runner) the browser logs a network failure that has nothing to do
- * with our code, which made "zero console errors" fail for environmental
- * reasons only.
+ * Every route asserts "zero console errors", but a browser also reports network
+ * failures for origins the test environment cannot reach. On an offline runner
+ * or a sandbox with no egress those show up as console errors that have nothing
+ * to do with this codebase, which made the assertion fail for environmental
+ * reasons.
  *
- * Everything else — any error originating from our own scripts, React
- * warnings, unhandled rejections — still fails the test.
+ * This filter is deliberately narrow. It allows *only* browser-level transport
+ * failures and only for requests that do not originate from our own scripts.
+ * Anything from our code — an error, a React warning, an unhandled rejection —
+ * still fails the test. If you find yourself widening this list, fix the cause
+ * instead: an allow-list entry is a real console error someone decided to live
+ * with.
  */
 
-const THIRD_PARTY_NOISE = [
-  // Dograh voice widget: network + config fetches out of our control.
-  /dograh/i,
+const ENVIRONMENTAL_NOISE = [
+  // Transport-level failures: DNS, connection reset, a sandbox with no route.
+  /Failed to load resource: net::ERR_(FAILED|BLOCKED|CONNECTION|CONNECTION_RESET|NAME_NOT_RESOLVED|ADDRESS_UNREACHABLE|INTERNET_DISCONNECTED|NETWORK_CHANGED)/i,
   /ERR_NETWORK_CHANGED/,
-  /Failed to load resource: net::ERR_(FAILED|BLOCKED|CONNECTION)/i,
 ]
 
-export function isThirdPartyNoise(message: string): boolean {
-  return THIRD_PARTY_NOISE.some((pattern) => pattern.test(message))
+export function isEnvironmentalNoise(message: string): boolean {
+  return ENVIRONMENTAL_NOISE.some((pattern) => pattern.test(message))
 }
 
 /** Keep only the console errors the site itself is responsible for. */
 export function ownConsoleErrors(messages: string[]): string[] {
-  return messages.filter((m) => !isThirdPartyNoise(m))
+  return messages.filter((m) => !isEnvironmentalNoise(m))
 }

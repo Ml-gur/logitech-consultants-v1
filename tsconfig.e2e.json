@@ -1,0 +1,18 @@
+{
+  // The E2E suite and the Playwright config are not part of the app build, so
+  // they need their own project: `tsconfig.json` includes only `src`, which
+  // meant a spec could reference a helper that no longer exists and nothing
+  // would fail until the suite actually ran. `npm run typecheck` compiles both.
+  //
+  // The DOM lib is enabled because the callbacks passed to `page.evaluate` are
+  // browser code and use `document`, `window`, `localStorage` and
+  // `PerformanceObserver` directly.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": ".",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["node"]
+  },
+  "include": ["e2e", "playwright.config.ts"]
+}
