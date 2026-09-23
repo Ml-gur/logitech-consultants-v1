@@ -15,7 +15,7 @@ export default function FAQ() {
 
   return (
     <section id="faq" className="relative">
-      <div className="relative max-w-[1200px] mx-auto px-6 py-24 max-md:py-16">
+      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-20 sm:py-28">
         <div className="grid lg:grid-cols-[1fr_560px] gap-12 max-lg:gap-10">
           <div className="max-lg:mb-2">
             <motion.p

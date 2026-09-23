@@ -1,37 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&display=swap');
 @import 'tailwindcss';
 
 /* ============================================
    Naivolabs: Design System
-   Dark "control room" system adopted from the
-   LaunchDarkly-style reference (design.md).
-   Monochromatic-plus-violet: Midnight canvas,
-   Carbon surfaces, Signal Violet + Voltage Blue
-   accents, pill radii, glow-based elevation.
+   Dark canvas with Signal Violet + Voltage Blue
+   accents. Fraunces display serif + Inter body.
    ============================================ */
 
 @theme {
-  /* Colors: design.md tokens */
-  --color-signal: #7084ff;        /* Signal Violet: accent, hero line 2, links */
-  --color-voltage: #405bff;       /* Voltage Blue: primary CTA fill */
-  --color-plasma: #3dd6f5;        /* Plasma Cyan: sparing radial warmth */
-  --color-midnight: #0e0e0e;      /* Midnight Ink: page canvas */
-  --color-carbon: #191919;        /* Carbon: nav pill, cards, footer */
-  --color-smoke: #2c2c2c;         /* Smoke: list dividers, dense rows */
-  --color-graphite: #414042;      /* Graphite: card borders, elevated panels */
-  --color-steel: #58595b;         /* Steel: input borders, inactive fields */
-  --color-slate: #6d6e71;         /* Slate: muted helper text */
-  --color-fog: #a7a9ac;           /* Fog: secondary text, placeholders */
-  --color-ash: #d1d3d4;           /* Ash: tertiary text, icons */
-  --color-paper: #ffffff;         /* Paper: primary text, white panels */
-  --color-error: #ff8b8b;         /* Error: form validation text + borders (7:1 on Carbon) */
-  --color-success: #7ee0a8;       /* Success: confirmation states (7:1 on Carbon) */
+  /* Colors */
+  --color-signal: #7c91ff;
+  --color-voltage: #3d55f0;
+  --color-voltage-hover: #2d43d8;
+  --color-plasma: #3dd6f5;
+  --color-midnight: #080810;
+  --color-carbon: #12121a;
+  --color-smoke: #1e1e2a;
+  --color-graphite: #2e2e3d;
+  --color-steel: #52525f;
+  --color-slate: #6d6d7a;
+  --color-fog: #9898a8;
+  --color-ash: #c8c8d4;
+  --color-paper: #f0f0f8;
+  --color-error: #ff8b8b;
+  --color-success: #7ee0a8;
+  --color-gold: #c9a84c;
 
-  /* Gradient: the brand's electronic pulse (179deg #405bff → #7084ff) */
-  --color-signal-gradient: linear-gradient(179deg, #405bff 1.06%, #7084ff 123.42%);
+  --color-signal-gradient: linear-gradient(135deg, #3d55f0 0%, #7c91ff 100%);
 
-  /* Typography: Inter (design.md substitute #1) + JetBrains Mono */
+  /* Typography: Fraunces display + Inter body + JetBrains Mono */
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Type scale (design.md) */
@@ -131,9 +130,9 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    font-weight: 500;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
     color: var(--color-paper);
     text-wrap: balance;
   }
@@ -398,6 +397,67 @@ body {
 
 footer {
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ── Landscape / orientation tweaks ───────────────────────────────── */
+@media (max-height: 520px) and (orientation: landscape) {
+  /* Hero shrinks on short landscape viewports */
+  #home {
+    min-height: 100dvh;
+    padding-top: 72px !important;
+    padding-bottom: 40px !important;
+  }
+  /* Reduce hero heading size for landscape phones */
+  #home h1 {
+    font-size: clamp(32px, 7vw, 64px) !important;
+  }
+  /* Nav pill stays compact */
+  header .nav-pill {
+    height: 52px !important;
+  }
+}
+
+/* ── Refined scrollbars ───────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-graphite);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-steel);
+}
+
+/* ── Display heading italic accent class ─────────────────────────── */
+.display-italic {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+}
+
+/* ── Gold accent for premium emphasis ───────────────────────────── */
+.text-gold {
+  color: var(--color-gold);
+}
+
+/* ── Section divider hairline ────────────────────────────────────── */
+.section-divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin: 0;
+}
+
+/* ── Gradient text utility ──────────────────────────────────────── */
+.gradient-text {
+  background: var(--color-signal-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Dograh widget: override body overflow-x:hidden so the fixed-position

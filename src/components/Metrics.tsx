@@ -4,86 +4,116 @@ import { motion } from 'framer-motion'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 import { MEASUREMENT_DIMENSIONS } from '../lib/brand'
 
-/**
- * "What we measure".
- *
- * This section previously displayed invented agency statistics (average ROI,
- * client retention). The brand is built on evidence over claims, so it now
- * states the dimensions every deployment is instrumented against, targets
- * agreed before launch and reported against afterwards. Real outcome figures
- * replace this framing once there are engagements to publish.
- */
 export default function Metrics() {
   return (
     <section id="measurement" className="relative">
-      <div className="relative max-w-[1200px] mx-auto px-6 py-24 max-md:py-16">
-        <div className="max-w-[760px] mb-14">
-          <motion.p
-            initial={revealInitial}
-            whileInView={revealWhileInView}
-            viewport={revealViewport}
-            transition={springReveal()}
-            className="section-label"
-          >
-            Measurement
-          </motion.p>
+      {/* Section divider */}
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
 
-          <motion.h2
-            initial={revealInitial}
-            whileInView={revealWhileInView}
-            viewport={revealViewport}
-            transition={springReveal(0.06)}
-            className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] mb-6"
-          >
-            We agree what success means before we build.
-          </motion.h2>
+      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-24 sm:py-32">
+        <div className="grid lg:grid-cols-[1fr_1.6fr] gap-12 lg:gap-20 items-start">
 
-          <motion.p
-            initial={revealInitial}
-            whileInView={revealWhileInView}
-            viewport={revealViewport}
-            transition={springReveal(0.1)}
-            className="text-[17px] text-fog leading-relaxed"
-          >
-            You will not find invented ROI figures on this page. What we can tell you is exactly which
-            dimensions every deployment is instrumented against, and that the targets for them are agreed with
-            you before the first user touches the system.
-          </motion.p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {MEASUREMENT_DIMENSIONS.map((m, i) => (
-            <motion.div
-              key={m.metric}
+          {/* Left: heading block */}
+          <div>
+            <motion.p
               initial={revealInitial}
               whileInView={revealWhileInView}
               viewport={revealViewport}
-              transition={springReveal(i * 0.06)}
-              className="card-dark rounded-[30px] p-6 max-md:p-5 flex flex-col"
+              transition={springReveal()}
+              className="section-label"
             >
-              {/* Highlighter segments, 1 violet + 3 hairline */}
-              <div className="flex gap-1.5 mb-6">
-                <div className="h-2 flex-1 rounded-full bg-gradient-to-r from-[#405bff] to-[#7084ff]" />
-                {[0, 1, 2].map((s) => (
-                  <div key={s} className="h-2 flex-1 rounded-full bg-white/10" />
-                ))}
-              </div>
+              Measurement
+            </motion.p>
 
-              <h3 className="text-[17px] font-medium text-paper mb-2.5">{m.metric}</h3>
-              <p className="text-sm text-fog leading-relaxed">{m.detail}</p>
-            </motion.div>
-          ))}
+            <motion.h2
+              initial={revealInitial}
+              whileInView={revealWhileInView}
+              viewport={revealViewport}
+              transition={springReveal(0.06)}
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 400,
+                fontSize: 'clamp(32px, 4.5vw, 52px)',
+                lineHeight: 1.1,
+                letterSpacing: '-0.02em',
+                marginBottom: '20px',
+              }}
+            >
+              We agree what success means{' '}
+              <em style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--color-signal)' }}>
+                before
+              </em>{' '}
+              we build.
+            </motion.h2>
+
+            <motion.p
+              initial={revealInitial}
+              whileInView={revealWhileInView}
+              viewport={revealViewport}
+              transition={springReveal(0.1)}
+              className="text-[16px] sm:text-[17px] leading-relaxed"
+              style={{ color: 'var(--color-fog)' }}
+            >
+              No invented ROI figures here. Every deployment is instrumented
+              against agreed targets before the first user touches the system.
+              Where we miss, we say so.
+            </motion.p>
+          </div>
+
+          {/* Right: metric cards */}
+          <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+            {MEASUREMENT_DIMENSIONS.map((m, i) => (
+              <motion.div
+                key={m.metric}
+                initial={revealInitial}
+                whileInView={revealWhileInView}
+                viewport={revealViewport}
+                transition={springReveal(i * 0.05)}
+                className="group flex flex-col rounded-[20px] p-6 transition-all duration-300"
+                style={{
+                  background: 'var(--color-carbon)',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.borderColor = 'rgba(124,145,255,0.3)'
+                  ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 24px rgba(61,85,240,0.12)'
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'
+                  ;(e.currentTarget as HTMLElement).style.boxShadow = 'none'
+                }}
+              >
+                {/* Accent bar */}
+                <div className="flex gap-1 mb-5">
+                  <div className="h-1 flex-[2] rounded-full" style={{ background: 'linear-gradient(90deg, var(--color-voltage), var(--color-signal))' }} />
+                  <div className="h-1 flex-1 rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }} />
+                  <div className="h-1 flex-1 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }} />
+                </div>
+
+                <h3
+                  className="text-[15px] font-medium mb-2"
+                  style={{ color: 'var(--color-paper)' }}
+                >
+                  {m.metric}
+                </h3>
+                <p className="text-[13px] leading-relaxed" style={{ color: 'var(--color-fog)' }}>
+                  {m.detail}
+                </p>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
         <motion.p
           initial={revealInitial}
           whileInView={revealWhileInView}
           viewport={revealViewport}
-          transition={springReveal(0.12)}
-          className="text-sm text-fog mt-8 max-w-[620px]"
+          transition={springReveal(0.14)}
+          className="text-[13px] mt-10 max-w-[560px]"
+          style={{ color: 'var(--color-slate)', borderLeft: '2px solid var(--color-graphite)', paddingLeft: '16px' }}
         >
-          Where a deployment does not meet its agreed target, we say so and either change the approach or stop.
-          Publishing only the wins would make the rest of this page worthless.
+          Where a deployment does not meet its agreed target, we say so and either change the
+          approach or stop. Publishing only the wins would make this page worthless.
         </motion.p>
       </div>
     </section>

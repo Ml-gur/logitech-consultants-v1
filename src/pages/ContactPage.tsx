@@ -163,7 +163,7 @@ export default function ContactPage() {
           },
         ]}
       />
-      <div className="relative max-w-[1200px] mx-auto px-6">
+      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
         <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
           Contact
         </motion.p>

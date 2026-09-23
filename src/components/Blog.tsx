@@ -13,7 +13,7 @@ export default function Blog() {
 
   return (
     <section id="blog" className="relative">
-      <div className="relative max-w-[1200px] mx-auto px-6 py-24 max-md:py-16">
+      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-20 sm:py-28">
         <motion.p
           initial={revealInitial}
           whileInView={revealWhileInView}

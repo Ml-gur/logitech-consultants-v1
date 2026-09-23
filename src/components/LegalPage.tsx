@@ -48,7 +48,7 @@ export default function LegalPage({
           ]),
         ]}
       />
-      <div className="relative max-w-[1200px] mx-auto px-6">
+      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
         <p className="section-label">Legal</p>
         <h1 className="text-[clamp(36px,5.5vw,64px)] leading-[1.05] tracking-[-0.03em] max-w-[720px] mb-5">
           {title}

@@ -25,7 +25,7 @@ export default function CapabilitiesPage() {
           ...CAPABILITIES.map((c) => serviceLd(c.name, c.description)),
         ]}
       />
-      <div className="relative max-w-[1200px] mx-auto px-6">
+      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
         <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
           Capabilities
         </motion.p>
@@ -226,7 +226,7 @@ export default function CapabilitiesPage() {
       <Process />
 
       <section className="relative">
-        <div className="relative max-w-[1200px] mx-auto px-6">
+        <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
           <FAQ />
         </div>
       </section>

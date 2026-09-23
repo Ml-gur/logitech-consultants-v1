@@ -39,7 +39,7 @@ export default function AboutPage() {
           },
         ]}
       />
-      <div className="relative max-w-[1200px] mx-auto px-6">
+      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
         {/* Hero */}
         <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
           About us
@@ -292,7 +292,7 @@ export default function AboutPage() {
       <WhyUs />
 
       <section className="relative">
-        <div className="relative max-w-[1200px] mx-auto px-6">
+        <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
           <FAQ />
         </div>
       </section>

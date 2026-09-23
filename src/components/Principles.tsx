@@ -4,22 +4,6 @@ import { motion } from 'framer-motion'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 import { PRINCIPLES } from '../lib/brand'
 
-/**
- * Principles band.
- *
- * This replaced a two-row testimonials marquee of invented clients and quotes.
- * The brand is built on evidence over claims, so until there are named
- * references we can stand behind, the honest equivalent is the set of
- * behavioural rules the company actually operates by, the same commitments
- * published in the brand foundation.
- *
- * Layout note: these are meant to be *read*, so they render as a static grid
- * where all seven rules are visible at once. An earlier revision scrolled them
- * through a marquee, which meant a visitor could never see the full set or read
- * a rule at their own pace. The last rule takes the full width as a closing
- * statement so the 3-column grid ends on a deliberate line rather than a gap.
- */
-
 const CLOSING_INDEX = PRINCIPLES.length - 1
 
 function PrincipleCard({ title, index }: { title: string; index: number }) {
@@ -27,28 +11,56 @@ function PrincipleCard({ title, index }: { title: string; index: number }) {
 
   return (
     <figure
-      className={`group relative flex h-full flex-col rounded-[30px] bg-[#191919] border border-white/10 p-7 max-md:p-6 transition-colors duration-300 hover:border-signal/40 ${
-        closing ? 'lg:flex-row lg:items-center lg:gap-8 lg:py-9' : ''
+      className={`group relative flex h-full flex-col rounded-[20px] p-6 sm:p-7 transition-all duration-300 ${
+        closing ? 'lg:flex-row lg:items-center lg:gap-10 lg:py-10' : ''
       }`}
+      style={{
+        background: 'var(--color-carbon)',
+        border: '1px solid rgba(255,255,255,0.07)',
+      }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(124,145,255,0.28)'
+        ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 20px rgba(61,85,240,0.1)'
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'
+        ;(e.currentTarget as HTMLElement).style.boxShadow = 'none'
+      }}
     >
       <p
-        className={`font-mono text-xs text-signal tabular-nums ${
-          closing ? 'lg:mb-0 mb-5' : 'mb-5'
-        }`}
+        className={`font-mono text-[11px] tracking-[0.12em] ${closing ? 'lg:mb-0 mb-5' : 'mb-5'}`}
+        style={{ color: 'var(--color-signal)' }}
       >
         {String(index + 1).padStart(2, '0')}
       </p>
 
       <blockquote
-        className={`text-ash leading-relaxed ${closing ? 'lg:text-[22px] lg:leading-snug lg:flex-1' : 'text-[15px]'}`}
+        className={`leading-relaxed ${
+          closing
+            ? 'lg:flex-1 text-[18px] lg:text-[22px] lg:leading-snug'
+            : 'text-[14px] sm:text-[15px]'
+        }`}
+        style={{
+          fontFamily: closing ? 'var(--font-display)' : 'var(--font-sans)',
+          fontWeight: closing ? 300 : 400,
+          fontStyle: closing ? 'italic' : 'normal',
+          color: 'var(--color-ash)',
+        }}
       >
         {title}
       </blockquote>
 
       <figcaption
-        className={`mt-6 pt-5 border-t border-white/5 text-xs uppercase tracking-[0.14em] text-fog ${
-          closing ? 'lg:mt-0 lg:pt-0 lg:border-t-0 lg:border-l lg:pl-8 lg:shrink-0' : ''
+        className={`mt-5 pt-4 text-[10px] uppercase tracking-[0.16em] ${
+          closing
+            ? 'lg:mt-0 lg:pt-0 lg:border-t-0 lg:border-l lg:pl-8 lg:shrink-0'
+            : ''
         }`}
+        style={{
+          borderTop: closing ? undefined : '1px solid rgba(255,255,255,0.06)',
+          borderLeft: closing ? '1px solid rgba(255,255,255,0.06)' : undefined,
+          color: 'var(--color-slate)',
+        }}
       >
         Naivolabs principle
       </figcaption>
@@ -59,46 +71,62 @@ function PrincipleCard({ title, index }: { title: string; index: number }) {
 export default function Principles() {
   return (
     <section id="principles" className="relative">
-      <div className="relative max-w-[1200px] mx-auto px-6 py-24 max-md:py-16">
-        <motion.p
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal()}
-          className="section-label"
-        >
-          How we work
-        </motion.p>
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-24 sm:py-32">
+        <div className="grid lg:grid-cols-[1fr_2fr] gap-12 lg:gap-16 items-start mb-12 sm:mb-16">
+          <div>
+            <motion.p
+              initial={revealInitial}
+              whileInView={revealWhileInView}
+              viewport={revealViewport}
+              transition={springReveal()}
+              className="section-label"
+            >
+              How we work
+            </motion.p>
 
-        <motion.h2
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal(0.08)}
-          className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] max-w-[680px] mb-6"
-        >
-          Seven rules we do not bend.
-        </motion.h2>
+            <motion.h2
+              initial={revealInitial}
+              whileInView={revealWhileInView}
+              viewport={revealViewport}
+              transition={springReveal(0.06)}
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 400,
+                fontSize: 'clamp(32px, 4.5vw, 52px)',
+                lineHeight: 1.1,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Seven rules we do{' '}
+              <em style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--color-signal)' }}>
+                not
+              </em>{' '}
+              bend.
+            </motion.h2>
+          </div>
 
-        <motion.p
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal(0.12)}
-          className="text-[17px] text-fog max-w-[520px] mb-16"
-        >
-          When there is a reference customer to name, this is where it will go. Until then, here is what you can
-          hold us to.
-        </motion.p>
+          <motion.p
+            initial={revealInitial}
+            whileInView={revealWhileInView}
+            viewport={revealViewport}
+            transition={springReveal(0.1)}
+            className="text-[16px] sm:text-[17px] leading-relaxed self-end"
+            style={{ color: 'var(--color-fog)' }}
+          >
+            When there is a reference customer to name, this is where it will go. Until then,
+            here is what you can hold us to.
+          </motion.p>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {PRINCIPLES.map((p, i) => (
             <motion.div
               key={p.title}
               initial={revealInitial}
               whileInView={revealWhileInView}
               viewport={revealViewport}
-              transition={springReveal(Math.min(i, 5) * 0.06)}
+              transition={springReveal(Math.min(i, 5) * 0.05)}
               className={i === CLOSING_INDEX ? 'sm:col-span-2 lg:col-span-3' : ''}
             >
               <PrincipleCard title={p.title} index={i} />

@@ -89,7 +89,7 @@ export default function RouteFallback() {
   return (
     <div className="pt-32" aria-busy="true">
       <LoadingAnnouncer label="Loading page" />
-      <div className="max-w-[1200px] mx-auto px-6 space-y-6">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 space-y-6">
         <Skeleton className="h-3 w-28" />
         <Skeleton className="h-12 w-[min(560px,90%)]" />
         <Skeleton className="h-4 w-[min(420px,80%)]" />

@@ -26,7 +26,7 @@ export default function Layout() {
   }, [pathname, hash])
 
   return (
-    <div className="min-h-screen bg-[#0e0e0e] text-paper">
+    <div className="min-h-screen text-paper" style={{ background: 'var(--color-midnight)' }}>
       {/* Skip link, first tab stop (WCAG 2.4.1 bypass blocks) */}
       <a
         href="#main"

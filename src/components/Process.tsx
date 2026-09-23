@@ -43,7 +43,7 @@ const phases = [
 export default function Process() {
   return (
     <section id="process" className="relative">
-      <div className="relative max-w-[1200px] mx-auto px-6 py-24 max-md:py-16">
+      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-20 sm:py-28">
         <div className="grid lg:grid-cols-[1fr_560px] gap-16 max-lg:gap-12">
           <div className="max-lg:mb-4">
             <motion.p

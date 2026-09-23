@@ -54,7 +54,7 @@ export default function BlogPostPage() {
           },
         ]}
       />
-      <div className="relative max-w-[1200px] mx-auto px-6">
+      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
         <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()}>
           <Link to="/blog" className="inline-flex items-center gap-2 text-sm text-fog hover:text-paper transition-colors mb-8">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

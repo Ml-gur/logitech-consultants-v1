@@ -33,8 +33,8 @@ export default function LogoMarquee() {
   const items = [...logos, ...logos]
 
   return (
-    <section className="relative overflow-hidden py-14 max-md:py-10 border-y border-white/5">
-      <div className="max-w-[1200px] mx-auto px-6 mb-8">
+    <section className="relative overflow-hidden py-12 sm:py-14" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 mb-8">
         <p className="text-center text-xs text-fog uppercase tracking-[0.14em]">
           We build on the platforms your organization already trusts
         </p>
@@ -44,8 +44,8 @@ export default function LogoMarquee() {
 
       <div className="relative">
         {/* Fade edges, midnight canvas */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#0e0e0e] to-transparent z-10" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#0e0e0e] to-transparent z-10" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-20 sm:w-32 z-10" style={{ background: 'linear-gradient(to right, var(--color-midnight), transparent)' }} />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-20 sm:w-32 z-10" style={{ background: 'linear-gradient(to left, var(--color-midnight), transparent)' }} />
 
         <motion.div
           className="flex items-center gap-16 w-max"

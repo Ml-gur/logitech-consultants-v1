@@ -56,21 +56,31 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-[#191919] text-paper border-t border-white/10">
-      <div className="max-w-[1200px] mx-auto px-6 pt-16 pb-10">
-        {/* Newsletter, lives in the footer */}
+    <footer className="text-paper" style={{ background: 'var(--color-carbon)', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-10">
+        {/* Newsletter */}
         <motion.div
           initial={revealInitial}
           whileInView={revealWhileInView}
           viewport={revealViewport}
           transition={springReveal()}
-          className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16"
+          className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-14 sm:mb-16"
         >
           <div className="max-w-md">
-            <h3 className="font-display text-[clamp(28px,3.5vw,40px)] font-medium leading-tight mb-2">
-              Notes from the build
+            <h3
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 400,
+                fontSize: 'clamp(26px, 3.5vw, 40px)',
+                lineHeight: 1.1,
+                letterSpacing: '-0.02em',
+                marginBottom: '10px',
+              }}
+            >
+              Notes from{' '}
+              <em style={{ fontStyle: 'italic', fontWeight: 300 }}>the build</em>
             </h3>
-            <p className="text-sm text-fog">
+            <p className="text-sm" style={{ color: 'var(--color-fog)' }}>
               One short email when we publish something worth reading. No cadence, no filler.
             </p>
           </div>
@@ -116,7 +126,7 @@ export default function Footer() {
           </form>
         </motion.div>
 
-        <div className="border-t border-white/10 pt-10 grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+        <div className="pt-10 grid grid-cols-2 md:grid-cols-4 gap-8 mb-10" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
           {/* Brand */}
           <div>
             <Wordmark as="p" className="font-display text-2xl font-medium" />
@@ -180,7 +190,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/10 pt-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="pt-6 flex flex-wrap items-center justify-between gap-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
           <div className="flex flex-wrap items-center gap-4">
             <p className="text-xs text-fog">&copy; {new Date().getFullYear()} Naivolabs. All rights reserved.</p>
             <p className="text-xs text-fog">

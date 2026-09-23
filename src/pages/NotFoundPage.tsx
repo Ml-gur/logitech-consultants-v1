@@ -37,7 +37,7 @@ export default function NotFoundPage() {
       {/* Ambient glow, consistent with the hero */}
       <div className="glow-violet-center inset-0" aria-hidden />
 
-      <div className="relative w-full max-w-[1200px] mx-auto px-6">
+      <div className="relative w-full max-w-[1200px] mx-auto px-5 sm:px-8">
         <div className="max-w-[720px]">
           <motion.p
             initial={reduce ? false : { opacity: 0, y: 12 }}
