@@ -269,19 +269,35 @@ export default function AboutPage() {
           </motion.h2>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {team.map((member, i) => (
+            {team.map((member, i) => {
+              const palettes = [
+                { from: '#0ea5e9', to: '#0284c7', ring: 'rgba(14,165,233,0.25)' },
+                { from: '#f59e0b', to: '#b45309', ring: 'rgba(245,158,11,0.25)' },
+                { from: '#8b5cf6', to: '#6d28d9', ring: 'rgba(139,92,246,0.25)' },
+                { from: '#f43f5e', to: '#be123c', ring: 'rgba(244,63,94,0.25)' },
+                { from: '#10b981', to: '#047857', ring: 'rgba(16,185,129,0.25)' },
+              ]
+              const p = palettes[i % palettes.length]
+              return (
               <motion.div
                 key={member.name}
                 initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.08)}
-                className="rounded-[24px] bg-[#191919] border border-white/10 p-7"
+                className="rounded-[24px] bg-[#191919] border border-white/10 p-7 transition-all duration-300"
+                style={{ '--ring': p.ring } as React.CSSProperties}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = p.ring; (e.currentTarget as HTMLElement).style.boxShadow = `0 0 24px ${p.ring}` }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.10)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none' }}
               >
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#405bff] to-[#7084ff] text-white flex items-center justify-center text-lg font-medium mb-5">
+                <div
+                  className="w-14 h-14 rounded-full text-white flex items-center justify-center text-lg font-semibold mb-5"
+                  style={{ background: `linear-gradient(135deg, ${p.from}, ${p.to})` }}
+                >
                   {member.name.split(' ').map((n) => n[0]).join('')}
                 </div>
                 <h3 className="text-lg font-medium mb-1">{member.name}</h3>
                 <p className="text-sm text-fog">{member.role}</p>
               </motion.div>
-            ))}
+            )})}
+
           </div>
         </div>
         </div>

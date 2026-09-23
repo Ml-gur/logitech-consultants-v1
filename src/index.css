@@ -399,6 +399,29 @@ footer {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* ── Mobile typography: prevent text-heavy blocks from wall-of-texting ── */
+@media (max-width: 639px) {
+  /* Section headings are never too large on a phone */
+  h2 {
+    font-size: clamp(28px, 7vw, 40px) !important;
+  }
+
+  /* Section vertical spacing: tighter on mobile */
+  section {
+    --section-py: 64px;
+  }
+
+  /* Cards: full-width on a phone, no tiny side-by-sides */
+  .card-dark {
+    border-radius: 20px;
+  }
+
+  /* Stat panels: ensure legible at small width */
+  .stat-value {
+    font-size: clamp(32px, 10vw, 48px);
+  }
+}
+
 /* ── Landscape / orientation tweaks ───────────────────────────────── */
 @media (max-height: 520px) and (orientation: landscape) {
   /* Hero shrinks on short landscape viewports */
