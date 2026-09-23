@@ -148,6 +148,12 @@ async function main() {
       })
       console.log(`  ~ Updated deployment pattern: ${cs.slug}`)
     } else {
+      // `_status: 'published'` is what publishes on create for a collection with
+      // `versions.drafts` enabled. Omitting it — or passing `draft: false`, which
+      // reads as the published branch of Payload's create options — leaves the
+      // `_status` field at its 'draft' default, so the pattern never reaches the
+      // site (whose public read filters on `_status = published`). Verified
+      // against a real database, not inferred from the types.
       await payload.create({
         collection: 'case-studies',
         data: { ...data, _status: 'published' },
