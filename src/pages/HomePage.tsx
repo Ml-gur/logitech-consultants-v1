@@ -20,12 +20,14 @@ export default function HomePage() {
         jsonLd={[organizationLd(), websiteLd()]}
       />
       <Hero />
-      <LogoMarquee />
-      <TabbedFeatures />
-      <Metrics />
-      <DeploymentPatterns />
-      <Principles />
-      <HomeCTA />
+      <main className="inspiration-shell">
+        <LogoMarquee />
+        <TabbedFeatures />
+        <Metrics />
+        <DeploymentPatterns />
+        <Principles />
+        <HomeCTA />
+      </main>
       {/* Capability anchors for deep links like /#capabilities */}
       <div className="sr-only" aria-hidden>
         {CAPABILITIES.map((c) => (
