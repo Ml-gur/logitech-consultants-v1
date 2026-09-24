@@ -209,7 +209,7 @@ export default function TabbedFeatures() {
             transition={springReveal(0.08)}
             className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] text-center max-w-[760px] mx-auto mb-4"
           >
-            Four capabilities. One working system.
+            From conversation to completion
           </motion.h2>
 
           <motion.p
@@ -219,8 +219,7 @@ export default function TabbedFeatures() {
             transition={springReveal(0.14)}
             className="text-[17px] text-fog text-center max-w-[560px] mx-auto mb-14"
           >
-            Intelligence that communicates, understands, acts and coordinates, deployed together, not sold as
-            separate experiments.
+Naivo connects intelligence to the work your organization already does.
           </motion.p>
 
           {/* Segmented tab control, 30px radius, Carbon fill, active dot */}

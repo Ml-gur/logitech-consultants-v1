@@ -4,6 +4,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom'
 const links = [
   { label: 'Home', to: '/' },
   { label: 'Product', to: '/capabilities' },
+  { label: 'About', to: '/about' },
   { label: 'Case studies', to: '/deployment-patterns' },
   { label: 'Contact', to: '/contact' },
 ]
@@ -27,7 +28,7 @@ export default function Nav() {
   return (
     <header className="hero-nav">
       <Link to="/" className="hero-logo" aria-label="Naivolabs home">
-        <img src="/favicon-512.png" alt="" width="52" height="52" />
+        <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ChatGPT%20Image%20Sep%2024%2C%202026%2C%2010_07_40%20AM-6bImuDFa4NINYfSkk9MQy1ohOs12tT.png" alt="" width="154" height="52" />
       </Link>
       <nav className="hero-desktop-nav" aria-label="Primary navigation">
         <div className="hero-nav-pill">

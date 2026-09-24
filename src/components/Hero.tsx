@@ -54,15 +54,6 @@ export default function Hero() {
       </div>
 
       <div className="hero-inner">
-        <div className="hero-trust anim" style={{ '--d': '0.05s' } as CSSProperties}>
-          <div className="trust-avatars" aria-hidden="true">
-            <span><span className="trust-inner">M</span></span>
-            <span><span className="trust-inner">A</span></span>
-            <span><span className="trust-inner">G</span></span>
-          </div>
-          <span className="trust-pill">Trusted by 2000+ enterprises</span>
-        </div>
-
         <h1 id="hero-title" className="hero-headline">
           <span>Intelligence</span>
           <span>Designed To Evolve</span>
