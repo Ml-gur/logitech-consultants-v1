@@ -750,7 +750,7 @@ footer {
   }
 }
 
-/* ── Refined scrollbars ─────────�����─���──��────────────────────────────── */
+/* ── Refined scrollbars ─────────�����─���──��──────────────────────��─────── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -828,10 +828,10 @@ footer {
 .hero-video-shade { background: linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.5) 55%, rgba(0,0,0,.72)); }
 .hero-inner { position: relative; z-index: 1; width: 100%; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: clamp(90px, 12vh, 130px) clamp(16px, 3vw, 32px) clamp(22px, 4vh, 42px); }
 .hero-nav { position: absolute; inset: 0 0 auto; z-index: 10; display: flex; align-items: center; justify-content: flex-end; min-height: 82px; padding: 8px clamp(24px, 4vw, 72px) 0; gap: clamp(24px, 4vw, 64px); border-top: 3px solid var(--color-signal); background: rgba(18, 20, 26, .96); }
- .hero-logo { display: flex; align-items: center; flex: 0 0 auto; width: clamp(250px, 22vw, 360px); height: 72px; padding: 0; margin-right: auto; border-radius: 0; background: transparent; box-shadow: none; transition: transform .2s ease; overflow: hidden; }
- .hero-logo:hover { transform: scale(1.02); }
- .hero-mobile-wordmark { display: none; }
- .hero-logo img { width: 130%; max-width: none; height: auto; transform: translate(-9%, -35%); object-fit: contain; object-position: left center; }
+ .hero-logo { position: absolute; left: 50%; top: 5px; z-index: 2; display: flex; align-items: center; width: clamp(250px, 22vw, 360px); height: 72px; padding: 0; margin: 0; border-radius: 0; background: transparent; box-shadow: none; transform: translateX(-50%); transition: transform .2s ease; overflow: hidden; }
+ .hero-logo:hover { transform: translateX(-50%) scale(1.02); }
+ .hero-mobile-wordmark { display: block; color: var(--color-paper); font-size: clamp(1.6rem, 2.2vw, 2.4rem); line-height: 1; white-space: nowrap; }
+ .hero-logo img { display: none; }
   .hero-desktop-nav { display: flex; align-items: stretch; height: 64px; }
   .hero-nav-pill { display: flex; align-items: center; gap: clamp(8px, 1.5vw, 22px); height: 56px; padding: 0 clamp(28px, 4vw, 64px); background: var(--color-midnight); clip-path: polygon(0 0, 100% 0, 94% 100%, 6% 100%); }
   .hero-nav-pill a { padding-inline: clamp(10px, 1.1vw, 16px); white-space: nowrap; font-family: var(--font-sans); }
