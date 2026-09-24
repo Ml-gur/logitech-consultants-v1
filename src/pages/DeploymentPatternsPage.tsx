@@ -13,15 +13,15 @@ export default function DeploymentPatternsPage() {
   const showSkeleton = cmsEnabled && !cmsLoaded && patterns.length === 0
 
   return (
-    <section className="relative pt-32">
+    <section className="case-study-page relative">
       <Seo
-        title="Deployment Patterns"
-        description="The classes of intelligent system Naivolabs builds, voice receptionists, knowledge agents, service routing and document intake, with what each has to prove."
-        path="/deployment-patterns"
+        title="Case Studies"
+        description="Explore the intelligent systems Naivolabs designs, builds and deploys for real organizational workflows."
+        path="/case-studies"
         jsonLd={[
           breadcrumbLd([
             { name: 'Home', path: '/' },
-            { name: 'Deployment patterns', path: '/deployment-patterns' },
+            { name: 'Case studies', path: '/case-studies' },
           ]),
           {
             '@context': 'https://schema.org',
@@ -39,7 +39,7 @@ export default function DeploymentPatternsPage() {
       />
       <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
         <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
-          Deployment patterns
+          Case studies
         </motion.p>
 
         <motion.h1
@@ -49,7 +49,7 @@ export default function DeploymentPatternsPage() {
           transition={springReveal(0.08)}
           className="text-[clamp(36px,6vw,72px)] leading-[1.02] tracking-[-0.03em] max-w-[820px] mb-6"
         >
-          Patterns, not <span className="text-signal">promises.</span>
+          What we deploy, <span className="text-signal">in practice.</span>
         </motion.h1>
 
         <motion.p
@@ -59,9 +59,7 @@ export default function DeploymentPatternsPage() {
           transition={springReveal(0.14)}
           className="text-[18px] text-fog max-w-[620px] mb-10"
         >
-          A deployment pattern is a class of system we have learned how to build, integrate and govern: the
-          problem it exists for, how it is put together, and the measurement dimensions agreed before it goes
-          live.
+          A simple view of the intelligent systems we design, build and operate for real organizational workflows.
         </motion.p>
 
         <motion.div
@@ -69,7 +67,7 @@ export default function DeploymentPatternsPage() {
           whileInView={revealWhileInView}
           viewport={revealViewport}
           transition={springReveal(0.18)}
-          className="rounded-[24px] bg-[#191919] border border-white/10 p-6 max-w-[720px] mb-20"
+          className="case-study-note rounded-[24px] bg-[#191919] border border-white/10 p-6 max-w-[720px] mb-20"
         >
           <p className="text-sm text-fog leading-relaxed">
             <span className="text-paper font-medium">Why no client logos?</span> Because we do not have

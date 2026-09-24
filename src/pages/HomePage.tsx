@@ -3,7 +3,6 @@
 import Seo, { organizationLd, websiteLd } from '../lib/Seo'
 import Hero from '../components/Hero'
 import LogoMarquee from '../components/LogoMarquee'
-import Metrics from '../components/Metrics'
 import DeploymentPatterns from '../components/DeploymentPatterns'
 import Principles from '../components/Principles'
 import HomeCTA from '../components/HomeCTA'
@@ -20,8 +19,7 @@ export default function HomePage() {
       <Hero />
       <main className="inspiration-shell">
         <LogoMarquee />
-        <Metrics />
-        <Principles />
+              <Principles />
         <DeploymentPatterns />
         <HomeCTA />
       </main>

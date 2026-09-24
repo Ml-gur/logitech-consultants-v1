@@ -119,8 +119,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               }
             />
 
-            {/* Legacy URLs, the case-studies section became deployment patterns. */}
-            <Route path="/case-studies" element={<Navigate to="/deployment-patterns" replace />} />
+            <Route
+              path="/case-studies"
+              element={
+                <Suspense fallback={<RouteFallback />}>
+                  <DeploymentPatternsPage />
+                </Suspense>
+              }
+            />
             <Route path="/case-studies/:slug" element={<Navigate to="/deployment-patterns" replace />} />
 
             {/* 404, every unmatched path renders the branded page. */}

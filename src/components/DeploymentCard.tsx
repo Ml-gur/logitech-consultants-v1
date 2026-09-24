@@ -21,8 +21,6 @@ export default function DeploymentCard({
   className?: string
   asLink?: boolean
 }) {
-  const measures = c.measures.slice(0, 2)
-
   const inner = (
     <>
       {/* Image, left half, no zoom on hover */}
@@ -62,16 +60,6 @@ export default function DeploymentCard({
         </div>
 
         <div className="mt-auto">
-          <p className="text-[11px] uppercase tracking-[0.14em] text-fog mb-4">What we measure</p>
-          <div className="flex flex-col sm:flex-row flex-wrap gap-x-10 gap-y-4">
-            {measures.map((m) => (
-              <div key={m.metric} className="min-w-0 max-w-[260px]">
-                <div className="text-[15px] font-medium text-paper mb-1">{m.metric}</div>
-                <div className="text-[13px] text-fog leading-snug">{m.detail}</div>
-              </div>
-            ))}
-          </div>
-
           {asLink && (
             <div className="mt-8 flex items-center gap-1.5 text-sm text-fog group-hover:text-paper transition-colors duration-300">
               See the pattern

@@ -635,6 +635,18 @@ html.lenis body {
 .about-reference-stats strong { color: #f2ffc2; font-size: clamp(2rem, 4vw, 3.4rem); font-weight: 400; letter-spacing: -.06em; }
 .about-reference-stats span { color: #b9bba9; font-size: .78rem; text-transform: uppercase; letter-spacing: .12em; }
 @media (max-width: 680px) { .about-reference-hero { padding-top: 4rem; } .about-reference-title { font-size: clamp(2.8rem, 13vw, 4.4rem); } .about-reference-collage { grid-template-columns: 1fr 1.3fr; height: 260px; gap: 6px; margin-top: 3.5rem; } .about-collage-card-left { display: none; } .about-collage-card-right { transform: translateY(20px); } .about-reference-stats { gap: 4px; margin-top: 2rem; } .about-reference-stats div { padding: .8rem .5rem; } .about-reference-stats span { font-size: .6rem; letter-spacing: .06em; } }
+.case-study-page { padding: clamp(8rem, 14vw, 12rem) 0 6rem; }
+.case-study-page > div { max-width: 1280px; }
+.case-study-page > div > .section-label { margin-bottom: 1.5rem; text-align: center; }
+.case-study-page > div > h1 { max-width: 900px; margin: 0 auto 1.35rem; text-align: center; font-size: clamp(3.2rem, 7vw, 6.5rem); line-height: .98; letter-spacing: -.055em; text-wrap: balance; }
+.case-study-page > div > h1 + p { max-width: 620px; margin: 0 auto 2.5rem; text-align: center; }
+.case-study-note { max-width: 760px !important; margin: 0 auto 5rem; background: transparent; border-color: rgba(242,255,194,.14); }
+.case-study-page .case-study-note span { color: #f2ffc2; }
+.case-study-page .relative.flex.flex-col { gap: 5rem; }
+.case-study-page .relative.flex.flex-col > div { position: static; top: auto !important; }
+.case-study-page .relative.flex.flex-col .will-change-transform { transform: none !important; }
+.case-study-page .relative.flex.flex-col .group { border-radius: 24px; }
+@media (max-width: 700px) { .case-study-page { padding-top: 6.5rem; } .case-study-page .relative.flex.flex-col { gap: 1.5rem; } .case-study-note { margin-bottom: 3rem; } }
 .contact-page-shell { padding-top: clamp(8rem, 15vw, 13rem); padding-bottom: 5rem; }
 .contact-page-shell > .section-label { margin-bottom: 1.5rem; text-align: center; }
 .contact-page-shell > h1 { max-width: 760px; margin-inline: auto; text-align: center; font-size: clamp(3.25rem, 8vw, 7rem); }
