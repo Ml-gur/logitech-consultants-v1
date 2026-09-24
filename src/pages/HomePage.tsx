@@ -4,7 +4,6 @@ import Seo, { organizationLd, websiteLd } from '../lib/Seo'
 import { CAPABILITIES } from '../lib/brand'
 import Hero from '../components/Hero'
 import LogoMarquee from '../components/LogoMarquee'
-import TabbedFeatures from '../components/TabbedFeatures'
 import Metrics from '../components/Metrics'
 import DeploymentPatterns from '../components/DeploymentPatterns'
 import Principles from '../components/Principles'
@@ -22,7 +21,6 @@ export default function HomePage() {
       <Hero />
       <main className="inspiration-shell">
         <LogoMarquee />
-        <TabbedFeatures />
         <Metrics />
         <DeploymentPatterns />
         <Principles />
