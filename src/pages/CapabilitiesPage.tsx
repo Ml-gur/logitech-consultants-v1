@@ -118,8 +118,8 @@ export default function CapabilitiesPage() {
                   key={cap.id}
                   className="rounded-[16px] border px-5 py-4 flex items-center justify-between gap-4"
                   style={{
-                    borderColor: `rgba(183,214,61,${0.4 - i * 0.09})`,
-                    background: `rgba(183,214,61,${0.09 - i * 0.02})`,
+                    borderColor: `rgba(255,122,0,${0.4 - i * 0.09})`,
+                    background: `rgba(255,122,0,${0.09 - i * 0.02})`,
                     marginLeft: `${i * 18}px`,
                     marginRight: `${i * 18}px`,
                   }}

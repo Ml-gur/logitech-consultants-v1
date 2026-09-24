@@ -57,7 +57,7 @@ export default function WhyUs() {
                 transition={springReveal(i * 0.08)}
                 className={`rounded-[30px] p-7 flex flex-col ${
                   accent
-                    ? 'bg-[#191919] border border-signal/40 shadow-[0_0_32px_rgba(183,214,61,0.19)]'
+                    ? 'bg-[#191919] border border-signal/40 shadow-[0_0_32px_rgba(255,122,0,0.19)]'
                     : 'bg-[#121212] border border-white/10'
                 }`}
               >

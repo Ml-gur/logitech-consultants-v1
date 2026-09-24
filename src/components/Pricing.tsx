@@ -97,7 +97,7 @@ export default function Pricing() {
               transition={springReveal(i * 0.08)}
               className={`rounded-[30px] p-8 flex flex-col ${
                 tier.featured
-                  ? 'bg-[#191919] border border-signal/40 shadow-[0_0_40px_rgba(183,214,61,0.19)]'
+                  ? 'bg-[#191919] border border-signal/40 shadow-[0_0_40px_rgba(255,122,0,0.19)]'
                   : 'bg-[#191919] border border-white/10'
               }`}
             >

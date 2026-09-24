@@ -188,7 +188,7 @@ export default function ContactPage() {
             {sent ? (
               <div
                 role="status"
-                className="rounded-[30px] border border-signal/30 bg-[#191919] p-10 text-center shadow-[0_0_40px_rgba(183,214,61,0.12)]"
+                className="rounded-[30px] border border-signal/30 bg-[#191919] p-10 text-center shadow-[0_0_40px_rgba(255,122,0,0.12)]"
               >
                 <div className="w-12 h-12 rounded-full bg-signal/15 text-signal flex items-center justify-center mx-auto mb-5">
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
