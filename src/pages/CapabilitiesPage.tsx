@@ -12,7 +12,7 @@ import Process from '../components/Process'
 export default function CapabilitiesPage() {
   return (
     <>
-      <section className="relative pt-32">
+      <section className="reference-page reference-services relative pt-32">
       <Seo
         title="Capabilities: Applied AI Systems"
         description="Four capabilities, one working system: converse, understand, act and orchestrate. What each means in practice and the controls that come with it."
@@ -47,7 +47,7 @@ export default function CapabilitiesPage() {
         </motion.p>
 
         {/* The four capabilities, in depth */}
-        <div className="space-y-6">
+        <div className="capability-compact-grid">
           {CAPABILITIES.map((cap, i) => (
             <motion.div
               key={cap.id}
@@ -66,7 +66,7 @@ export default function CapabilitiesPage() {
                     </h2>
                   </div>
                   <p className="text-[17px] text-paper leading-relaxed mb-5">{cap.headline}</p>
-                  <p className="text-[16px] text-fog leading-relaxed mb-8">{cap.description}</p>
+                  <p className="capability-description text-[16px] text-fog leading-relaxed mb-8">{cap.description}</p>
 
                   <p className="text-[11px] uppercase tracking-[0.14em] text-fog mb-3">Systems</p>
                   <div className="flex flex-wrap gap-2">

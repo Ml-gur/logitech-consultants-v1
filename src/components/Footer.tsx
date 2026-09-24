@@ -56,7 +56,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className="text-paper" style={{ background: 'var(--color-carbon)', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+    <footer className="reference-footer text-paper" style={{ background: 'var(--color-carbon)', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
       <div className="max-w-[1200px] mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-10">
         {/* Newsletter */}
         <motion.div

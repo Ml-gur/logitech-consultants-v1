@@ -13,7 +13,7 @@ export default function BlogPage() {
   const showSkeleton = cmsEnabled && !cmsLoaded && blogPosts.length === 0
 
   return (
-    <section className="relative pt-32">
+    <section className="reference-page reference-insights relative pt-32">
       <Seo
         title="Insights on Production AI"
         description="Notes on getting AI systems into production: data readiness, buy-build-or-wait decisions, governance, measurement and where intelligence earns its keep."

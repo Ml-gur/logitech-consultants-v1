@@ -14,7 +14,7 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <section id="faq" className="relative">
+    <section id="faq" className="reference-faq relative">
       <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-20 sm:py-28">
         <div className="grid lg:grid-cols-[1fr_560px] gap-12 max-lg:gap-10">
           <div className="max-lg:mb-2">

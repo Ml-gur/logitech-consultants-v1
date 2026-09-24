@@ -447,6 +447,136 @@ html.lenis body {
   .inspiration-shell h2 { font-size: clamp(2.4rem, 12vw, 4rem); }
   .inspiration-shell > section::before { inset-inline: 16px; }
 }
+/* B2bizz-inspired inner pages: compact, image-led chapters with the same
+   black / pale-lime system as the home hero. */
+.reference-page {
+  min-height: 100vh;
+  overflow: clip;
+  background: #000;
+  padding-bottom: 6rem;
+}
+.reference-page > div {
+  max-width: 1360px;
+}
+.reference-page h1,
+.reference-page h2,
+.reference-page h3 {
+  color: #f2ffc2;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  letter-spacing: -.06em;
+}
+.reference-page .section-label {
+  color: rgba(242,255,194,.7);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.reference-page .btn-primary {
+  background: #f2ffc2;
+  color: #080808;
+  border-radius: 12px;
+}
+.reference-page .btn-ghost {
+  border-color: rgba(242,255,194,.55);
+  color: #f2ffc2;
+  border-radius: 12px;
+}
+.reference-page .card-dark,
+.reference-page [class*='bg-[#191919]'] {
+  background: #151817;
+  border-color: rgba(242,255,194,.13);
+  border-radius: 22px;
+}
+.reference-page::after {
+  content: '';
+  display: block;
+  height: 1px;
+  margin: 4rem 5% 0;
+  background: linear-gradient(90deg, transparent, rgba(242,255,194,.3), transparent);
+}
+.reference-about > div > div:first-of-type,
+.reference-services > div > div:first-of-type,
+.reference-insights > div > div:first-of-type {
+  text-align: center;
+  margin-inline: auto;
+}
+.reference-about > div > div:first-of-type > p,
+.reference-services > div > div:first-of-type > p,
+.reference-insights > div > div:first-of-type > p {
+  margin-inline: auto;
+}
+.reference-about > div > div:first-of-type h1,
+.reference-services > div > div:first-of-type h1,
+.reference-insights > div > div:first-of-type h1 {
+  max-width: 920px;
+  margin-inline: auto;
+}
+.reference-insights .grid {
+  gap: 18px;
+}
+.reference-insights .group > div:first-child {
+  border: 0;
+  border-radius: 22px;
+  aspect-ratio: 1.15 / 1;
+  background: #151817;
+}
+.reference-insights .group h3 {
+  font-size: clamp(1.2rem, 2vw, 1.65rem);
+  line-height: 1.05;
+}
+.reference-insights .group:hover h3 { color: #fff; }
+.reference-services .capability-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.reference-services .capability-compact-grid > div {
+  padding: 1.5rem;
+  border-radius: 22px;
+  background: #151817;
+  border-color: rgba(242,255,194,.13);
+}
+.reference-services .capability-compact-grid > div > div {
+  gap: 1.25rem;
+}
+.reference-services .capability-compact-grid h2 {
+  font-size: clamp(1.65rem, 3vw, 2.6rem);
+}
+.reference-services .capability-description {
+  font-size: .95rem;
+  margin-bottom: 1rem;
+}
+.reference-services .capability-compact-grid > div > div > div:last-child {
+  display: none;
+}
+.reference-services .capability-compact-grid > div > div > div:first-child > p:nth-of-type(2) {
+  display: none;
+}
+.reference-faq {
+  background: #000;
+}
+.reference-faq > div {
+  max-width: 1360px;
+}
+.reference-faq h2 { color: #f2ffc2; font-family: var(--font-sans); font-weight: 400; letter-spacing: -.06em; }
+.reference-faq [class*='bg-[#191919]'] {
+  background: #151817;
+  border-color: rgba(242,255,194,.13);
+  border-radius: 16px;
+}
+.reference-faq button { padding-block: 1.15rem; }
+.reference-footer {
+  background: #151817 !important;
+  border-top-color: rgba(242,255,194,.15) !important;
+}
+.reference-footer h3 { color: #f2ffc2; font-family: var(--font-sans) !important; font-style: normal !important; }
+.reference-footer .input-dark { border-radius: 12px; border-color: rgba(242,255,194,.25); }
+.reference-footer button[type='submit'] { background: #f2ffc2; border-radius: 12px; }
+@media (max-width: 760px) {
+  .reference-services .capability-compact-grid { grid-template-columns: 1fr; }
+  .reference-page { padding-top: 7rem; }
+  .reference-page h1 { font-size: clamp(2.6rem, 12vw, 4rem); }
+}
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee,
   .animate-marquee-vertical,

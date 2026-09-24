@@ -20,7 +20,7 @@ import { revealInitial, revealWhileInView, revealViewport, springReveal } from '
 export default function AboutPage() {
   return (
     <>
-      <section className="relative pt-32">
+      <section className="reference-page reference-about relative pt-32">
       <Seo
         title="About Naivolabs"
         description="An applied AI systems company. We design, build and deploy governed AI systems that work inside real organizations. Built from Africa, for the world."
