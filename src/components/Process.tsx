@@ -104,7 +104,7 @@ export default function Process() {
               >
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-xs font-medium uppercase tracking-[0.12em] text-fog">{phase.phase}</span>
-                  {/* Step bars, N violet bars, N = phase number */}
+                  {/* Step bars, N signal bars, N = phase number */}
                   <span className="flex items-center gap-1.5" aria-hidden>
                     {Array.from({ length: i + 1 }).map((_, b) => (
                       <span

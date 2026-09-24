@@ -106,7 +106,7 @@ export default function BlogPostPage() {
           className="max-w-[720px]"
         >
           <div className="flex items-center gap-3 mb-10 pb-8 border-b border-white/10">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#405bff] to-[#7084ff] text-white flex items-center justify-center text-sm font-medium">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-voltage to-signal text-white flex items-center justify-center text-sm font-medium">
               {post.author.split(' ').map((n) => n[0]).join('')}
             </div>
             <div>

@@ -158,7 +158,7 @@ export default function AboutPage() {
                 initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.06)}
                 className="card-dark rounded-[24px] p-7"
               >
-                <div className="w-8 h-[3px] rounded-full bg-gradient-to-r from-[#405bff] to-[#7084ff] mb-6" />
+                <div className="w-8 h-[3px] rounded-full bg-gradient-to-r from-voltage to-signal mb-6" />
                 <h3 className="text-lg font-medium mb-3">{v.title}</h3>
                 <p className="text-sm text-fog leading-relaxed">{v.description}</p>
               </motion.div>

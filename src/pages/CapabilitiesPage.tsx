@@ -118,8 +118,8 @@ export default function CapabilitiesPage() {
                   key={cap.id}
                   className="rounded-[16px] border px-5 py-4 flex items-center justify-between gap-4"
                   style={{
-                    borderColor: `rgba(112,132,255,${0.4 - i * 0.09})`,
-                    background: `rgba(112,132,255,${0.09 - i * 0.02})`,
+                    borderColor: `rgba(183,214,61,${0.4 - i * 0.09})`,
+                    background: `rgba(183,214,61,${0.09 - i * 0.02})`,
                     marginLeft: `${i * 18}px`,
                     marginRight: `${i * 18}px`,
                   }}
@@ -160,7 +160,7 @@ export default function CapabilitiesPage() {
                 initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.06)}
                 className="card-dark rounded-[24px] p-7"
               >
-                <div className="w-8 h-[3px] rounded-full bg-gradient-to-r from-[#405bff] to-[#7084ff] mb-6" />
+                <div className="w-8 h-[3px] rounded-full bg-gradient-to-r from-voltage to-signal mb-6" />
                 <h3 className="text-lg font-medium mb-3">{d.title}</h3>
                 <p className="text-sm text-fog leading-relaxed">{d.description}</p>
               </motion.div>

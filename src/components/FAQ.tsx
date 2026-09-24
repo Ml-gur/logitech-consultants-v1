@@ -59,7 +59,7 @@ export default function FAQ() {
                   <span className="text-[16px] font-medium text-paper leading-snug">
                     {numbered(i, faq.q)}
                   </span>
-                  {/* Accent plus icon, Signal Violet, rotates 45deg when open */}
+                  {/* Accent plus icon, Signal Green, rotates 45deg when open */}
                   <motion.svg
                     animate={{ rotate: openIndex === i ? 45 : 0 }}
                     transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}

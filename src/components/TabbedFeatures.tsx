@@ -163,7 +163,7 @@ function Checklist({ items }: { items: string[] }) {
     <ul className="space-y-4">
       {items.map((item) => (
         <li key={item} className="flex items-start gap-3">
-          {/* Checkmark, Signal Violet (design.md Feature Checklist Item) */}
+          {/* Checkmark, Signal Green (design.md Feature Checklist Item) */}
           <svg
             className="w-5 h-5 mt-0.5 shrink-0 text-signal"
             viewBox="0 0 24 24"

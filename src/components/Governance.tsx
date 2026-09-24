@@ -250,7 +250,7 @@ export default function Governance() {
               style={{ background: 'radial-gradient(55% 55% at 40% 50%, rgba(64,91,255,0.2) 0%, transparent 70%)' }}
               aria-hidden
             />
-            <div className="relative rounded-[16px] bg-[#191919] border border-white/10 overflow-hidden shadow-[0_0_32px_rgba(112,132,255,0.12)]">
+            <div className="relative rounded-[16px] bg-[#191919] border border-white/10 overflow-hidden shadow-[0_0_32px_rgba(183,214,61,0.12)]">
               {/* Tabs + copy button */}
               <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-white/5">
                 <div className="flex items-center gap-4" role="tablist" aria-label="Governance sample">
