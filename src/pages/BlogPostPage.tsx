@@ -1,12 +1,9 @@
-'use client'
-
 import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useCms } from '../lib/CmsProvider'
 import Seo, { breadcrumbLd } from '../lib/Seo'
 import { SITE, absUrl } from '../lib/brand'
 import NotFoundPage from './NotFoundPage'
-import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
 export default function BlogPostPage() {
   const { slug } = useParams()
@@ -55,7 +52,7 @@ export default function BlogPostPage() {
         ]}
       />
       <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
-        <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()}>
+        <motion.div>
           <Link to="/blog" className="inline-flex items-center gap-2 text-sm text-fog hover:text-paper transition-colors mb-8">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M10 3l-5 5 5 5" />
@@ -65,9 +62,9 @@ export default function BlogPostPage() {
         </motion.div>
 
         {/* Header */}
-        <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)} className="max-w-[760px] mb-12">
+        <motion.div className="max-w-[760px] mb-12">
           <div className="flex items-center gap-3 text-xs text-fog mb-6">
-            <span className="font-medium text-signal">{post.category}</span>
+            <span className="font-medium text-lime">{post.category}</span>
             <span className="w-1 h-1 rounded-full bg-white/15" />
             <span>{post.date}</span>
           </div>
@@ -77,13 +74,7 @@ export default function BlogPostPage() {
         </motion.div>
 
         {/* Cover */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={revealViewport}
-          transition={springReveal(0.1)}
-          className="rounded-[20px] overflow-hidden mb-12 aspect-[16/9] bg-[#191919] border border-white/10"
-        >
+        <div className="rounded-panel overflow-hidden mb-12 aspect-[16/9] bg-carbon border border-hairline">
           {post.image ? (
             <img
               src={post.image}
@@ -93,20 +84,16 @@ export default function BlogPostPage() {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#2c2c2c] to-[#141414]" />
+            <div className="w-full h-full bg-graphite" />
           )}
-        </motion.div>
+        </div>
 
         {/* Body */}
         <motion.article
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal(0.12)}
           className="max-w-[720px]"
         >
-          <div className="flex items-center gap-3 mb-10 pb-8 border-b border-white/10">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#405bff] to-[#7084ff] text-white flex items-center justify-center text-sm font-medium">
+          <div className="flex items-center gap-3 mb-10 pb-8 border-b border-hairline">
+            <div className="w-10 h-10 rounded-full bg-lime text-ink flex items-center justify-center text-sm font-medium">
               {post.author.split(' ').map((n) => n[0]).join('')}
             </div>
             <div>
@@ -118,7 +105,7 @@ export default function BlogPostPage() {
           {post.subheads && post.subheads.length > 0 ? (
             post.subheads.map((s, si) => (
               <div key={si}>
-                <h2 className="font-display text-2xl font-medium tracking-[-0.02em] mb-4 mt-10">
+                <h2 className="font-sans text-2xl font-medium tracking-[-0.02em] mb-4 mt-10">
                   {s.heading}
                 </h2>
                 {s.paragraphs.map((p, i) => (
@@ -143,13 +130,13 @@ export default function BlogPostPage() {
         </motion.article>
 
         {/* More articles */}
-        <div className="border-t border-white/10 pt-16 mt-20">
+        <div className="border-t border-hairline pt-16 mt-20">
           <p className="section-label mb-8">More articles</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {others.map((o, i) => (
-              <motion.div key={o.slug} initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.08)}>
+              <motion.div key={o.slug}>
                 <Link to={`/blog/${o.slug}`} className="group block h-full">
-                  <div className="aspect-[4/5] rounded-[20px] overflow-hidden mb-4 bg-[#191919] border border-white/10">
+                  <div className="aspect-[4/5] rounded-panel overflow-hidden mb-4 bg-carbon border border-hairline">
                     {o.image ? (
                       <img
                         src={o.image}
@@ -159,15 +146,15 @@ export default function BlogPostPage() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-[#2c2c2c] to-[#141414]" />
+                      <div className="w-full h-full bg-graphite" />
                     )}
                   </div>
                   <div className="flex items-center gap-3 text-xs text-fog mb-2">
-                    <span className="font-medium text-signal">{o.category}</span>
+                    <span className="font-medium text-lime">{o.category}</span>
                     <span className="w-1 h-1 rounded-full bg-white/15" />
                     <span>{o.date}</span>
                   </div>
-                  <h3 className="font-display text-lg font-medium text-paper group-hover:text-signal transition-colors">
+                  <h3 className="font-sans text-lg font-medium text-paper group-hover:text-lime transition-colors">
                     {o.title}
                   </h3>
                 </Link>

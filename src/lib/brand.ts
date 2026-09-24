@@ -2,8 +2,7 @@
  * Naivolabs, brand + site constants.
  *
  * Single source of truth for the company identity, the messaging system, and
- * every place the site needs a canonical name, URL or contact detail. Derived
- * from the Naivo Labs brand identity foundation (v1.0, 21 September 2026).
+ * every place the site needs a canonical name, URL or contact detail.
  *
  * Rule: the brand name is ONE word, "Naivolabs". Never "Naivo Labs",
  * "NaivoLabs" or "Naivo" in user-facing copy.
@@ -29,7 +28,7 @@ export const SITE = {
   brandIdea: 'Put intelligence to work.',
   /** Primary meta description (≤ 155 chars for SERP display). */
   description:
-    'Naivolabs is an applied AI systems company. We design, build and deploy governed intelligent systems that work inside real organizational environments.',
+    'Naivolabs is an applied AI systems company. We design, build and deploy governed AI systems that complete real work inside real organizations.',
   /** Brand promise, the operational definition of the company. */
   promise:
     'We build systems that work in the real world, measure their results and remain honest about their limits.',
@@ -45,14 +44,16 @@ export const SITE = {
     lines: '51 Lenana Road, Nairobi, 00100, Kenya',
   },
   geo: { latitude: -1.2864, longitude: 36.7812 },
-  /** TODO(operator): replace with the live profiles before launch. */
-  social: {
-    x: 'https://x.com/naivolabs',
-    linkedin: 'https://www.linkedin.com/company/naivolabs',
-    youtube: 'https://www.youtube.com/@naivolabs',
-    github: 'https://github.com/naivolabs',
-  },
 } as const
+
+/*
+ * Social profiles are deliberately absent: the footer must not link anywhere
+ * the company does not actually own, and the Organization JSON-LD must not
+ * claim profiles it cannot back up. Add a profile here only once it is live;
+ * both the footer and the structured data read from this object, so a single
+ * entry turns the link on everywhere it belongs.
+ */
+export const SOCIAL: { label: string; href: string }[] = []
 
 /** The three public definitions of the company (brand doc §02). */
 export const DEFINITIONS = {

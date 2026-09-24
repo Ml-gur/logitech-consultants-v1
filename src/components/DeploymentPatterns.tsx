@@ -1,80 +1,68 @@
-'use client'
-
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useCms } from '../lib/CmsProvider'
-import DeploymentStack from './DeploymentStack'
 import { ListSkeleton } from './Loading'
-import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
 /**
- * Deployment patterns (formerly the case-studies section).
+ * Deployment patterns, home page.
  *
- * The proof here is the *pattern*, not a client logo: what we build, which
- * capability actions it spans, and the dimensions we instrument. Named
- * references replace this framing as engagements complete.
+ * On /deployment-patterns these panels pin and stack as you scroll, which is
+ * the right treatment for the page whose whole job is to walk through them. On
+ * the home page it was a second scroll-driven set piece competing with the
+ * hero, so it is reduced here to four quiet entries: name, what it is, what it
+ * has to prove.
  */
 export default function DeploymentPatterns() {
-  const { caseStudies: patterns, cmsEnabled, cmsLoaded } = useCms()
+  const { deploymentPatterns: patterns, cmsEnabled, cmsLoaded } = useCms()
 
   return (
-    <section id="deployment-patterns" className="relative">
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-20 sm:py-28">
-        <motion.p
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal()}
-          className="section-label"
-        >
-          Deployment patterns
-        </motion.p>
-
+    <section id="deployment-patterns" className="border-t border-hairline">
+      <div className="mx-auto max-w-[1200px] px-5 py-20 sm:px-8 sm:py-28">
         <motion.h2
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal(0.06)}
-          className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] max-w-[720px] mb-6"
+          className="max-w-[24ch] text-[clamp(30px,4.6vw,50px)] leading-[1.06]"
         >
           What we deploy, and what it has to prove.
         </motion.h2>
 
         <motion.p
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal(0.1)}
-          className="text-[17px] text-fog max-w-[620px] mb-16"
+          className="mt-5 max-w-[56ch] text-[17px] leading-relaxed text-fog"
         >
-          Each pattern below is a class of system we build: the problem it exists for, how it is put together,
-          and the measurement dimensions agreed before it goes live.
+          Four classes of system we build, each with the measurements agreed before it goes live. We publish
+          the pattern rather than a client logo, because the pattern is the part we can stand behind today.
         </motion.p>
 
-        {/* Skeleton only while a configured CMS is fetching and has no data yet. */}
         {cmsEnabled && !cmsLoaded && patterns.length === 0 ? (
-          <ListSkeleton count={3} variant="pattern" />
+          <div className="mt-14">
+            <ListSkeleton count={2} variant="pattern" />
+          </div>
         ) : (
-          <DeploymentStack patterns={patterns} />
+          <div className="mt-14 grid gap-x-10 gap-y-12 sm:grid-cols-2">
+            {patterns.map((p, i) => (
+              <motion.article
+                key={p.slug}
+                className="border-t border-hairline pt-6"
+              >
+                <Link to={`/deployment-patterns/${p.slug}`} className="group block">
+                  <p className="text-[12px] text-fog">{p.category}</p>
+                  <h3 className="mt-2 font-sans text-[clamp(23px,2.6vw,28px)] leading-tight text-paper transition-colors duration-200 group-hover:text-lime">
+                    {p.name}
+                  </h3>
+                  <p className="mt-3 max-w-[46ch] text-[14px] leading-relaxed text-fog">{p.tagline}</p>
+                  <p className="mt-4 text-[12px] text-fog">
+                    Measured <span className="text-ash">{p.measures.slice(0, 2).map((m) => m.metric).join(', ')}</span>
+                  </p>
+                </Link>
+              </motion.article>
+            ))}
+          </div>
         )}
 
         <motion.div
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal(0.1)}
-          className="mt-16 flex flex-wrap items-center gap-4"
+          className="mt-12"
         >
-          <Link to="/deployment-patterns" className="btn-ghost px-6 py-3 text-sm">
+          <Link to="/deployment-patterns" className="link-quiet text-[15px]">
             All deployment patterns
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M6 3l5 5-5 5" />
-            </svg>
           </Link>
-          <p className="text-sm text-fog max-w-[420px]">
-            Named references are published as engagements complete. We would rather show you nothing than
-            show you something we cannot back up.
-          </p>
         </motion.div>
       </div>
     </section>

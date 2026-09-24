@@ -1,11 +1,14 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from './test'
+import type { Page } from '@playwright/test'
 import { seedConsent } from './consent'
 
 /**
- * Homepage tests — the Naivolabs narrative in order: hero CTA above the fold,
- * the four-capability tab block, governance, measurement, the scroll-driven
- * deployment-pattern stack, principles marquee, positioning, deployment model,
- * pricing and FAQ.
+ * Homepage tests — the Naivolabs narrative in order: hero, four capabilities,
+ * four deployment patterns, three commitments, one call to action.
+ *
+ * These replaced a suite written against a seven-section page that carried a
+ * tabbed capability block, a fabricated metrics band and seven numbered
+ * "principle" cards. The assertions below describe the page that exists now.
  */
 
 /** Jump directly to a section (Lenis smooth-scroll races with scrollIntoViewIfNeeded). */
@@ -19,6 +22,23 @@ async function scrollToSection(page: Page, selector: string) {
   return section
 }
 
+/**
+ * The accent as the browser resolves it, read from the live `--color-brass`
+ * token. Asserting a hardcoded hex here made the test depend on which theme the
+ * suite happens to run in — the light accent is deliberately deeper than the
+ * dark one, so `rgb(216, 166, 68)` was only ever right in dark mode.
+ */
+async function accentRgb(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const probe = document.createElement('span')
+    probe.style.color = getComputedStyle(document.documentElement).getPropertyValue('--color-lime').trim()
+    document.body.appendChild(probe)
+    const rgb = getComputedStyle(probe).color
+    probe.remove()
+    return rgb
+  })
+}
+
 test('hero: primary CTA sits above the fold on desktop and mobile', async ({ page }) => {
   await seedConsent(page)
 
@@ -26,6 +46,7 @@ test('hero: primary CTA sits above the fold on desktop and mobile', async ({ pag
     { width: 1440, height: 900 },
     { width: 1280, height: 720 },
     { width: 390, height: 844 },
+    { width: 360, height: 640 },
   ]) {
     await page.setViewportSize(size)
     await page.goto('/')
@@ -43,198 +64,307 @@ test('hero: primary CTA sits above the fold on desktop and mobile', async ({ pag
   }
 })
 
-test('hero: headline splits white and Signal Violet lines', async ({ page }) => {
+test('hero: one statement, in one face and one colour', async ({ page }) => {
   await seedConsent(page)
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/')
 
   const h1 = page.getByRole('heading', { level: 1 })
-  await expect(h1).toContainText('Put intelligence')
-  await expect(h1).toContainText('to work.')
-  await expect(h1.getByText('to work.', { exact: true })).toHaveCSS('color', 'rgb(112, 132, 255)')
+  await expect(h1).toContainText('Intelligence that')
+  await expect(h1).toContainText('finishes the work.')
 
-  // The full idea is exposed to assistive tech as one sentence.
-  await expect(h1.getByText('Put intelligence to work.', { exact: true })).toHaveCount(1)
+  // Set in the site's one face. There is no display serif: hierarchy is size
+  // and weight, and a second face would fight the accent for attention.
+  const family = await h1.evaluate((el) => getComputedStyle(el).fontFamily)
+  expect(family.toLowerCase()).toContain('inter')
+
+  // The headline is one colour. A single tinted word inside a headline is the
+  // most common generated-page tell, so it is asserted against.
+  const colours = await h1.evaluate((el) =>
+    Array.from(el.querySelectorAll('*')).map((n) => getComputedStyle(n as Element).color),
+  )
+  const own = await h1.evaluate((el) => getComputedStyle(el).color)
+  expect(new Set([own, ...colours]).size, 'headline is more than one colour').toBe(1)
 })
 
-test('hero: email capture validates, then hands off to the contact form', async ({ page }) => {
+/**
+ * The hero is the page's one full-bleed screen, and the band along its bottom
+ * edge is where a site of this kind usually starts inventing things: client
+ * marks it does not have, an uptime figure nobody published, a completion rate
+ * nobody measured. This asserts the honest version — facts that can be checked
+ * against the rest of the site — and that the band arrives at them.
+ */
+test('hero: one screen, a band of defensible numbers, no client logos', async ({ page }) => {
   await seedConsent(page)
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/')
 
-  const email = page.getByLabel('Work email')
-  const submit = page.getByRole('button', { name: 'Start a conversation' })
+  const hero = page.locator('section#hero')
+  const box = await hero.boundingBox()
+  console.log(`[hero] 1440x900 — height ${box?.height}`)
+  expect(box!.height, 'the hero should be the first screen, not a fragment of it').toBeGreaterThanOrEqual(
+    880,
+  )
 
-  // Empty → error state
-  await submit.click()
-  await expect(page.getByText('Enter a work email so we can reply.')).toBeVisible()
-  await expect(email).toHaveAttribute('aria-invalid', 'true')
+  // The four cells, in order: the published first-deployment window, the ten
+  // steps of the deployment model, the six dimensions we measure, and the
+  // number of benchmarks we have made up.
+  await expect(hero.locator('dd')).toHaveText(['4–8 wks', '10', '6', '0'])
+  await expect(hero.locator('dt')).toHaveText([
+    'To production',
+    'Discovery to product',
+    'Dimensions we measure',
+    'Benchmarks we invented',
+  ])
 
-  // Invalid → different message
-  await email.fill('not-an-email')
-  await submit.click()
-  await expect(page.getByText('That does not look like a valid email address.')).toBeVisible()
+  // The row above it names where we build, not who we claim to have worked for.
+  await expect(hero.getByText('Applied AI systems, from Nairobi')).toBeVisible()
 
-  // Valid → carries the address into the contact route
-  await email.fill('jane@organization.org')
-  await submit.click()
-  await expect(page).toHaveURL(/\/contact\?email=jane%40organization\.org$/)
+  const text = await hero.innerText()
+  expect(text, 'an unqualified rate is a claim we cannot support').not.toMatch(/\d+(\.\d+)?\s*%/)
+  expect(text, 'no client names in the hero').not.toMatch(/Microsoft|Amazon|Google|Trusted by/i)
+  // Nothing illustrative: the marks are drawn, and a logo wall is not evidence.
+  await expect(hero.locator('img')).toHaveCount(0)
 })
 
-test('capabilities: four tabs switch the working system panel', async ({ page }) => {
+/**
+ * The band is the point of a full-bleed opener: if it falls below the fold, the
+ * first screen is a headline and the section may as well be a banner. It has to
+ * land inside the viewport at laptop and phone widths.
+ */
+test('hero: the band lands on the first screen at laptop and phone widths', async ({ page }) => {
+  await seedConsent(page)
+
+  for (const size of [
+    { width: 1440, height: 900 },
+    { width: 1024, height: 768 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(size)
+    await page.goto('/')
+
+    const band = await page.locator('section#hero dl').boundingBox()
+    const bottom = band!.y + band!.height
+    console.log(`[hero] ${size.width}x${size.height} — band bottom ${Math.round(bottom)}`)
+
+    expect(bottom, `band below the fold at ${size.width}x${size.height}`).toBeLessThanOrEqual(
+      size.height,
+    )
+  }
+})
+
+test('hero: asks for one thing, and has no competing capture form', async ({ page }) => {
+  await seedConsent(page)
+  await page.goto('/')
+
+  const hero = page.locator('section#hero')
+  await expect(hero.getByRole('link', { name: 'Book a discovery call' })).toBeVisible()
+  await expect(hero.getByRole('link', { name: 'See what we deploy' })).toBeVisible()
+
+  // The email capture that used to sit here duplicated the contact form and
+  // navigated away with a query param. It is gone.
+  await expect(hero.locator('input[type="email"]')).toHaveCount(0)
+})
+
+/**
+ * Two things about the first screen that are design decisions, not styling: a
+ * screen answers one question, so it carries one filled action; and the plate
+ * behind the statement is a real layer that is deliberately clear where the
+ * type sits.
+ */
+test('hero: one filled action, over a plate that stays clear of the type', async ({ page }) => {
+  await seedConsent(page)
+  await page.goto('/')
+
+  const hero = page.locator('section#hero')
+
+  // Exactly one control is filled with the accent. The second path forward is a
+  // quiet text link: two buttons of equal weight is what makes an opening
+  // screen read as a template.
+  const accent = await accentRgb(page)
+  const filled = await hero.locator('a').evaluateAll(
+    (links, colour) => links.filter((a) => getComputedStyle(a).backgroundColor === colour).length,
+    accent,
+  )
+  expect(filled, 'more than one filled action in the hero').toBe(1)
+
+  // The dot field renders, and its mask is inverted — transparent through the
+  // middle, drawn toward the edges. A texture behind the statement would be
+  // noise; a texture around it is what gives the plate depth.
+  const dots = hero.locator('.hero-dots')
+  await expect(dots).toHaveCount(1)
+  const mask = await dots.evaluate((el) => {
+    const style = getComputedStyle(el)
+    return style.maskImage || style.webkitMaskImage
+  })
+  expect(mask).toContain('radial-gradient')
+  // The first stop is fully transparent (Chromium computes `transparent` to
+  // `rgba(0, 0, 0, 0)`), so the plate has a clean middle to set type on.
+  expect(mask).toContain('rgba(0, 0, 0, 0)')
+
+  // The backdrop's layer order, bottom to top: the loop, the scrim that keeps
+  // the copy readable over it, the dot field, the light source, the vignette.
+  // This is the part a pixel golden would not describe even if it could be
+  // compared across machines — the scrim has to sit between the video and the
+  // type, or the statement is measured against a moving picture.
+  // The loop is attached after first paint, so wait for it rather than assuming
+  // it is in the first HTML the page produces.
+  await expect(hero.locator('.hero-video')).toHaveCount(1)
+  const layers = await hero.locator('.hero-backdrop > *').evaluateAll((nodes: Element[]) =>
+    nodes.map((n) => n.className.split(' ').find((c: string) => c.startsWith('hero-'))),
+  )
+  expect(layers).toEqual(['hero-video', 'hero-scrim', 'hero-dots', 'hero-glow', 'hero-vignette'])
+})
+
+test('home stays minimal: five sections, the depth lives on the inner pages', async ({ page }) => {
+  await seedConsent(page)
+  await page.goto('/')
+
+  // Sections that were removed from the landing page.
+  for (const id of ['#measurement', '#principles', '#pricing', '#faq', '#governance', '#process', '#why-us']) {
+    await expect(page.locator(`section${id}`), `${id} should not be on the home page`).toHaveCount(0)
+  }
+
+  for (const id of ['#hero', '#capabilities', '#deployment-patterns', '#approach']) {
+    await expect(page.locator(`section${id}`).first(), `${id} missing from the home page`).toBeVisible()
+  }
+
+  await expect(page.locator('section')).toHaveCount(5)
+})
+
+test('capabilities: four rows, each one a link to its depth', async ({ page }) => {
   await seedConsent(page)
   await page.goto('/')
   const section = await scrollToSection(page, 'section#capabilities')
 
-  const tablist = page.getByRole('tablist', { name: 'Capabilities' })
-  await expect(tablist).toBeVisible()
-  for (const name of ['Converse', 'Understand', 'Act', 'Orchestrate']) {
-    await expect(tablist.getByRole('tab', { name })).toBeVisible()
+  // No tab control any more — the four are all readable at once.
+  await expect(section.getByRole('tablist')).toHaveCount(0)
+
+  for (const [name, headline] of [
+    ['Converse', 'Systems that communicate naturally with people.'],
+    ['Understand', 'Systems that work with organizational information.'],
+    ['Act', 'Systems that perform defined tasks.'],
+    ['Orchestrate', 'Systems that connect intelligence to larger workflows.'],
+  ] as const) {
+    const row = section.getByRole('link', { name: new RegExp(`^${name}`) })
+    await expect(row).toBeVisible()
+    await expect(row).toContainText(headline)
+    await expect(row).toHaveAttribute('href', new RegExp(`/capabilities#${name.toLowerCase()}$`))
   }
-
-  // Default panel — Converse, with its checklist and concrete systems.
-  const panel = section.getByRole('tabpanel')
-  await expect(panel).toContainText('Systems that communicate naturally with people.')
-  await expect(panel.getByText('Voice agents', { exact: true })).toBeVisible()
-
-  await tablist.getByRole('tab', { name: 'Understand' }).click()
-  await expect(panel).toContainText('Systems that work with organizational information.')
-
-  await tablist.getByRole('tab', { name: 'Act' }).click()
-  await expect(panel).toContainText('Systems that perform defined tasks.')
-
-  await tablist.getByRole('tab', { name: 'Orchestrate' }).click()
-  await expect(panel).toContainText('Systems that connect intelligence to larger workflows.')
-  await expect(panel.getByText('Governance', { exact: true })).toBeVisible()
 })
 
-test('home stays minimal: the deep sections live on the inner pages', async ({ page }) => {
+test('capabilities: every anchor row lands on its own block on /capabilities', async ({ page }) => {
   await seedConsent(page)
-  await page.goto('/')
 
-  // The brand's depth is one level down, not stacked on the landing page.
-  for (const id of ['#governance', '#why-us', '#process', '#pricing', '#resources']) {
-    await expect(page.locator(`section${id}`), `${id} should not be on the home page`).toHaveCount(0)
+  for (const id of ['converse', 'understand', 'act', 'orchestrate']) {
+    await page.goto(`/capabilities#${id}`)
+    await expect(page.locator(`[id="${id}"]`)).toBeVisible()
   }
-
-  // The sections the home page does carry.
-  for (const id of ['#home', '#capabilities', '#measurement', '#deployment-patterns', '#principles', '#blog', '#faq']) {
-    await expect(page.locator(`section${id}`).first(), `${id} missing from the home page`).toBeVisible()
-  }
-
-  // A short, scannable page: 8 sections, nothing more.
-  await expect(page.locator('section')).toHaveCount(8)
 })
 
-test('measurement: publishes the dimensions, not invented ROI figures', async ({ page }) => {
+test('deployment patterns: four entries, each naming what it has to prove', async ({ page }) => {
   await seedConsent(page)
   await page.goto('/')
-  const section = await scrollToSection(page, 'section#measurement')
+  const section = await scrollToSection(page, 'section#deployment-patterns')
 
-  await expect(section.getByRole('heading', { name: /We agree what success means/ })).toBeVisible()
-  await expect(section.getByText('Completion rate', { exact: true })).toBeVisible()
-  await expect(section.getByText('Escalation accuracy', { exact: true })).toBeVisible()
-  await expect(section.getByText('Cost per completed task', { exact: true })).toBeVisible()
-
-  // No unverifiable stats anywhere in the section.
-  const text = await section.innerText()
-  expect(text).not.toMatch(/\d+% (ROI|faster|increase)/i)
-})
-
-test('deployment patterns: sticky, scroll-driven stack that scales as it is covered', async ({ page }) => {
-  await seedConsent(page)
-  await page.setViewportSize({ width: 1440, height: 900 })
-  await page.goto('/')
-
-  // `panels` are the sticky wrappers (what pins); `layers` are the transformed
-  // children inside them (what recedes). The scale is applied to the layer, so
-  // the recede assertion has to read the layer, not the wrapper.
-  const panels = page.locator('section#deployment-patterns .sticky')
-  const layers = page.locator('section#deployment-patterns .sticky > div')
-  await expect(panels).toHaveCount(4)
-  await expect(layers).toHaveCount(4)
-  await expect(panels.first()).toHaveCSS('position', 'sticky')
-
-  // Read the geometry from the browser: the pin line is where the stack's top
-  // reaches --stack-base (96px at this width), and each panel owns an equal
-  // slice of the remaining scroll distance. Deriving both beats guessing pixel
-  // offsets, and it is what makes this assertion independent of copy length.
-  const geo = await page.evaluate(() => {
-    const first = document.querySelector('#deployment-patterns .sticky') as HTMLElement
-    const container = first.parentElement as HTMLElement
-    const rect = container.getBoundingClientRect()
-    return {
-      containerTop: rect.top + window.scrollY,
-      scrollRange: rect.height - window.innerHeight,
-      pinTop: parseFloat(getComputedStyle(first).top) || 96,
-    }
-  })
-  expect(geo.scrollRange, 'the stack must be taller than the viewport to pin').toBeGreaterThan(0)
-
-  const pinY = geo.containerTop - geo.pinTop
-  await page.evaluate((y) => window.scrollTo(0, y), pinY)
-  await page.waitForTimeout(500)
-  const atPinPanel = await panels.first().boundingBox()
-  const atPinLayer = await layers.first().boundingBox()
-
-  // One full slice later the first panel has been covered: it is still pinned
-  // (that is the stack) and it has scaled down (that is the recede).
-  await page.evaluate((y) => window.scrollTo(0, y), pinY + geo.scrollRange / 4)
-  await page.waitForTimeout(700)
-  const coveredPanel = await panels.first().boundingBox()
-  const coveredLayer = await layers.first().boundingBox()
-
-  expect(atPinPanel, 'no box for the pinned panel').not.toBeNull()
-  expect(coveredPanel, 'no box for the covered panel').not.toBeNull()
-  expect(coveredPanel!.y, 'covered panel did not stay pinned').toBeGreaterThanOrEqual(-2)
-  expect(coveredPanel!.y, 'covered panel did not stay pinned').toBeLessThanOrEqual(geo.pinTop + 4)
-  expect(atPinLayer, 'no box for the pinned layer').not.toBeNull()
-  expect(coveredLayer, 'no box for the covered layer').not.toBeNull()
-  expect(coveredLayer!.width, 'covered layer did not scale down').toBeLessThan(atPinLayer!.width)
-
-  // Every pattern is still reachable in the accessible reading order.
-  const list = page.locator('section#deployment-patterns ol.sr-only li')
-  await expect(list).toHaveCount(4)
-  await expect(list.first()).toContainText('AI Voice Receptionist')
-  await expect(list.last()).toContainText('Document Intake')
-})
-
-test('principles: all seven rules are readable at once, with nothing auto-scrolling', async ({ page }) => {
-  await seedConsent(page)
-  await page.goto('/')
-  const section = await scrollToSection(page, 'section#principles')
-
-  await expect(section.getByRole('heading', { name: 'Seven rules we do not bend.' })).toBeVisible()
-
-  // The whole set is rendered — seven cards, not a moving window of them.
-  const cards = section.locator('figure').filter({ hasText: 'Naivolabs principle' })
-  await expect(cards).toHaveCount(7)
-
-  // Every rule is visible without waiting for anything to scroll past.
-  for (const rule of [
-    'Never make a claim we cannot support',
-    'Start with a real problem, not a fashionable technology',
-    'Deploy before declaring success',
-    'Measure what matters',
-    'Human oversight stays where the stakes require it',
-    'Custom work should create reusable technology',
-    'Platform ambitions follow proven demand',
+  for (const name of [
+    'AI Voice Receptionist',
+    'Institutional Knowledge Agent',
+    'Service Request Routing',
+    'Document Intake & Processing',
   ]) {
-    await expect(section.getByText(rule, { exact: true })).toBeVisible()
+    await expect(section.getByRole('heading', { name, level: 3 })).toBeVisible()
   }
 
-  // No marquee track anywhere in this section, and nothing drifts over time.
-  await expect(section.locator('.animate-marquee')).toHaveCount(0)
-  const positions = async () =>
-    Promise.all(
-      (await cards.all()).map((c) => c.evaluate((el) => el.getBoundingClientRect().x)),
-    )
-  const first = await positions()
-  await page.waitForTimeout(1200)
-  expect(await positions()).toEqual(first)
+  // Each entry states the measurement dimensions, not a client metric.
+  await expect(section.getByText('Measured').first()).toBeVisible()
+
+  // The scroll-driven stack lives on /deployment-patterns, not here.
+  await expect(page.locator('section#deployment-patterns .sticky')).toHaveCount(0)
 })
 
-test('hub pages carry the depth: positioning on /about, governance + model on /capabilities', async ({ page }) => {
+test('commitments: three promises, and no invented statistics', async ({ page }) => {
+  await seedConsent(page)
+  await page.goto('/')
+  const section = await scrollToSection(page, 'section#approach')
+
+  await expect(section.getByRole('heading', { name: 'What you can hold us to.' })).toBeVisible()
+  await expect(
+    section.getByRole('heading', { name: 'We agree what success means before we build.' }),
+  ).toBeVisible()
+  await expect(
+    section.getByRole('heading', { name: 'Governance is part of the system, not a document about it.' }),
+  ).toBeVisible()
+  await expect(
+    section.getByRole('heading', { name: 'Every deployment leaves you with something reusable.' }),
+  ).toBeVisible()
+
+  // The band it replaced claimed "94% completion rate", "10× deployment
+  // velocity" and "0 silent failures". None of those were measured.
+  const text = await section.innerText()
+  expect(text).not.toMatch(/\d+\s*%/)
+  expect(text).not.toMatch(/10×/)
+  expect(text).not.toMatch(/94/)
+})
+
+test('the page ends by asking for one thing', async ({ page }) => {
+  await seedConsent(page)
+  await page.goto('/')
+
+  // Three, all the same action under the same name: the header's, the hero's
+  // and the closing band's. The header CTA used to read "Book a call", which
+  // made one action two different things on the same screen.
+  const ctas = page.getByRole('link', { name: 'Book a discovery call' })
+  await expect(ctas).toHaveCount(3)
+  await ctas.last().click()
+  await expect(page).toHaveURL(/\/contact$/)
+  await expect(page.getByRole('button', { name: 'Send your message' })).toBeVisible()
+})
+
+test('FAQ accordion opens and closes', async ({ page }) => {
+  await seedConsent(page)
+  await page.goto('/capabilities')
+  const section = await scrollToSection(page, 'section#faq')
+
+  // Questions carry no "01/" prefix — the list is not a sequence.
+  const firstButton = section.getByRole('button', { name: 'What does Naivolabs actually do?' })
+  await expect(firstButton).toBeVisible()
+
+  const answer = section.getByText(/We are an applied AI systems company/i)
+  await expect(answer).toBeHidden()
+
+  await firstButton.click()
+  await expect(answer).toBeVisible()
+  await expect(firstButton).toHaveAttribute('aria-expanded', 'true')
+
+  await firstButton.click()
+  await expect(answer).toBeHidden()
+  await expect(firstButton).toHaveAttribute('aria-expanded', 'false')
+})
+
+test('footer carries real destinations only', async ({ page }) => {
+  await seedConsent(page)
+  await page.goto('/')
+  const footer = page.locator('footer')
+
+  // Real contact details, not placeholder handles.
+  await expect(footer.getByRole('link', { name: 'hello@naivolabs.com' })).toBeVisible()
+  await expect(footer.getByRole('link', { name: '+254 112 292 847' })).toBeVisible()
+  await expect(footer.getByText('51 Lenana Road, Nairobi, 00100, Kenya')).toBeVisible()
+
+  // Every external link resolves to something the company owns. The four
+  // placeholder social URLs that used to be here are gone.
+  const external = await footer.locator('a[href^="http"]').count()
+  expect(external, 'footer links off-site').toBe(0)
+
+  // The newsletter form had no backend and answered every address with
+  // "Subscribed". It is gone.
+  await expect(footer.getByRole('button', { name: /Subscribe/ })).toHaveCount(0)
+})
+
+test('hub pages carry the depth: positioning on /about, governance + model on /capabilities', async ({
+  page,
+}) => {
   await seedConsent(page)
 
   await page.goto('/about')
@@ -251,7 +381,7 @@ test('hub pages carry the depth: positioning on /about, governance + model on /c
   ).toBeVisible()
 })
 
-test('positioning: Naivolabs column is the accent one', async ({ page }) => {
+test('positioning: the Naivolabs column is the accent one', async ({ page }) => {
   await seedConsent(page)
   await page.goto('/about')
   const section = await scrollToSection(page, 'section#why-us')
@@ -265,10 +395,11 @@ test('positioning: Naivolabs column is the accent one', async ({ page }) => {
   expect(await platforms.locator('svg path').first().getAttribute('d')).toContain('M18 6L6 18')
   expect(await agencies.locator('svg path').first().getAttribute('d')).toContain('M18 6L6 18')
 
-  // …and our column with a Signal Violet checkmark.
+  // …and our column with a brass checkmark, in the live accent colour rather
+  // than a hex that only matches one theme.
   await expect(naivolabs.locator('svg')).toHaveCount(5)
   expect(await naivolabs.locator('svg path').first().getAttribute('d')).toContain('M20 6L9 17l-5-5')
-  await expect(naivolabs.locator('svg').first()).toHaveCSS('color', 'rgb(112, 132, 255)')
+  await expect(naivolabs.locator('svg').first()).toHaveCSS('color', await accentRgb(page))
 })
 
 test('deployment model: the ten-stage process and flywheel principle render', async ({ page }) => {
@@ -283,52 +414,11 @@ test('deployment model: the ten-stage process and flywheel principle render', as
   await expect(section.getByText('Operating principle')).toBeVisible()
 })
 
-test('pricing: the section is hidden for now', async ({ page }) => {
+test('no pricing figures are published anywhere on the public page', async ({ page }) => {
   await seedConsent(page)
   await page.goto('/')
 
-  // The component is kept in the tree but not rendered until the operator
-  // re-enables it — no price figures anywhere on the public page.
   await expect(page.locator('section#pricing')).toHaveCount(0)
   await expect(page.getByText('$1,995')).toHaveCount(0)
   await expect(page.getByText('Engagement models, not packages.')).toHaveCount(0)
-})
-
-
-
-test('FAQ accordion opens and closes', async ({ page }) => {
-  await seedConsent(page)
-  await page.goto('/')
-  const section = await scrollToSection(page, 'section#faq')
-
-  const firstButton = section.getByRole('button', { name: /01\/ What does Naivolabs actually do\?/ })
-  await expect(firstButton).toBeVisible()
-
-  const answer = section.getByText(/We are an applied AI systems company/i)
-  await expect(answer).toBeHidden()
-
-  await firstButton.click()
-  await expect(answer).toBeVisible()
-  await expect(firstButton).toHaveAttribute('aria-expanded', 'true')
-
-  await firstButton.click()
-  await expect(answer).toBeHidden()
-  await expect(firstButton).toHaveAttribute('aria-expanded', 'false')
-})
-
-test('footer newsletter validates and confirms', async ({ page }) => {
-  await seedConsent(page)
-  await page.goto('/')
-  const footer = page.locator('footer')
-
-  await footer.getByRole('button', { name: 'Subscribe' }).click()
-  await expect(footer.getByText('Please enter your email address.')).toBeVisible()
-
-  await footer.getByLabel('Email address').fill('nope')
-  await footer.getByRole('button', { name: 'Subscribe' }).click()
-  await expect(footer.getByText('That does not look like a valid email address.')).toBeVisible()
-
-  await footer.getByLabel('Email address').fill('reader@organization.org')
-  await footer.getByRole('button', { name: 'Subscribe' }).click()
-  await expect(footer.getByRole('button', { name: 'Subscribed' })).toBeVisible()
 })

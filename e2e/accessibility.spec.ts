@@ -1,4 +1,5 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from './test'
+import type { Page } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 import { seedConsent } from './consent'
 
@@ -30,19 +31,16 @@ const routes = [
 ]
 
 /**
- * The site loads a third-party voice widget (index.html) that injects its own
- * markup under `dograh-*` ids with its own inline styles. Its colours are the
- * vendor's, not ours, so it is excluded from the scan: a failure there is not
- * something this repository can fix. Everything the site renders is still
- * scanned, and the widget's remaining problem (an unreadable CTA label) is
- * recorded in the CHANGELOG as part of re-pointing the embed before launch.
+ * There is no third-party embed on the site, and nothing is excluded from these
+ * scans: everything axe reports is something this repository can fix. If an
+ * embed is ever added again, exclude it by selector here and say why.
  */
-const THIRD_PARTY_EMBEDS = '[id^="dograh-"]'
 
 /**
- * Scroll the full page so framer-motion `whileInView` reveals fire — otherwise
- * below-fold content sits at opacity 0 and is invisible to the scan. Also lets
- * the marquees and the scroll-driven stack settle.
+ * Scroll the full page so the hero's entrance sequence finishes and any
+ * scroll-linked component settles. Below-fold content is present from first
+ * paint (ADR-004), so the sweep is about animation state, not about making
+ * content exist.
  *
  * Two determinism guards, both learned from intermittent failures where the scan
  * reported colour-contrast violations on elements that were mid-animation (a
@@ -104,7 +102,6 @@ for (const route of routes) {
 
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-      .exclude(THIRD_PARTY_EMBEDS)
       .analyze()
 
     const violations = results.violations.map((v) => ({
@@ -132,7 +129,6 @@ test('a11y: the cookie banner (undecided) has no WCAG A/AA violations', async ({
 
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-    .exclude(THIRD_PARTY_EMBEDS)
     .analyze()
 
   expect(

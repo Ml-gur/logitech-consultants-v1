@@ -37,7 +37,7 @@ export const deploymentPatterns: DeploymentPattern[] = [
     slug: 'ai-voice-receptionist',
     name: 'AI Voice Receptionist',
     category: 'Membership organizations',
-    image: '/images/M5MY3Wk4Y4dsOCa2vifZ9R6pI.webp',
+    image: '/images/ai-voice-receptionist.webp',
     tagline:
       'An intelligent first point of contact that answers, understands, retrieves and completes, then hands off to a person when it should.',
     timeframe: '4–6 weeks to first live deployment',
@@ -70,7 +70,7 @@ export const deploymentPatterns: DeploymentPattern[] = [
     slug: 'institutional-knowledge-agent',
     name: 'Institutional Knowledge Agent',
     category: 'Higher education',
-    image: '/images/vl5w99JCKqkuvW49lyswomsyhnY.webp',
+    image: '/images/knowledge-and-data.webp',
     tagline:
       'Answers drawn from the institution\u2019s own documents, cited back to the source, scoped to who is asking.',
     timeframe: '6–8 weeks to first live deployment',
@@ -102,7 +102,7 @@ export const deploymentPatterns: DeploymentPattern[] = [
     slug: 'service-request-routing',
     name: 'Service Request Routing',
     category: 'Operations-heavy enterprises',
-    image: '/images/Tf9L4582eDStTX4KSFaUOoUP5Ys.webp',
+    image: '/images/service-request-routing.webp',
     tagline:
       'Requests captured, understood and routed to the right queue in the systems of record, with the status visible to the requester.',
     timeframe: '5–7 weeks to first live deployment',
@@ -134,7 +134,7 @@ export const deploymentPatterns: DeploymentPattern[] = [
     slug: 'document-intake',
     name: 'Document Intake & Processing',
     category: 'Healthcare administration',
-    image: '/images/J7KZFcCw0ZrENLKo0wuCy6nASg.webp',
+    image: '/images/document-intake.webp',
     tagline:
       'Documents received, read, validated and filed into the right system, with anything uncertain flagged for a person.',
     timeframe: '6–8 weeks to first live deployment',
@@ -164,11 +164,8 @@ export const deploymentPatterns: DeploymentPattern[] = [
   },
 ]
 
-/** Backwards-compatible alias, the record shape grew out of the case-study model. */
-export type CaseStudy = DeploymentPattern
-
-/** Convenience export used by the home page section. */
-export const caseStudies = deploymentPatterns
+/** Every deployment pattern, regardless of how it was sourced. */
+export type DeploymentPatternList = DeploymentPattern[]
 
 export interface BlogPost {
   slug: string
@@ -192,7 +189,7 @@ export const blogPosts: BlogPost[] = [
     title: 'From Demo to Production: Why AI Pilots Stall',
     category: 'AI Strategy',
     date: 'Sep 18, 2026',
-    image: '/images/WZnkJ0N8GjD8YGH73bVRdcc9tvI.webp',
+    image: '/images/ai-strategy.webp',
     author: 'Marcus Elliot',
     role: 'AI Strategy Lead',
     excerpt:
@@ -237,7 +234,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Getting Your Data AI-Ready, Without the Big Project',
     category: 'Guides',
     date: 'Jun 24, 2026',
-    image: '/images/vl5w99JCKqkuvW49lyswomsyhnY.webp',
+    image: '/images/knowledge-and-data.webp',
     author: 'The Naivolabs team',
     role: 'Engineering',
     excerpt:
@@ -278,7 +275,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Buy, Build, or Wait: A Simpler Way to Decide',
     category: 'AI Strategy',
     date: 'Jun 24, 2026',
-    image: '/images/WZnkJ0N8GjD8YGH73bVRdcc9tvI.webp',
+    image: '/images/ai-strategy.webp',
     author: 'Lena Hoffmann',
     role: 'Automation Architect',
     excerpt:
@@ -315,7 +312,7 @@ export const blogPosts: BlogPost[] = [
     title: 'Your Tools Already Talk. You Don\u2019t Have To.',
     category: 'Automation',
     date: 'Jun 24, 2026',
-    image: '/images/Eu8lb04bFCoyCpFuitulq7gxSfM.webp',
+    image: '/images/integrations.webp',
     author: 'The Naivolabs team',
     role: 'Engineering',
     excerpt:

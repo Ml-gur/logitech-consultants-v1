@@ -1,5 +1,3 @@
-'use client'
-
 import { Link } from 'react-router-dom'
 import LegalPage, { type LegalSection } from '../components/LegalPage'
 import { SITE } from '../lib/brand'

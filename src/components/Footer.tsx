@@ -1,15 +1,9 @@
-'use client'
-
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 import { SITE } from '../lib/brand'
 import { openCookieSettings } from '../lib/cookieConsent'
 import Wordmark from './Wordmark'
 
 const navLinks = [
-  { label: 'Home', to: '/' },
   { label: 'Capabilities', to: '/capabilities' },
   { label: 'Deployment patterns', to: '/deployment-patterns' },
   { label: 'Insights', to: '/blog' },
@@ -22,139 +16,59 @@ const legalLinks = [
   { label: 'Terms & conditions', to: '/terms' },
 ]
 
-const socialLinks = [
-  { label: 'LinkedIn', href: SITE.social.linkedin },
-  { label: 'X (Twitter)', href: SITE.social.x },
-  { label: 'GitHub', href: SITE.social.github },
-  { label: 'YouTube', href: SITE.social.youtube },
-]
-
+/**
+ * Footer.
+ *
+ * Two things were removed here:
+ *
+ *   · A newsletter form. It had no backend and answered every valid address
+ *     with "Subscribed", so it made a promise the system could not keep.
+ *     Returning it means wiring a real provider first.
+ *   · A column of four social links, all pointing at placeholder handles
+ *     (x.com/naivolabs, linkedin.com/company/naivolabs, github.com/naivolabs,
+ *     youtube.com/@naivolabs) that resolve to nothing. Four 404s in the footer
+ *     of a company whose pitch is engineering rigour is the wrong signal. The
+ *     column now carries the contact details, which are real, and the
+ *     Organization structured data no longer claims profiles we do not own.
+ */
 export default function Footer() {
-  const [email, setEmail] = useState('')
-  const [error, setError] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'done'>('idle')
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const value = email.trim()
-    if (!value) {
-      setError('Please enter your email address.')
-      setStatus('idle')
-      return
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      setError('That does not look like a valid email address.')
-      setStatus('idle')
-      return
-    }
-    setError('')
-    setStatus('loading')
-    // No newsletter backend is wired up yet. Confirm optimistically and record
-    // the intent so the operator can connect a provider without a UI change.
-    await new Promise((r) => setTimeout(r, 500))
-    setStatus('done')
-  }
-
   return (
-    <footer className="text-paper" style={{ background: 'var(--color-carbon)', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-10">
-        {/* Newsletter */}
-        <motion.div
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal()}
-          className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-14 sm:mb-16"
-        >
-          <div className="max-w-md">
-            <h3
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontWeight: 400,
-                fontSize: 'clamp(26px, 3.5vw, 40px)',
-                lineHeight: 1.1,
-                letterSpacing: '-0.02em',
-                marginBottom: '10px',
-              }}
-            >
-              Notes from{' '}
-              <em style={{ fontStyle: 'italic', fontWeight: 300 }}>the build</em>
-            </h3>
-            <p className="text-sm" style={{ color: 'var(--color-fog)' }}>
-              One short email when we publish something worth reading. No cadence, no filler.
-            </p>
-          </div>
-
-          <form
-            className="flex flex-col sm:flex-row gap-3 w-full max-w-md"
-            onSubmit={submit}
-            noValidate
-          >
-            <div className="flex-1 min-w-0">
-              <label htmlFor="footer-email" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="footer-email"
-                type="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value)
-                  if (error) setError('')
-                }}
-                aria-invalid={!!error}
-                aria-describedby={error ? 'footer-email-error' : undefined}
-                placeholder="you@organization.com"
-                className={`input-dark px-5 py-3 ${error ? 'border-error' : ''}`}
-              />
-              {error && (
-                <p id="footer-email-error" role="alert" className="text-xs text-error mt-1.5">
-                  {error}
-                </p>
-              )}
-            </div>
-            <button
-              type="submit"
-              disabled={status === 'loading'}
-              className="px-6 py-3 h-fit rounded-[30px] bg-[#405bff] text-white text-sm font-medium transition-colors duration-200 hover:bg-[#3351e6] disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {status === 'loading' ? 'Subscribing…' : status === 'done' ? 'Subscribed' : 'Subscribe'}
-            </button>
-            <p aria-live="polite" className="sr-only">
-              {status === 'done' ? 'Subscription confirmed.' : ''}
-            </p>
-          </form>
-        </motion.div>
-
-        <div className="pt-10 grid grid-cols-2 md:grid-cols-4 gap-8 mb-10" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-          {/* Brand */}
-          <div>
-            <Wordmark as="p" className="font-display text-2xl font-medium" />
-            <p className="text-sm text-fog mt-2 max-w-xs leading-relaxed">
-              An applied AI systems company. We build governed intelligent systems that work inside real
+    <footer className="border-t border-hairline bg-carbon text-ash">
+      <div className="mx-auto max-w-[1200px] px-5 pb-10 pt-14 sm:px-8 sm:pt-18">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
+          <div className="col-span-2 md:col-span-1">
+            <Wordmark as="p" className="text-[22px] leading-none text-paper" />
+            <p className="mt-3 max-w-[34ch] text-[13px] leading-relaxed text-fog">
+              An applied AI systems company. We build governed systems that complete real work inside real
               organizations.
             </p>
           </div>
 
-          <div>
-            <h4 className="text-xs font-medium text-fog uppercase tracking-[0.14em] mb-4">Navigation</h4>
-            <ul className="space-y-2">
+          <nav aria-label="Footer">
+            <h2 className="text-[13px] text-paper">Company</h2>
+            <ul className="mt-4 flex flex-col">
               {navLinks.map((l) => (
                 <li key={l.label}>
-                  <Link to={l.to} className="inline-block text-sm text-ash hover:text-paper transition-colors duration-200 py-3 -my-3 max-md:py-3.5 max-md:-my-3.5">
+                  <Link
+                    to={l.to}
+                    className="inline-flex min-h-11 items-center text-[14px] text-fog transition-colors duration-200 hover:text-paper"
+                  >
                     {l.label}
                   </Link>
                 </li>
               ))}
             </ul>
-          </div>
+          </nav>
 
           <div>
-            <h4 className="text-xs font-medium text-fog uppercase tracking-[0.14em] mb-4">Legal</h4>
-            <ul className="space-y-2">
+            <h2 className="text-[13px] text-paper">Legal</h2>
+            <ul className="mt-4 flex flex-col">
               {legalLinks.map((l) => (
                 <li key={l.label}>
-                  <Link to={l.to} className="inline-block text-sm text-ash hover:text-paper transition-colors duration-200 py-3 -my-3 max-md:py-3.5 max-md:-my-3.5">
+                  <Link
+                    to={l.to}
+                    className="inline-flex min-h-11 items-center text-[14px] text-fog transition-colors duration-200 hover:text-paper"
+                  >
                     {l.label}
                   </Link>
                 </li>
@@ -163,7 +77,7 @@ export default function Footer() {
                 <button
                   type="button"
                   onClick={openCookieSettings}
-                  className="inline-block text-sm text-ash hover:text-paper transition-colors duration-200 py-3 -my-3 max-md:py-3.5 max-md:-my-3.5 text-left"
+                  className="inline-flex min-h-11 items-center text-left text-[14px] text-fog transition-colors duration-200 hover:text-paper"
                 >
                   Cookie preferences
                 </button>
@@ -172,37 +86,32 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-xs font-medium text-fog uppercase tracking-[0.14em] mb-4">Elsewhere</h4>
-            <ul className="space-y-2">
-              {socialLinks.map((l) => (
-                <li key={l.label}>
-                  <a
-                    href={l.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block text-sm text-ash hover:text-paper transition-colors duration-200 py-3 -my-3 max-md:py-3.5 max-md:-my-3.5"
-                  >
-                    {l.label}
-                  </a>
-                </li>
-              ))}
+            <h2 className="text-[13px] text-paper">Contact</h2>
+            <ul className="mt-4 flex flex-col gap-2">
+              <li>
+                <a
+                  href={`mailto:${SITE.email}`}
+                  className="inline-flex min-h-11 items-center text-[14px] text-fog transition-colors duration-200 hover:text-paper"
+                >
+                  {SITE.email}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`tel:${SITE.phone}`}
+                  className="inline-flex min-h-11 items-center text-[14px] text-fog transition-colors duration-200 hover:text-paper"
+                >
+                  {SITE.phoneDisplay}
+                </a>
+              </li>
+              <li className="pt-1 text-[14px] leading-relaxed text-fog">{SITE.address.lines}</li>
             </ul>
           </div>
         </div>
 
-        <div className="pt-6 flex flex-wrap items-center justify-between gap-4" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-          <div className="flex flex-wrap items-center gap-4">
-            <p className="text-xs text-fog">&copy; {new Date().getFullYear()} Naivolabs. All rights reserved.</p>
-            <p className="text-xs text-fog">
-              Built from Africa for organizations everywhere.
-            </p>
-          </div>
-          <a
-            href={`mailto:${SITE.email}`}
-            className="text-xs text-fog hover:text-paper transition-colors py-3 -my-3"
-          >
-            {SITE.email}
-          </a>
+        <div className="mt-12 flex flex-col gap-3 border-t border-hairline pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[13px] text-fog">&copy; {new Date().getFullYear()} Naivolabs. All rights reserved.</p>
+          <p className="text-[13px] text-fog">Built from Nairobi for organizations everywhere.</p>
         </div>
       </div>
     </footer>

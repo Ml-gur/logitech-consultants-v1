@@ -1,197 +1,189 @@
-'use client'
-
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '../utils'
-import Wordmark from './Wordmark'
+import ThemeToggle from './ThemeToggle'
 
 const navLinks = [
   { label: 'Capabilities', to: '/capabilities' },
-  { label: 'Deployments', to: '/deployment-patterns' },
+  { label: 'Deployment patterns', to: '/deployment-patterns' },
   { label: 'Insights', to: '/blog' },
   { label: 'About', to: '/about' },
 ]
 
+const EASE = [0.22, 1, 0.36, 1] as const
+
+/**
+ * Site header.
+ *
+ * One floating bar in three parts: the brand mark as a real circular button on
+ * the left, the links in a pill of their own, absolutely centred so a wider
+ * mark or action cannot drag them off centre, and the page's action on the
+ * right. The pill is the system's one inverted surface — a `paper` fill with
+ * the paper-side tone pair for its labels (`src/index.css`), which is white on
+ * the near-black canvas and black in the light inversion, with no `dark:`
+ * branch anywhere in the markup.
+ *
+ * The links carry the reference direction's active mark: three small dots under
+ * the current page, so "where am I" is answered by a mark rather than by a
+ * second background. It is drawn from `[aria-current='page']`, which NavLink
+ * already sets, so the mark cannot fall out of step with the route.
+ *
+ * On phones the whole bar collapses to the mark, the theme control and a 48px
+ * burger; the menu is a paper sheet over a blurred scrim, with the same links,
+ * the same action, and the same dots.
+ */
 export default function Nav() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const { pathname } = useLocation()
 
-  useEffect(() => { setMobileOpen(false) }, [pathname])
+  useEffect(() => setMobileOpen(false), [pathname])
 
   useEffect(() => {
     if (!mobileOpen) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMobileOpen(false) }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileOpen(false)
+    }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+
+    // Hold the page still behind the sheet. Lenis drives the scroll in the
+    // normal case, but the sheet is fixed and the page behind it should not
+    // move under a thumb that misses a link.
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = previous
+    }
   }, [mobileOpen])
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
+    const onScroll = () => setScrolled(window.scrollY > 12)
+    onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   return (
-    <motion.header
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed top-0 inset-x-0 z-50"
-      style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}
+    <header
+      className={cn(
+        'fixed inset-x-0 top-0 z-50 transition-colors duration-300',
+        scrolled ? 'border-b border-hairline bg-ink/85 backdrop-blur-md' : 'border-b border-transparent',
+      )}
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
-      <div className="px-3 sm:px-5">
-        {/* Floating nav pill */}
-        <div
-          className="nav-pill mx-auto max-w-[1100px] rounded-full flex items-center justify-between transition-all duration-300"
-          style={{
-            height: '60px',
-            paddingLeft: '12px',
-            paddingRight: '12px',
-            background: scrolled ? 'rgba(18,18,26,0.92)' : 'rgba(18,18,26,0.75)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: scrolled
-              ? '1px solid rgba(255,255,255,0.12)'
-              : '1px solid rgba(255,255,255,0.07)',
-            boxShadow: scrolled ? '0 8px 32px rgba(0,0,0,0.5)' : '0 4px 20px rgba(0,0,0,0.3)',
-          }}
+      <div className="relative mx-auto flex h-[72px] max-w-[1200px] items-center justify-between gap-3 px-4 sm:px-6">
+        {/* The mark. A circular paper button with the brand glyph scaled inside
+            it, so the circle's size is the button's size and the glyph can be
+            re-scaled without touching it. The accessible name is the link's, so
+            the image itself is decorative. */}
+        <Link
+          to="/"
+          aria-label="Naivolabs home"
+          className="nav-mark shrink-0"
         >
-          {/* Wordmark */}
-          <Link
-            to="/"
-            className="flex items-center min-h-[44px] px-2"
-            aria-label="Naivolabs home"
-          >
-            <Wordmark className="font-display text-[18px] sm:text-[20px] font-medium leading-none" />
+          <img
+            src="/favicon.svg"
+            alt=""
+            width={52}
+            height={52}
+            className="h-[72%] w-[72%] object-contain"
+          />
+        </Link>
+
+        <nav
+          className="nav-pill absolute left-1/2 hidden -translate-x-1/2 items-center lg:flex"
+          aria-label="Primary"
+        >
+          {navLinks.map((link) => (
+            <NavLink key={link.to} to={link.to} className="nav-link">
+              {link.label}
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-1.5">
+          <ThemeToggle />
+          <Link to="/contact" className="nav-action hidden lg:inline-flex">
+            Book a discovery call
           </Link>
-
-          {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-0.5" aria-label="Primary">
-            {navLinks.map((link) => (
-              <NavLink
-                key={link.label}
-                to={link.to}
-                className={({ isActive }) =>
-                  cn(
-                    'relative text-[13px] font-medium py-3 px-4 rounded-full transition-colors duration-200',
-                    isActive
-                      ? 'text-white'
-                      : 'text-[var(--color-ash)] hover:text-white'
-                  )
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    {link.label}
-                    {isActive && (
-                      <motion.span
-                        layoutId="nav-indicator"
-                        className="absolute left-4 right-4 -bottom-0.5 h-px rounded-full"
-                        style={{ background: 'var(--color-signal)' }}
-                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                  </>
-                )}
-              </NavLink>
-            ))}
-
-            <Link
-              to="/contact"
-              className="ml-2 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-white text-[13px] font-medium transition-all duration-200"
-              style={{ background: 'var(--color-voltage)' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-voltage-hover)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'var(--color-voltage)')}
-            >
-              Book a call
-            </Link>
-          </nav>
-
-          {/* Mobile hamburger */}
           <button
-            className="md:hidden flex items-center justify-center rounded-full transition-colors duration-200"
-            style={{ width: '44px', height: '44px', color: 'var(--color-ash)' }}
-            onClick={() => setMobileOpen(!mobileOpen)}
+            type="button"
+            className={cn(
+              'flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-colors duration-200 lg:hidden',
+              mobileOpen ? 'bg-paper text-on-paper' : 'bg-carbon text-paper hover:bg-smoke',
+            )}
+            onClick={() => setMobileOpen((v) => !v)}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              {mobileOpen
-                ? <path d="M18 6L6 18M6 6l12 12" />
-                : <path d="M3 8h18M3 16h18" />
-              }
-            </svg>
+            <span className="relative block h-[18px] w-[18px]" aria-hidden>
+              <span
+                className={cn(
+                  'absolute left-0 h-[1.5px] w-full rounded-full bg-current transition-transform duration-300',
+                  mobileOpen ? 'top-1/2 -translate-y-1/2 rotate-45' : 'top-0',
+                )}
+              />
+              <span
+                className={cn(
+                  'absolute top-1/2 left-0 h-[1.5px] w-full -translate-y-1/2 rounded-full bg-current transition-opacity duration-200',
+                  mobileOpen ? 'opacity-0' : 'opacity-100',
+                )}
+              />
+              <span
+                className={cn(
+                  'absolute left-0 h-[1.5px] w-full rounded-full bg-current transition-transform duration-300',
+                  mobileOpen ? 'top-1/2 -translate-y-1/2 -rotate-45' : 'bottom-0',
+                )}
+              />
+            </span>
           </button>
         </div>
       </div>
 
-      {/* Mobile menu drawer */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div
-            id="mobile-menu"
-            initial={{ opacity: 0, scale: 0.96, y: -8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: -8 }}
-            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            className="md:hidden absolute inset-x-0 mt-2 px-3 sm:px-5"
-          >
-            <nav
-              className="mx-auto max-w-[1100px] rounded-[24px] flex flex-col overflow-hidden"
-              style={{
-                background: 'rgba(18,18,26,0.97)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
-              }}
+          <>
+            <motion.div
+              key="scrim"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.28, ease: 'easeOut' }}
+              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-[6px] lg:hidden"
+              onClick={() => setMobileOpen(false)}
+              aria-hidden
+            />
+            <motion.nav
+              key="sheet"
+              id="mobile-menu"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.38, ease: EASE }}
               aria-label="Mobile"
+              className="fixed inset-x-4 top-[84px] z-50 rounded-[28px] bg-paper px-[18px] pb-5 shadow-[0_20px_60px_rgba(0,0,0,0.45)] lg:hidden"
             >
-              {/* Nav links */}
-              <div className="px-4 py-3">
-                {navLinks.map((link, i) => (
-                  <NavLink
-                    key={link.label}
-                    to={link.to}
-                    className={({ isActive }) =>
-                      cn(
-                        'flex items-center justify-between py-4 text-[15px] font-medium transition-colors duration-200',
-                        i < navLinks.length - 1 ? 'border-b' : '',
-                        isActive ? 'text-white' : 'text-[var(--color-ash)] hover:text-white'
-                      )
-                    }
-                    style={{ borderColor: 'rgba(255,255,255,0.06)' }}
-                  >
-                    {link.label}
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-signal)', opacity: 0.7 }}>
-                      <path d="M6 3l5 5-5 5" />
-                    </svg>
-                  </NavLink>
+              <ul>
+                {navLinks.map((link) => (
+                  <li key={link.to} className="border-b border-on-paper/10 last:border-b-0">
+                    <NavLink to={link.to} className="nav-link flex min-h-[52px] w-full text-[17px]">
+                      {link.label}
+                    </NavLink>
+                  </li>
                 ))}
-              </div>
+              </ul>
 
-              {/* CTA row */}
-              <div className="px-4 pt-2 pb-4">
-                <Link
-                  to="/contact"
-                  className="flex items-center justify-center gap-2 w-full py-4 rounded-full text-white text-[14px] font-medium transition-all duration-200"
-                  style={{ background: 'var(--color-voltage)' }}
-                >
-                  Book a discovery call
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                    <path d="M6 3l5 5-5 5" />
-                  </svg>
-                </Link>
-              </div>
-            </nav>
-          </motion.div>
+              <Link to="/contact" className="btn-primary mt-4 w-full px-6 py-3.5 text-[15px]">
+                Book a discovery call
+              </Link>
+            </motion.nav>
+          </>
         )}
       </AnimatePresence>
-    </motion.header>
+    </header>
   )
 }

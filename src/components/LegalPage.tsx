@@ -1,5 +1,3 @@
-'use client'
-
 import { Link } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import Seo, { breadcrumbLd } from '../lib/Seo'
@@ -59,7 +57,7 @@ export default function LegalPage({
         <div className="grid lg:grid-cols-[220px_1fr] gap-12 lg:gap-16 pb-8">
           {/* Table of contents */}
           <nav aria-label="On this page" className="lg:sticky lg:top-28 h-fit order-2 lg:order-1">
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-fog mb-4">On this page</p>
+            <p className="text-[13px] font-medium text-fog mb-4">On this page</p>
             <ul className="space-y-1">
               {sections.map((s) => (
                 <li key={s.id}>
@@ -79,20 +77,20 @@ export default function LegalPage({
             {sections.map((s) => (
               <div key={s.id} id={s.id} className="scroll-mt-28">
                 <h2 className="text-[22px] sm:text-[26px] font-medium mb-4">{s.heading}</h2>
-                <div className="space-y-4 text-[16px] leading-relaxed text-fog [&_a]:text-signal [&_a]:underline [&_a]:underline-offset-2 [&_li]:leading-relaxed [&_strong]:text-paper [&_strong]:font-medium">
+                <div className="space-y-4 text-[16px] leading-relaxed text-fog [&_a]:text-lime [&_a]:underline [&_a]:underline-offset-2 [&_li]:leading-relaxed [&_strong]:text-paper [&_strong]:font-medium">
                   {s.body}
                 </div>
               </div>
             ))}
 
-            <div className="rounded-[24px] bg-[#191919] border border-white/10 p-6">
+            <div className="rounded-panel bg-carbon border border-hairline p-6">
               <p className="text-sm text-fog leading-relaxed">
                 Questions about this document? Write to{' '}
-                <a href={`mailto:${SITE.email}`} className="text-signal underline underline-offset-2">
+                <a href={`mailto:${SITE.email}`} className="text-lime underline underline-offset-2">
                   {SITE.email}
                 </a>{' '}
                 or see the{' '}
-                <Link to="/contact" className="text-signal underline underline-offset-2">
+                <Link to="/contact" className="text-lime underline underline-offset-2">
                   contact page
                 </Link>
                 .

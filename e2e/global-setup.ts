@@ -36,9 +36,9 @@ export default async function globalSetup() {
     for (const route of routes) {
       try {
         await page.goto(`${baseURL}${route}`, { waitUntil: 'domcontentloaded' })
-        // Allow scroll-reveal animations to run so IntersectionObserver work is
-        // cached too (framer-motion whileInView state is per-visit, but this
-        // exercises the full render path once).
+        // Let the route settle after its lazy chunk resolves: this exercises the
+        // full render path (and the hero's page-load sequence) once, so the first
+        // test of each worker does not pay that cost mid-assertion.
         await page.waitForTimeout(150)
       } catch (err) {
         console.warn(`global-setup: warm-up failed for ${route}: ${err}`)

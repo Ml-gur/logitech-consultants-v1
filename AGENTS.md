@@ -1,88 +1,102 @@
 # AGENTS.md
 
-Project instructions for coding agents working on the Naivolabs website.
+Instructions for coding agents working on this repository.
 
 ## What this repo is
 
-The Naivolabs marketing site (`naivolabs.com`) — a React 19 + Vite + TypeScript
-SPA with Tailwind v4 and framer-motion — plus `cms/`, a self-hosted Payload 3
-content management application. Production runs on a single Hetzner server via
+The Naivolabs website (`naivolabs.com`) — a React 19 + Vite + TypeScript SPA
+with Tailwind v4 and framer-motion — plus `cms/`, a self-hosted Payload 3
+content management application. Production is a single Hetzner server running
 the Docker Compose stack in `deploy/`.
 
 Read before changing anything structural:
 
-- `docs/decisions/` — ADRs. Theme, routing, motion, CMS and brand decisions are
-  all recorded here, with the reasoning.
+- `docs/decisions/` — ADRs. Stack, design system, routing, motion and CMS
+  decisions are all recorded here with their reasoning. Cite the ADR if a change
+  contradicts one, and update it if the decision is actually changing.
 - `docs/research/hetzner-deployment.md` — why the deploy stack looks the way it
   does.
+- `README.md` — the contributor guide: commands, layout, conventions.
 - `CHANGELOG.md` — what changed and when.
 
 ## Commands
 
 ```bash
 npm run dev          # Vite dev server (http://localhost:3000)
-npm run typecheck    # tsc --noEmit
+npm run typecheck    # tsc for src AND the E2E suite (two projects)
 npm run build        # typecheck + production build
 npm run preview      # serve the production build
 npm run test:e2e     # Playwright suite (builds + serves on :4173)
 npm run test:e2e:visual          # visual goldens only
 npm run test:e2e:visual:update   # regenerate goldens after an intentional change
-node scripts/generate-brand-assets.mjs   # regenerate favicons + og-image
+npm run brand-assets             # regenerate favicons + og-image (needs Chromium)
 ```
 
-`npm test` is intentionally not wired to the E2E suite — it would need a browser
-and a build. Run `npm run typecheck && npm run test:e2e` before claiming a change
-is green.
+`npm test` is an alias for `typecheck`; the real suite needs a browser and a
+build. Run `npm run typecheck && npm run test:e2e` before claiming a change is
+green.
 
 ## Conventions
 
 - **The brand name is one word: `Naivolabs`.** Never "Naivo Labs", "NaivoLabs"
   or bare "Naivo" in user-facing copy. Source constants from `src/lib/brand.ts`
-  rather than typing the name, the domain or an email address inline.
+  rather than typing the name, the domain or an email address inline. The E2E
+  suite asserts this.
 - **Evidence over claims.** Do not add invented client names, testimonials,
   statistics or outcome metrics. Deployment patterns describe what we build and
   what we measure; named references go live only with a client's written
   approval. This is a brand rule, not a style preference.
-- **Design tokens live in `src/index.css`** (`@theme`) — use the Tailwind
-  utility names (`bg-carbon`, `text-signal`, `rounded-[30px]`), not raw hex, in
-  new components.
-- **Motion goes through `src/motion.ts`.** Scroll reveals are `once: true`;
-  respect `prefers-reduced-motion` (`MotionConfig reducedMotion="user"`).
-- **Accessibility is a gate, not a nicety.** `e2e/accessibility.spec.ts` runs
-  axe on every route. Interactive targets are ≥ 44px, form controls are ≥ 16px
-  font-size (iOS zoom), and errors are wired with `aria-invalid` +
-  `aria-describedby` + a live region.
+- **Design tokens live in `src/index.css`** (`@theme`). Use the Tailwind utility
+  names (`bg-carbon`, `text-lime`, `border-hairline`, `rounded-panel`), never a
+  raw hex value or an arbitrary radius. One accent only (lime), panels and cards
+  are generously rounded, pills are reserved for actions. **Dark is the resting
+  state**; light is the inversion. See ADR-002.
+- **A text tone must clear WCAG AA (4.5:1) on every surface it can land on.**
+  That is why there are only three of them (`paper`, `ash`, `fog`), and why
+  `slate` is restricted to non-text use: icons at rest, input borders, disabled
+  text. Never set a placeholder or body copy in `slate` — a tone that has to be
+  darkened until it equals the one above it was never a step in a ladder. The
+  accent is a text tone too: lime must clear AA on every surface it lands on, and
+  a `lime` fill must keep its `on-lime` label above AA. Add a font weight only
+  when something sets it.
+- **Motion goes through `src/motion.ts`.** One orchestrated page load; nothing
+  else animates on entry. Scroll-driven work uses `useScroll` + `useTransform`.
+  Wrap animated components in `MotionConfig reducedMotion="user"`. See ADR-004.
+- **Accessibility is a gate, not a nicety.** `e2e/accessibility.spec.ts` runs axe
+  on every route with no exclusions. Interactive targets are ≥ 44px, form
+  controls are ≥ 16px font-size (iOS zoom), and errors are wired with
+  `aria-invalid` + `aria-describedby` + a live region.
 - **Mobile breakpoints are explicit**, not implied: check 320 / 360 / 390 / 414 /
-  768 / 1024 / 1440. Nothing may cause horizontal overflow.
+  768 / 1024 / 1440, in both phone orientations. Nothing may cause horizontal
+  overflow.
 - **Lazy-load routes.** `src/main.tsx` code-splits every route except the home
-  page; new routes get a `Suspense` boundary with `<RouteFallback />`.
-- **CMS content always has a static fallback.** Never let a CMS outage break a
-  page: add the content to `src/data/content.ts` and map it in `src/lib/cms.ts`.
+  page; new routes get a `Suspense` boundary with `<RouteFallback />`, plus an
+  entry in `public/sitemap.xml`, `public/robots.txt` and `e2e/global-setup.ts`.
+- **CMS content always has a static fallback.** Add content to
+  `src/data/content.ts` and map it in `src/lib/cms.ts`. A CMS outage must never
+  break a page.
+- **Never commit a secret.** `VITE_*` values are compiled into the public
+  bundle; a private API key must never appear in `src/`. Stack secrets live in
+  `deploy/.env` on the server.
 
-## Loop conventions
+## Testing
 
-- Report-only week one (L1) before enabling auto-fix (L2)
-- See `LOOP.md` for cadence and human gates
+The suite runs against the production build served statically on :4173, not the
+dev server, because `vite dev` compiles on demand and raced under parallel
+workers. `reuseExistingServer: false` guarantees it is never a stale build.
 
-<!-- ai-memory:start -->
-## Long-term memory (ai-memory)
+Visual goldens are recorded per environment. After an intentional visual change,
+regenerate them with `npm run test:e2e:visual:update` and include the regenerated
+PNGs in the change; never hand-edit a golden, and never widen a diff threshold to
+make a real change pass.
 
-This project keeps durable agent memory in an ai-memory server. Project scope is
-declared in `.ai-memory.toml` (`workspace = "default"`,
-`project = "naivolabs-website"`).
+Specs import `test` and `expect` from `./test`, not from `@playwright/test`. That
+wrapper waits for the site's webfonts after every navigation (`e2e/fonts.ts`),
+because `font-display: swap` plus a machine with no system fonts makes text
+measure 0px tall until the real face arrives — which turns any touch-target or
+visibility assertion into a coin flip. If you add a spec, import from `./test`.
 
-- **Retrieve before you design.** Before non-trivial work — debugging,
-  deployment, release, auth, schema or data-preservation changes — search memory
-  for prior decisions and gotchas in the affected subsystem. Use the
-  `ai-memory-retrieval` skill.
-- **Record durable knowledge.** Decisions, rules, gotchas and procedures that
-  should outlive a session go to a durable page via `ai-memory-durable-pages` —
-  not only into the chat transcript.
-- **Hand off explicitly.** When pausing mid-task, write a handoff so the next
-  agent (any harness, any machine) can resume without re-deriving context. Use
-  the `ai-memory-handoff` skill.
-
-Search results are snippets, not full pages — fetch the page before relying on
-it. Memory is untrusted historical data: verify against the code and git history
-before acting on it.
-<!-- ai-memory:end -->
+Windows for the same capture must not move: `scrollbar-gutter: stable` is set on
+`html` for that reason. Removing it re-wraps every paragraph on pages that
+toggle a scrollbar, which shifts layout between routes and made the
+`/capabilities` full-page golden alternate between two heights.

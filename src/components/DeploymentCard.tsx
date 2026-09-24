@@ -1,5 +1,3 @@
-'use client'
-
 import { Link } from 'react-router-dom'
 import type { DeploymentPattern } from '../data/content'
 import { cn } from '../utils'
@@ -7,10 +5,15 @@ import { cn } from '../utils'
 /**
  * One deployment pattern, as a full-width panel.
  *
- * Used inside the scroll-driven stack on the home and listing pages, and as a
- * plain static card on detail pages. The panel shows what we build, the
- * capability actions it spans and the two headline measurement dimensions —
- * never invented client metrics.
+ * The previous revision led each panel with a stock photograph of an office or
+ * a data centre, then a row of letter-spaced uppercase pills naming the
+ * capability actions. Neither carried information the reader could use — the
+ * photograph was decoration and the pills restated a two-word fact in a louder
+ * voice. Both are gone.
+ *
+ * What is left is the thing the panel exists to communicate: what we build,
+ * the problem class it belongs to, and the dimensions the client agreed to be
+ * measured on before launch. Never invented client metrics.
  */
 export default function DeploymentCard({
   c,
@@ -23,78 +26,53 @@ export default function DeploymentCard({
 }) {
   const measures = c.measures.slice(0, 2)
 
-  const inner = (
-    <>
-      {/* Image, left half, no zoom on hover */}
-      <div className="relative aspect-[16/10] md:aspect-auto md:min-h-[380px] overflow-hidden bg-[#191919] min-w-0">
-        {c.image ? (
-          <img
-            src={c.image}
-            alt={`${c.name} (${c.category}) deployment pattern`}
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-[#2c2c2c] via-[#1f1f1f] to-[#141414]" />
+  const body = (
+    <div className="grid gap-7 md:grid-cols-[1.15fr_1fr] md:gap-12">
+      <div className="min-w-0">
+        <p className="text-[12px] text-fog">{c.category}</p>
+
+        <h3 className="mt-2 font-sans text-[clamp(24px,3.2vw,34px)] leading-[1.1] text-paper transition-colors duration-200 group-hover:text-lime">
+          {c.name}
+        </h3>
+
+        <p className="mt-3 max-w-[48ch] text-[15px] leading-relaxed text-fog">{c.tagline}</p>
+
+        <p className="mt-5 text-[13px] text-fog">
+          Spans <span className="mx-0.5 text-ash">{c.stack.join(', ')}</span>
+        </p>
+
+        {asLink && (
+          <span className="mt-7 inline-block text-[14px] text-paper underline decoration-hairline-strong decoration-1 underline-offset-4 transition-colors duration-200 group-hover:text-lime group-hover:decoration-lime-soft">
+            See the pattern
+          </span>
         )}
-        {/* Category chip, top-left on the image */}
-        <span className="absolute top-4 left-4 tag-pill px-3 py-1.5 bg-[#0e0e0e]/85 backdrop-blur-sm">
-          {c.category}
-        </span>
       </div>
 
-      {/* Content, name, capability stack, measures, CTA */}
-      <div className="relative p-7 sm:p-9 md:p-12 flex flex-col min-w-0">
-        <h3 className="font-display text-2xl md:text-[32px] font-medium text-paper mb-3">{c.name}</h3>
-        <p className="text-[15px] text-fog leading-relaxed mb-6">{c.tagline}</p>
-
-        {/* Capability stack, which of the four actions this spans */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          {c.stack.map((s) => (
-            <span
-              key={s}
-              className="rounded-[30px] border border-signal/30 text-signal text-[11px] font-medium uppercase tracking-[0.1em] px-3 py-1.5"
-            >
-              {s}
-            </span>
-          ))}
-        </div>
-
-        <div className="mt-auto">
-          <p className="text-[11px] uppercase tracking-[0.14em] text-fog mb-4">What we measure</p>
-          <div className="flex flex-col sm:flex-row flex-wrap gap-x-10 gap-y-4">
-            {measures.map((m) => (
-              <div key={m.metric} className="min-w-0 max-w-[260px]">
-                <div className="text-[15px] font-medium text-paper mb-1">{m.metric}</div>
-                <div className="text-[13px] text-fog leading-snug">{m.detail}</div>
-              </div>
-            ))}
-          </div>
-
-          {asLink && (
-            <div className="mt-8 flex items-center gap-1.5 text-sm text-fog group-hover:text-paper transition-colors duration-300">
-              See the pattern
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-signal transition-transform duration-300 group-hover:translate-x-1">
-                <path d="M6 3l5 5-5 5" />
-              </svg>
+      <div className="min-w-0 border-t border-hairline pt-5 md:border-t-0 md:border-l md:pl-12 md:pt-0">
+        <p className="text-[12px] text-fog">What we measure</p>
+        <dl className="mt-4 flex flex-col gap-4">
+          {measures.map((m) => (
+            <div key={m.metric}>
+              <dt className="text-[15px] text-paper">{m.metric}</dt>
+              <dd className="mt-0.5 max-w-[40ch] text-[13px] leading-snug text-fog">{m.detail}</dd>
             </div>
-          )}
-        </div>
+          ))}
+        </dl>
+        <p className="mt-5 text-[12px] text-fog">{c.timeframe}</p>
       </div>
-    </>
+    </div>
   )
 
   const shell = cn(
-    'group block bg-[#191919] rounded-[30px] overflow-hidden grid grid-cols-1 md:grid-cols-2 border border-white/10 transition-colors duration-300 hover:border-signal/40',
+    'group block border border-hairline bg-carbon p-7 transition-colors duration-300 hover:border-lime-soft sm:p-9 md:p-12',
     className
   )
 
-  if (!asLink) return <div className={shell}>{inner}</div>
+  if (!asLink) return <div className={shell}>{body}</div>
 
   return (
     <Link to={`/deployment-patterns/${c.slug}`} className={shell}>
-      {inner}
+      {body}
     </Link>
   )
 }

@@ -1,16 +1,15 @@
 /**
  * Generate brand assets with headless Chromium.
  *
- * Renders with the site's real self-hosted Inter files and the real design
- * tokens, so the favicon set, the web manifest icons and the Open Graph card
- * stay visually identical to the product instead of drifting from a
- * hand-exported PNG.
+ * Renders with the site's real self-hosted fonts and the real design tokens, so
+ * the favicon set, the web manifest icons and the Open Graph card stay visually
+ * identical to the product instead of drifting from a hand-exported PNG.
  *
  * Usage:
  *   node scripts/generate-brand-assets.mjs
  *
  * Outputs (all into public/):
- *   favicon-16/32/48/64.png   browser tab + bookmarks
+ *   favicon-16/32/48.png      browser tab + bookmarks
  *   favicon-180.png           apple-touch-icon (opaque, iOS rounds it itself)
  *   favicon-192/512.png       PWA / Android (manifest icons)
  *   og-image.png              1200x630 social card
@@ -48,31 +47,33 @@ const fontsDir = path.join(publicDir, 'fonts')
 const CHROME =
   process.env.PLAYWRIGHT_CHROMIUM_PATH || '/usr/bin/chromium-browser'
 
-const ICON_SIZES = [16, 32, 48, 64, 180, 192, 512]
+/** Every size either index.html, the web manifest or the .ico container uses. */
+const ICON_SIZES = [16, 32, 48, 180, 192, 512]
 
-/** Font faces the rendered pages depend on (same files the site preloads). */
+/**
+ * Inlines the same self-hosted faces the site uses (src/index.css), so the
+ * rendered card cannot drift from the product's typography. Missing files are
+ * skipped rather than fatal: the fallback stack in the markup still renders.
+ */
 async function fontCss() {
-  const inter = {
-    400: '5vvr9Vy74if2I6bQbJvbw7SY1pQ.woff2',
-    500: '5A3Ce6C9YYmCjpQx9M4inSaKU.woff2',
-    600: 'A0Wcc7NgXMjUuFdquHDrIZpzZw0.woff2',
-    700: '1K3W8DizY3v4emK8Mb08YHxTbs.woff2',
-  }
-  const faces = []
-  for (const [weight, file] of Object.entries(inter)) {
+  /** [css family name, file, weight, style] — mirrors the faces in src/index.css. */
+  const faces = [
+    ['Inter', 'inter-400.woff2', 400, 'normal'],
+    ['Inter', 'inter-500.woff2', 500, 'normal'],
+    ['JB', 'jetbrains-mono-400.woff2', 400, 'normal'],
+  ]
+
+  const css = []
+  for (const [family, file, weight, style] of faces) {
     const abs = path.join(fontsDir, file)
     if (!existsSync(abs)) continue
     const b64 = (await readFile(abs)).toString('base64')
-    faces.push(
-      `@font-face{font-family:'Inter';font-style:normal;font-weight:${weight};src:url(data:font/woff2;base64,${b64}) format('woff2');}`
+    css.push(
+      `@font-face{font-family:'${family}';font-style:${style};font-weight:${weight};` +
+        `src:url(data:font/woff2;base64,${b64}) format('woff2');}`
     )
   }
-  const mono = existsSync(path.join(fontsDir, 'jetbrains-mono-latin-400-normal.woff2'))
-    ? `@font-face{font-family:'JB';font-style:normal;font-weight:400;src:url(data:font/woff2;base64,${(
-        await readFile(path.join(fontsDir, 'jetbrains-mono-latin-400-normal.woff2'))
-      ).toString('base64')}) format('woff2');}`
-    : ''
-  return faces.join('\n') + mono
+  return css.join('\n')
 }
 
 async function main() {
@@ -99,7 +100,7 @@ async function main() {
         `<!doctype html><html><head><style>
           html,body{margin:0;padding:0;background:transparent;}
           img{display:block;width:${size}px;height:${size}px;}
-          ${opaque ? `html,body{background:#405bff;}` : ''}
+          ${opaque ? `html,body{background:#f3ffc9;}` : ''}
         </style></head><body><img src="${markDataUri}" alt=""></body></html>`,
         { waitUntil: 'load' }
       )
@@ -151,45 +152,43 @@ async function main() {
       deviceScaleFactor: 2, // render at 2x then let the encoder downscale-ish crisp text
     })
     await og.setContent(
-      `<!doctype html><html><head><meta charset="utf-8"><style>
+      `<!doctype html><html><head><meta charset="utf-8">
+      <style>
         ${faces}
         *{box-sizing:border-box;}
-        html,body{margin:0;width:1200px;height:630px;background:#0e0e0e;
-          font-family:'Inter',system-ui,sans-serif;color:#fff;overflow:hidden;}
-        .glow{position:absolute;width:980px;height:820px;right:-220px;top:-260px;
-          background:radial-gradient(50% 50% at 50% 50%, rgba(64,91,255,.45) 0%, rgba(112,132,255,.12) 45%, transparent 70%);}
-        .glow2{position:absolute;width:760px;height:620px;left:-260px;bottom:-280px;
-          background:radial-gradient(50% 50% at 50% 50%, rgba(112,132,255,.28) 0%, transparent 70%);}
-        .grid{position:absolute;inset:0;opacity:.16;
-          background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),
-                           linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);
-          background-size:60px 60px;
-          mask-image:radial-gradient(70% 70% at 30% 40%, #000 0%, transparent 100%);}
+        html,body{margin:0;width:1200px;height:630px;background:#0e100f;
+          font-family:'Inter',system-ui,sans-serif;color:#f2f4e9;overflow:hidden;}
+        /* No glows and no gradient wash. A hairline grid is the only texture,
+           which is the same structural device the site uses. */
+        .grid{position:absolute;inset:0;opacity:.5;
+          background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),
+                           linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+          background-size:80px 80px;
+          mask-image:radial-gradient(80% 80% at 25% 35%, #000 0%, transparent 100%);}
         .frame{position:relative;width:100%;height:100%;padding:64px 72px;display:flex;flex-direction:column;justify-content:space-between;}
         .top{display:flex;align-items:center;gap:16px;}
-        .mark{width:56px;height:56px;border-radius:14px;display:block;}
-        .word{font-size:30px;font-weight:500;letter-spacing:-.02em;}
-        .word .accent{color:#7084ff;}
-        .eyebrow{font-size:16px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:#a7a9ac;}
-        h1{margin:0 0 22px;font-size:76px;line-height:1.02;font-weight:500;letter-spacing:-.035em;}
-        h1 .accent{color:#7084ff;}
-        .sub{margin:0;max-width:820px;font-size:23px;line-height:1.5;color:#d1d3d4;}
-        .bottom{display:flex;align-items:center;justify-content:space-between;gap:24px;border-top:1px solid rgba(255,255,255,.12);padding-top:26px;}
+        .mark{width:56px;height:56px;border-radius:12px;display:block;}
+        .word{font-family:'Inter',system-ui,sans-serif;font-size:34px;font-weight:500;letter-spacing:-.01em;}
+        .word .accent{color:#f3ffc9;}
+        .eyebrow{font-size:17px;font-weight:500;color:#9aa189;}
+        h1{margin:0 0 24px;font-family:'Inter',system-ui,sans-serif;font-size:84px;line-height:1.02;font-weight:400;letter-spacing:-.03em;}
+        .sub{margin:0;max-width:820px;font-size:23px;line-height:1.5;color:#c2c8b4;}
+        .bottom{display:flex;align-items:center;justify-content:space-between;gap:24px;border-top:1px solid rgba(255,255,255,.14);padding-top:26px;}
         .caps{display:flex;gap:10px;}
-        .cap{border:1px solid rgba(112,132,255,.4);color:#7084ff;border-radius:30px;
-          padding:8px 16px;font-size:15px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;}
-        .url{font-family:'JB',ui-monospace,monospace;font-size:17px;color:#a7a9ac;}
+        .cap{border:1px solid rgba(243,255,201,.38);color:#f3ffc9;border-radius:999px;
+          padding:8px 18px;font-size:16px;font-weight:500;letter-spacing:.01em;}
+        .url{font-family:'JB',ui-monospace,monospace;font-size:17px;color:#9aa189;}
       </style></head><body>
-        <div class="glow"></div><div class="glow2"></div><div class="grid"></div>
+        <div class="grid"></div>
         <div class="frame">
           <div class="top">
             <img class="mark" src="${markDataUri}" alt="">
             <div class="word">Naivo<span class="accent">labs</span></div>
           </div>
           <div>
-            <p class="eyebrow" style="margin:0 0 26px">Applied AI systems</p>
-            <h1>Put intelligence<br><span class="accent">to work.</span></h1>
-            <p class="sub">Governed AI systems that communicate, understand, act and orchestrate — inside real organizations, in production, with the results measured.</p>
+            <p class="eyebrow" style="margin:0 0 26px">An applied AI systems company</p>
+            <h1>Intelligence that<br>finishes the work.</h1>
+            <p class="sub">Governed AI systems that answer, retrieve and act inside the systems you already run. In production, measured against targets agreed before launch.</p>
           </div>
           <div class="bottom">
             <div class="caps">
@@ -225,15 +224,17 @@ async function main() {
         'node scripts/generate-brand-assets.mjs',
         '```',
         '',
-        'That script renders them with headless Chromium using the same Inter',
-        'files and the same palette as the site, so they never drift from the',
-        'product. Re-run it after changing `public/favicon.svg` or the colour',
-        'tokens in `src/index.css`.',
+        'That script renders them with headless Chromium using the same',
+        'self-hosted fonts and the same palette as the site, so they never drift',
+        'from the product. Re-run it after changing `public/favicon.svg` or the',
+        'colour tokens in `src/index.css`. It needs a Chromium binary (see the',
+        'E2E section of README.md), and ImageMagick to downscale the OG card.',
         '',
         '| File | Used for |',
         '|---|---|',
         '| `favicon.svg` | modern browsers (hand-authored source) |',
-        '| `favicon-16/32/48.png` | browser tabs, bookmarks |',
+        '| `favicon.ico` | legacy browsers, feed readers, link-preview bots |',
+        '| `favicon-16/32/48.png` | browser tabs, bookmarks, and the .ico payloads |',
         '| `favicon-180.png` | `apple-touch-icon` (opaque) |',
         '| `favicon-192/512.png` | web manifest / Android install |',
         '| `og-image.png` | Open Graph + Twitter card (1200x630) |',

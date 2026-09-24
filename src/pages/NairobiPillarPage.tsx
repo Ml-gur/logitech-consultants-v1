@@ -1,11 +1,8 @@
-'use client'
-
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import Seo, { breadcrumbLd } from '../lib/Seo'
 import { SITE, absUrl } from '../lib/brand'
 import FAQ from '../components/FAQ'
-import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
 /**
  * Regional page: Naivolabs in Nairobi.
@@ -73,24 +70,22 @@ export default function NairobiPillarPage() {
       />
       <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
         {/* Hero */}
-        <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
+        <motion.p className="section-label">
           Nairobi, Kenya
         </motion.p>
         <motion.h1
-          initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.08)}
           className="text-[clamp(38px,6vw,76px)] leading-[1.02] tracking-[-0.03em] max-w-[860px] mb-6"
         >
-          Built in Nairobi. Designed for the <span className="text-signal">real conditions.</span>
+          Built in Nairobi. Designed for the <span className="text-lime">real conditions.</span>
         </motion.h1>
         <motion.p
-          initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.14)}
           className="text-[18px] text-fog max-w-[640px] leading-relaxed mb-10"
         >
           Naivolabs is an applied AI systems company based in Nairobi. Understanding the local operating
           environment is not a marketing angle for us. It is the reason our systems hold up here, and
           elsewhere.
         </motion.p>
-        <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.2)} className="flex flex-wrap gap-4 items-center">
+        <motion.div className="flex flex-wrap gap-4 items-center">
           <Link to="/contact" className="btn-primary px-7 py-3.5 text-sm">
             Book a discovery call
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -104,11 +99,10 @@ export default function NairobiPillarPage() {
 
         {/* Operating realities */}
         <div className="pt-24">
-          <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
+          <motion.p className="section-label">
             The operating environment
           </motion.p>
           <motion.h2
-            initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
             className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] max-w-[760px] mb-16"
           >
             What building from Nairobi actually teaches you.
@@ -118,10 +112,9 @@ export default function NairobiPillarPage() {
             {realities.map((p, i) => (
               <motion.div
                 key={p.title}
-                initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.06)}
-                className="card-dark rounded-[30px] p-7"
+                className="card-dark p-7"
               >
-                <div className="w-8 h-[3px] rounded-full bg-gradient-to-r from-[#405bff] to-[#7084ff] mb-6" />
+                <div className="w-8 h-[3px] rounded-full bg-lime mb-6" />
                 <h3 className="text-lg font-medium mb-3">{p.title}</h3>
                 <p className="text-sm text-fog leading-relaxed">{p.body}</p>
               </motion.div>
@@ -131,11 +124,10 @@ export default function NairobiPillarPage() {
 
         {/* What we deploy here */}
         <div className="pt-24">
-          <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
+          <motion.p className="section-label">
             What we deploy
           </motion.p>
           <motion.h2
-            initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
             className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] max-w-[720px] mb-16"
           >
             Systems that complete work, not conversations.
@@ -145,15 +137,14 @@ export default function NairobiPillarPage() {
             {capabilities.map((c, i) => (
               <motion.div
                 key={c.title}
-                initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.06)}
               >
                 <Link
                   to={c.to}
-                  className="group flex flex-col h-full rounded-[30px] bg-[#191919] border border-white/10 p-7 transition-colors duration-300 hover:border-signal/40"
+                  className="group flex flex-col h-full rounded-panel bg-carbon border border-hairline p-7 transition-colors duration-300 hover:border-lime/40"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-medium text-paper">{c.title}</h3>
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate transition-all duration-300 group-hover:text-signal group-hover:translate-x-1" aria-hidden>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate transition-all duration-300 group-hover:text-lime group-hover:translate-x-1" aria-hidden>
                       <path d="M6 3l5 5-5 5" />
                     </svg>
                   </div>
@@ -166,11 +157,10 @@ export default function NairobiPillarPage() {
 
         {/* How to start */}
         <div className="pt-24">
-          <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
+          <motion.p className="section-label">
             Getting started
           </motion.p>
           <motion.h2
-            initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
             className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] max-w-[720px] mb-16"
           >
             From a real problem to a live system.
@@ -184,10 +174,9 @@ export default function NairobiPillarPage() {
             ].map((s, i) => (
               <motion.div
                 key={s.step}
-                initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.08)}
-                className="rounded-[30px] bg-[#191919] border border-white/10 p-7"
+                className="rounded-panel bg-carbon border border-hairline p-7"
               >
-                <p className="font-mono text-sm text-signal mb-6">{s.step}</p>
+                <p className="font-mono text-sm text-lime mb-6">{s.step}</p>
                 <h3 className="text-lg font-medium mb-3">{s.title}</h3>
                 <p className="text-sm text-fog leading-relaxed">{s.body}</p>
               </motion.div>
@@ -195,10 +184,9 @@ export default function NairobiPillarPage() {
           </div>
 
           <motion.div
-            initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.1)}
-            className="mt-16 rounded-[30px] border border-white/10 bg-[#191919] p-10 text-center"
+            className="mt-16 rounded-panel border border-hairline bg-carbon p-10 text-center"
           >
-            <h3 className="font-display text-[clamp(24px,3.5vw,36px)] font-medium mb-4">
+            <h3 className="font-sans text-[clamp(24px,3.5vw,36px)] font-medium mb-4">
               Bring us a problem, not a brief.
             </h3>
             <p className="text-fog max-w-[520px] mx-auto mb-8">

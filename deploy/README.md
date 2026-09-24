@@ -52,8 +52,14 @@ first `up`**, or certificate issuance fails and you will be waiting on retries.
 rsync -avz --delete \
   --exclude node_modules --exclude .git --exclude dist \
   --exclude cms/node_modules --exclude cms/.next --exclude cms/cms.db \
+  --exclude .agents --exclude .github --exclude docs --exclude e2e \
+  --exclude test-results --exclude playwright-report \
   ./ deploy@naivolabs.com:/srv/naivolabs/
 ```
+
+The last line's excludes are not required for the build, but the server only
+needs the application, `deploy/` and `cms/`. Copying test suites, docs and agent
+tooling to production is noise that has to be kept in sync for no reason.
 
 ## 4. Configure secrets
 
@@ -121,6 +127,8 @@ duplicating.
 # on your machine
 rsync -avz --delete --exclude node_modules --exclude .git --exclude dist \
   --exclude cms/node_modules --exclude cms/.next --exclude cms/cms.db \
+  --exclude .agents --exclude .github --exclude docs --exclude e2e \
+  --exclude test-results --exclude playwright-report \
   ./ deploy@naivolabs.com:/srv/naivolabs/
 
 # on the server

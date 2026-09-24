@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
@@ -9,7 +7,6 @@ import { useCms } from '../lib/CmsProvider'
 import { cmsEnabled, submitInquiry } from '../lib/cms'
 import { SITE } from '../lib/brand'
 import { Spinner } from '../components/Loading'
-import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
 type Field = 'name' | 'email' | 'organization' | 'interest' | 'message'
 
@@ -24,10 +21,10 @@ export default function ContactPage() {
     { label: 'Address', value: contactInfo.address, href: null },
   ]
 
-  // The hero's email capture hands off to this page with `?email=…` (and the
-  // deployment-pattern CTAs can pass `?interest=…`). Prefill rather than drop
-  // it, being asked for an address you just typed is the fastest way to lose
-  // an enquiry.
+  // Inbound links can arrive with `?email=…` and/or `?interest=…` — a pattern
+  // page's CTA sets the interest, and a campaign link can carry an address.
+  // Prefill rather than discard them: being asked for something you have just
+  // supplied is the fastest way to lose an enquiry.
   const [searchParams] = useSearchParams()
   const handedOffEmail = (searchParams.get('email') ?? '').trim()
   const handedOffInterest = (searchParams.get('interest') ?? '').trim()
@@ -124,10 +121,10 @@ export default function ContactPage() {
   }
 
   const fieldClasses = (hasError: boolean) =>
-    `w-full px-5 py-3.5 rounded-[10px] bg-[#191919] border text-base text-paper placeholder:text-slate focus:outline-none focus:ring-2 transition-colors ${
+    `w-full px-5 py-3.5 rounded-field bg-carbon border text-base text-paper placeholder:text-fog focus:outline-none focus:ring-2 transition-colors ${
       hasError
         ? 'border-error focus:ring-error/30'
-        : 'border-steel focus:border-signal focus:ring-signal/20'
+        : 'border-slate focus:border-lime focus:ring-lime/20'
     }`
 
   const errorCount = Object.values(errors).filter(Boolean).length
@@ -164,19 +161,17 @@ export default function ContactPage() {
         ]}
       />
       <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
-        <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
+        <motion.p className="section-label">
           Contact
         </motion.p>
 
         <motion.h1
-          initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.08)}
           className="text-[clamp(40px,6vw,80px)] leading-[1.02] tracking-[-0.03em] max-w-[700px] mb-6"
         >
-          Tell us what is <span className="text-signal">not working.</span>
+          Tell us what is <span className="text-lime">not working.</span>
         </motion.h1>
 
         <motion.p
-          initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.14)}
           className="text-[18px] text-fog max-w-[560px] leading-relaxed mb-16"
         >
           The best first call is about a specific problem: a queue that never clears, information nobody can
@@ -186,18 +181,18 @@ export default function ContactPage() {
 
         <div className="grid lg:grid-cols-[1fr_420px] gap-16">
           {/* Form */}
-          <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.1)}>
+          <motion.div>
             {sent ? (
               <div
                 role="status"
-                className="rounded-[30px] border border-signal/30 bg-[#191919] p-10 text-center shadow-[0_0_40px_rgba(112,132,255,0.12)]"
+                className="rounded-panel border border-lime-soft bg-carbon p-10 text-center"
               >
-                <div className="w-12 h-12 rounded-full bg-signal/15 text-signal flex items-center justify-center mx-auto mb-5">
+                <div className="w-12 h-12 rounded-full bg-lime/15 text-lime flex items-center justify-center mx-auto mb-5">
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
                     <path d="M20 6L9 17l-5-5" />
                   </svg>
                 </div>
-                <h2 className="font-display text-2xl font-medium text-paper mb-2">Message sent</h2>
+                <h2 className="font-sans text-2xl font-medium text-paper mb-2">Message sent</h2>
                 <p className="text-sm text-fog">
                   Thanks {values.name.trim() || 'there'}. We&rsquo;ll get back to you within one business day,
                   usually sooner.
@@ -228,7 +223,7 @@ export default function ContactPage() {
                 {handoffNotice && (
                   <p
                     role="status"
-                    className="rounded-[16px] border border-signal/30 bg-signal/5 px-4 py-3 text-sm text-fog"
+                    className="rounded-panel border border-lime-soft bg-lime/5 px-4 py-3 text-sm text-fog"
                   >
                     We carried your email across from the last page, add your name and what you are trying to
                     solve, and that is the whole form.
@@ -238,7 +233,7 @@ export default function ContactPage() {
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-ash mb-2">
-                      Full name <span className="text-signal" aria-hidden="true">*</span>
+                      Full name <span className="text-lime" aria-hidden="true">*</span>
                     </label>
                     <input
                       id="name"
@@ -259,7 +254,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-ash mb-2">
-                      Work email <span className="text-signal" aria-hidden="true">*</span>
+                      Work email <span className="text-lime" aria-hidden="true">*</span>
                     </label>
                     <input
                       id="email"
@@ -297,7 +292,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <label htmlFor="interest" className="block text-sm font-medium text-ash mb-2">
-                      Where you are <span className="text-signal" aria-hidden="true">*</span>
+                      Where you are <span className="text-lime" aria-hidden="true">*</span>
                     </label>
                     <select
                       id="interest"
@@ -307,11 +302,11 @@ export default function ContactPage() {
                       aria-describedby={errors.interest ? 'interest-error' : undefined}
                       className={`${fieldClasses(!!errors.interest)} appearance-none ${values.interest ? '' : 'text-fog'}`}
                     >
-                      <option value="" disabled className="bg-[#191919] text-paper">
+                      <option value="" disabled className="bg-carbon text-paper">
                         Select an option
                       </option>
                       {ENGAGEMENTS.map((p) => (
-                        <option key={p} value={p} className="bg-[#191919] text-paper">
+                        <option key={p} value={p} className="bg-carbon text-paper">
                           {p}
                         </option>
                       ))}
@@ -326,7 +321,7 @@ export default function ContactPage() {
 
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium text-ash mb-2">
-                    What are you trying to solve? <span className="text-signal" aria-hidden="true">*</span>
+                    What are you trying to solve? <span className="text-lime" aria-hidden="true">*</span>
                   </label>
                   <textarea
                     id="message"
@@ -350,7 +345,7 @@ export default function ContactPage() {
                 </div>
 
                 {status === 'error' && (
-                  <div role="alert" className="rounded-[16px] border border-error/50 bg-error/5 p-4">
+                  <div role="alert" className="rounded-panel border border-error/50 bg-error/5 p-4">
                     <p className="text-sm text-error">
                       We couldn&rsquo;t send your message just now. Please try again, or email{' '}
                       <a href={`mailto:${contactInfo.email}`} className="underline">
@@ -393,12 +388,12 @@ export default function ContactPage() {
           </motion.div>
 
           {/* Contact info */}
-          <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.14)} className="space-y-4 h-fit">
+          <motion.div className="space-y-4 h-fit">
             {contactInfoCards.map((info) => (
-              <div key={info.label} className="rounded-[24px] bg-[#191919] border border-white/10 p-6">
-                <div className="text-xs uppercase tracking-[0.14em] text-fog mb-2">{info.label}</div>
+              <div key={info.label} className="rounded-panel bg-carbon border border-hairline p-6">
+                <div className="text-[13px] text-fog mb-2">{info.label}</div>
                 {info.href ? (
-                  <a href={info.href} className="text-base font-medium text-paper hover:text-signal transition-colors break-all block py-3 -my-3">
+                  <a href={info.href} className="text-base font-medium text-paper hover:text-lime transition-colors break-all block py-3 -my-3">
                     {info.value}
                   </a>
                 ) : (
@@ -407,8 +402,8 @@ export default function ContactPage() {
               </div>
             ))}
 
-            <div className="rounded-[24px] bg-[#191919] border border-white/10 p-6">
-              <div className="text-xs uppercase tracking-[0.14em] text-fog mb-2">Response time</div>
+            <div className="rounded-panel bg-carbon border border-hairline p-6">
+              <div className="text-[13px] text-fog mb-2">Response time</div>
               <p className="text-sm text-ash leading-relaxed">
                 We reply within one business day, East Africa Time (UTC+3). If it is urgent, call the number
                 above.

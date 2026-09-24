@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect } from 'react'
 import { SITE, absUrl } from './brand'
 
@@ -166,7 +164,7 @@ export function organizationLd() {
       'Workflow automation',
       'AI governance and evaluation',
     ],
-    sameAs: [SITE.social.x, SITE.social.linkedin, SITE.social.youtube, SITE.social.github].filter(Boolean),
+    // `sameAs` is omitted until a real profile exists — see SOCIAL in ./brand.
   }
 }
 

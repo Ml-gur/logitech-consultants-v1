@@ -1,7 +1,4 @@
-'use client'
-
 import { motion } from 'framer-motion'
-import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 import { COMPETITIVE_LANDSCAPE } from '../lib/brand'
 
 /**
@@ -15,30 +12,18 @@ export default function WhyUs() {
     <section id="why-us" className="relative">
       <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-20 sm:py-28">
         <motion.p
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal()}
           className="section-label text-center"
         >
           Where we sit
         </motion.p>
 
         <motion.h2
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal(0.06)}
           className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] text-center max-w-[700px] mx-auto mb-4"
         >
           Between the platform and the work.
         </motion.h2>
 
         <motion.p
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal(0.1)}
           className="text-[17px] text-fog text-center max-w-[520px] mx-auto mb-16"
         >
           Platforms supply capability. Agencies supply bespoke projects. Neither is a governed system running
@@ -51,14 +36,10 @@ export default function WhyUs() {
             return (
               <motion.div
                 key={col.title}
-                initial={revealInitial}
-                whileInView={revealWhileInView}
-                viewport={revealViewport}
-                transition={springReveal(i * 0.08)}
-                className={`rounded-[30px] p-7 flex flex-col ${
+                className={`rounded-panel p-7 flex flex-col ${
                   accent
-                    ? 'bg-[#191919] border border-signal/40 shadow-[0_0_32px_rgba(112,132,255,0.19)]'
-                    : 'bg-[#121212] border border-white/10'
+                    ? 'bg-carbon border border-lime-soft'
+                    : 'border border-hairline'
                 }`}
               >
                 <h3 className={`text-xl font-medium mb-8 ${accent ? 'text-paper' : 'text-ash'}`}>{col.title}</h3>
@@ -67,7 +48,7 @@ export default function WhyUs() {
                   {col.items.map((item) => (
                     <li key={item} className="flex items-start gap-3">
                       <svg
-                        className={`w-4 h-4 mt-1 shrink-0 ${accent ? 'text-signal' : 'text-slate'}`}
+                        className={`w-4 h-4 mt-1 shrink-0 ${accent ? 'text-lime' : 'text-slate'}`}
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"

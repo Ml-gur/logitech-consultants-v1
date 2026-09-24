@@ -1,5 +1,3 @@
-'use client'
-
 import { cn } from '../utils'
 
 /**
@@ -37,7 +35,7 @@ export function LoadingAnnouncer({ label = 'Loading content' }: { label?: string
 /** Skeleton for a blog card (image band + title + meta lines). */
 export function CardSkeleton() {
   return (
-    <div className="rounded-[30px] bg-[#191919] border border-white/10 overflow-hidden">
+    <div className="rounded-panel bg-carbon border border-hairline overflow-hidden">
       <Skeleton className="w-full aspect-[16/10] rounded-none" />
       <div className="p-6 space-y-3">
         <Skeleton className="h-3 w-20" />
@@ -52,8 +50,7 @@ export function CardSkeleton() {
 /** Skeleton for a deployment-pattern card. */
 export function PatternSkeleton() {
   return (
-    <div className="rounded-[30px] bg-[#191919] border border-white/10 overflow-hidden grid grid-cols-1 md:grid-cols-2">
-      <Skeleton className="w-full min-h-[240px] md:min-h-[380px] rounded-none" />
+    <div className="rounded-panel bg-carbon border border-hairline overflow-hidden">
       <div className="p-8 md:p-12 space-y-4">
         <Skeleton className="h-3 w-24" />
         <Skeleton className="h-7 w-3/4" />
@@ -99,7 +96,7 @@ export default function RouteFallback() {
             <Skeleton className="h-3 w-11/12" />
             <Skeleton className="h-3 w-4/5" />
           </div>
-          <Skeleton className="h-64 w-full rounded-[20px]" />
+          <Skeleton className="h-64 w-full rounded-panel" />
         </div>
       </div>
     </div>

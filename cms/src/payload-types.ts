@@ -206,39 +206,106 @@ export interface BlogPost {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Patterns we deploy. Describe the problem, the approach, what it connects to, what we measure and the governance controls — never invented client results.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "case-studies".
  */
 export interface CaseStudy {
   id: number;
+  /**
+   * Pattern name, e.g. "AI Voice Receptionist".
+   */
   name: string;
   /**
    * URL slug. Generated from the name on create; keep as-is to preserve existing links.
    */
   slug: string;
   /**
-   * e.g. E-commerce, Fintech, SaaS
+   * Primary segment, e.g. Membership organizations, Higher education.
    */
   category: string;
   image?: (number | null) | Media;
   tagline: string;
-  year: string;
+  /**
+   * Typical time to first live deployment, e.g. "4–6 weeks to first live deployment".
+   */
   timeframe: string;
-  challenge: string;
-  build: string;
-  outcome: {
-    value: string;
-    label: string;
-    id?: string | null;
-  }[];
-  review: {
-    quote: string;
-    name: string;
-    role: string;
+  /**
+   * Which capability actions this pattern spans: Converse, Understand, Act, Orchestrate.
+   */
+  stack?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * The problem, stated at the operational level.
+   */
+  problem: string;
+  /**
+   * How the system is built and where it sits in the organization.
+   */
+  approach: string;
+  integrations?:
+    | {
+        item: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Agreed with the client before launch. No invented numbers.
+   */
+  measures?:
+    | {
+        metric: string;
+        detail: string;
+        id?: string | null;
+      }[]
+    | null;
+  governance?:
+    | {
+        control: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Deprecated — use "Measurement dimensions" instead. Retained for existing rows.
+   */
+  outcome?:
+    | {
+        value?: string | null;
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Deprecated — the website no longer renders testimonials. Do not add invented quotes; named references go live only with the client’s written approval.
+   */
+  review?: {
+    quote?: string | null;
+    name?: string | null;
+    role?: string | null;
   };
-  metric: {
-    value: string;
-    label: string;
+  /**
+   * Deprecated year label from the case-study schema; the pattern timeframe replaces it.
+   */
+  year?: string | null;
+  /**
+   * Deprecated — superseded by "Problem". Retained for existing rows.
+   */
+  challenge?: string | null;
+  /**
+   * Deprecated — superseded by "Approach". Retained for existing rows.
+   */
+  build?: string | null;
+  /**
+   * Deprecated headline metric from the case-study schema.
+   */
+  metric?: {
+    value?: string | null;
+    label?: string | null;
   };
   /**
    * Display order on the site (ascending; 0 = first).
@@ -421,10 +488,34 @@ export interface CaseStudiesSelect<T extends boolean = true> {
   category?: T;
   image?: T;
   tagline?: T;
-  year?: T;
   timeframe?: T;
-  challenge?: T;
-  build?: T;
+  stack?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  problem?: T;
+  approach?: T;
+  integrations?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  measures?:
+    | T
+    | {
+        metric?: T;
+        detail?: T;
+        id?: T;
+      };
+  governance?:
+    | T
+    | {
+        control?: T;
+        id?: T;
+      };
   outcome?:
     | T
     | {
@@ -439,6 +530,9 @@ export interface CaseStudiesSelect<T extends boolean = true> {
         name?: T;
         role?: T;
       };
+  year?: T;
+  challenge?: T;
+  build?: T;
   metric?:
     | T
     | {

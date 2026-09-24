@@ -1,23 +1,27 @@
 /**
- * Seed script — imports the site's existing content into the CMS.
+ * Seed script — imports the site's bundled content into the CMS.
  *
- * Run from cms/:
- *   DATABASE_URL=file:./cms.db npm run seed
+ * Run from cms/ (see README.md).
  *
- * Idempotent: existing docs (matched by slug / email / global) are updated,
- * never duplicated. Creates an admin user if one does not exist.
+ * Idempotent: existing documents (matched by slug, email or global) are updated
+ * rather than duplicated, so it is safe to rerun to refresh content.
+ *
+ * The first admin user is created from SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD.
+ * Both are required when there is no admin yet — there is deliberately no
+ * fallback password, because a default committed to a repository is a published
+ * credential. Change the password in the admin panel after the first sign-in.
  */
 import { getPayload } from 'payload'
 import config from './payload.config'
 import {
   blogPosts as sitePosts,
-  caseStudies as siteCaseStudies,
+  deploymentPatterns as sitePatterns,
   contactInfo,
   faqs,
 } from '../../src/data/content'
 
 const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'admin@naivolabs.com'
-const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'NaivolabsAdmin!2026'
+const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD
 
 // Payload generates these from the collection config (see src/payload-types.ts).
 type PostCategory = 'Guides' | 'AI Strategy' | 'Automation'
@@ -34,6 +38,12 @@ async function main() {
 
   const adminId = existingUsers.docs[0]?.id ?? null
   if (!adminId) {
+    if (!ADMIN_PASSWORD || ADMIN_PASSWORD.length < 12) {
+      throw new Error(
+        'SEED_ADMIN_PASSWORD is missing or shorter than 12 characters.\n' +
+          'Set it to a strong value for the first run, then change it in the admin panel.',
+      )
+    }
     await payload.create({
       collection: 'users',
       data: { email: ADMIN_EMAIL, password: ADMIN_PASSWORD },
@@ -97,19 +107,20 @@ async function main() {
   }
 
   // 2b. Deployment patterns --------------------------------------------------
-  const { docs: allCaseStudies } = await payload.find({
+  // The collection slug is `case-studies` (see src/collections/CaseStudies.ts).
+  const { docs: allPatterns } = await payload.find({
     collection: 'case-studies',
     limit: 100,
     overrideAccess: true,
   })
 
-  const patternsToSeed = siteCaseStudies.map((cs, i) => ({
-    ...cs,
+  const patternsToSeed = sitePatterns.map((pattern, i) => ({
+    ...pattern,
     order: i + 1,
   }))
 
   for (const cs of patternsToSeed) {
-    const existing = allCaseStudies.find((d) => d.slug === cs.slug)
+    const existing = allPatterns.find((d) => d.slug === cs.slug)
 
     // New model fields. `review` is deliberately not seeded: the site does not
     // render testimonials and we do not want invented quotes in the CMS.
@@ -137,6 +148,12 @@ async function main() {
       })
       console.log(`  ~ Updated deployment pattern: ${cs.slug}`)
     } else {
+      // `_status: 'published'` is what publishes on create for a collection with
+      // `versions.drafts` enabled. Omitting it — or passing `draft: false`, which
+      // reads as the published branch of Payload's create options — leaves the
+      // `_status` field at its 'draft' default, so the pattern never reaches the
+      // site (whose public read filters on `_status = published`). Verified
+      // against a real database, not inferred from the types.
       await payload.create({
         collection: 'case-studies',
         data: { ...data, _status: 'published' },

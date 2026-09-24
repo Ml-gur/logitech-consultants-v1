@@ -1,5 +1,3 @@
-'use client'
-
 /**
  * Cookie consent store.
  *

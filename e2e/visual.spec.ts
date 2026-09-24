@@ -1,145 +1,114 @@
-import { test, expect, Locator, Page } from '@playwright/test'
+import { test, expect } from './test'
+import type { Locator, Page } from '@playwright/test'
 import { seedConsent } from './consent'
 
 /**
- * Visual regression goldens (per playwright-best-practices/visual-regression.md).
- * Covers the key home-page sections (hero, capabilities, governance,
- * measurement, deployment stack, principles, positioning, deployment model,
- * pricing, FAQ, footer) and every route (full page). Runs in the
- * desktop-chromium project.
+ * Visual regression goldens.
+ *
+ * Covers the home-page sections (hero, capabilities, deployment patterns,
+ * commitments, footer), the FAQ on /capabilities, every route as a full-page
+ * capture, and a set of 390px mobile-width captures for the sections that have
+ * historically regressed on phones.
  *
  * Determinism strategy:
- * - CSS animations/transitions (the marquees) are frozen by the global
- *   `animations: 'disabled'` screenshot option (playwright.config.ts).
- * - JS-driven framer-motion reveals are one-shot: we scroll the section (or the
- *   whole page) into view and wait for the springs to settle before capturing.
+ * - CSS animations and transitions are frozen by the global `animations:
+ *   'disabled'` screenshot option (playwright.config.ts).
+ * - Fonts are waited on before any capture (./fonts) so text metrics are final:
+ *   a capture taken mid-swap records the fallback face's line breaks.
  * - Cookie consent is pre-seeded so the fixed banner never overlays a capture.
  *
+ * There is no longer any scroll-reveal to wait for. Sections used to fade in
+ * from `opacity: 0`, which this file had to force-fire before every capture; the
+ * site now renders its content from first paint (src/motion.ts), so the only
+ * motion left to settle is the hero's page-load sequence.
+ *
  * Regenerate after an intentional visual change:
- *   npx playwright test e2e/visual.spec.ts --update-snapshots
+ *   npm run test:e2e:visual:update
  */
 
 test.describe.configure({ mode: 'serial' })
 
 /**
- * Never load the third-party voice widget (index.html) in a visual capture.
- *
- * It is a fixed overlay in the viewport's bottom-right corner, so it lands
- * inside almost every section and route capture. It loads from a vendor origin,
- * so whether it renders (and in what state) is not this repository's to
- * control: left in, the goldens assert the vendor's embed and flip pass/fail
- * depending on whether that origin answered (observed: two captures identical
- * except inside the widget's box, e.g. x 1257-1432 y 893-964). Blocking the
- * script is deterministic in every environment; the a11y suite excludes the
- * same embed for the same reason.
- *
- * (Hiding it by CSS instead is not enough: the widget injects its own
- * stylesheet and a button in a fixed container, and an `addInitScript` that
- * touches the DOM runs before `document.documentElement` exists.)
- */
-test.beforeEach(async ({ page }) => {
-  await page.route('**/*dograh*', (route) => route.abort())
-})
-
-/** Wait for font-display: swap repaints so text metrics/line heights are final. */
-async function waitFonts(page: Page) {
-  await page.evaluate(() => document.fonts.ready)
-}
-
-/**
- * Scroll a section into view and wait for one-shot reveals to settle. Hardened
- * against reveal-timing flakiness the same way settleReveals is: after
- * scrolling, force-fire any reveal still at its hidden state, so a heavy
- * section elsewhere on the page can't leave a below-fold section half-revealed
- * at capture time.
+ * Scroll a section into view and let the hero's load sequence and any
+ * scroll-linked transform finish before it is captured.
  */
 async function settleSection(page: Page, section: Locator) {
-  await waitFonts(page)
-  await section.scrollIntoViewIfNeeded()
-  // Force-fire reveals still at their hidden state (opacity 0 inline style).
-  await page.evaluate(async () => {
-    for (let pass = 0; pass < 4; pass++) {
-      const hidden = Array.from(
-        document.querySelectorAll<HTMLElement>('[style*="opacity"]'),
-      ).filter((el) => getComputedStyle(el).opacity === '0')
-      if (hidden.length === 0) break
-      for (const el of hidden) {
-        el.scrollIntoView({ block: 'center' })
-        await new Promise((r) => setTimeout(r, 150))
-      }
-    }
-  })
-  // Back to the section under capture, then let the last springs finish.
   await section.scrollIntoViewIfNeeded()
   await page.waitForTimeout(2000)
 }
 
 /**
- * Scroll the whole page (fires every whileInView reveal) then wait to settle.
+ * Freeze the hero's background loop on its first frame.
  *
- * Determinism note (2026-08-05): framer-motion reveals are IntersectionObserver
- * driven. A fast sweep races IO callback delivery, so the same golden flipped
- * pass/fail run-to-run. We sweep in fine steps (every element spends many
- * frames in view), then force-fire any element still at its initial hidden
- * state by scrolling it into view (reveals are once:true, so already-animated
- * elements are unaffected).
- *
- * Returns the number of elements still at opacity 0 AFTER the pass (elements
- * actually rendered — display:none subtrees like the closed mobile menu on
- * desktop are excluded). Route tests assert this is 0, so a reveal that ever
- * silently fails to fire fails the test loudly instead of re-capturing a
- * content-invisible golden.
+ * `animations: 'disabled'` stops CSS animations and transitions. It does not
+ * stop a video, so a hero captured while the clip runs pins whichever frame
+ * happened to be on screen — a different one on every run, on every machine.
+ * The clip is decoration; the plate and the type over it are the design, so the
+ * capture waits for the element to exist and then holds it at t=0.
  */
-async function settleReveals(page: Page): Promise<number> {
-  await waitFonts(page)
+async function freezeLoop(page: Page) {
+  await page
+    .waitForFunction(() => !!document.querySelector('video.hero-video'), null, { timeout: 4000 })
+    .catch(() => null)
+
   await page.evaluate(async () => {
-    const step = 150
-    const dwell = 50
-    const maxY = document.body.scrollHeight
-    for (let y = 0; y <= maxY; y += step) {
-      window.scrollTo(0, y)
-      await new Promise((r) => setTimeout(r, dwell))
-    }
-    // Force-fire any reveal still at its hidden state (opacity 0 inline style).
-    // Multi-pass: IO callbacks can deliver late under CPU contention.
-    for (let pass = 0; pass < 4; pass++) {
-      const hidden = Array.from(
-        document.querySelectorAll<HTMLElement>('[style*="opacity"]'),
-      ).filter((el) => getComputedStyle(el).opacity === '0')
-      if (hidden.length === 0) break
-      for (const el of hidden) {
-        el.scrollIntoView({ block: 'center' })
-        await new Promise((r) => setTimeout(r, 150))
-      }
-    }
+    const video = document.querySelector<HTMLVideoElement>('video.hero-video')
+    if (!video) return
+    video.pause()
+    video.currentTime = 0
+    if (video.readyState >= 2) return
+    await new Promise<void>((resolve) => {
+      video.addEventListener('seeked', () => resolve(), { once: true })
+      window.setTimeout(resolve, 1500)
+    })
   })
-  const stillHidden = await page.evaluate(() => {
-    const rendered = (el: HTMLElement): boolean => {
-      let n: HTMLElement | null = el
-      while (n && n !== document.body) {
-        if (getComputedStyle(n).display === 'none') return false
-        n = n.parentElement
-      }
-      return true
-    }
-    return Array.from(document.querySelectorAll<HTMLElement>('[style*="opacity"]')).filter(
-      (el) => getComputedStyle(el).opacity === '0' && rendered(el),
-    ).length
-  })
-  await page.evaluate(() => window.scrollTo(0, 0))
-  // Let the last-fired springs finish before capture.
-  await page.waitForTimeout(1500)
-  return stillHidden
 }
 
-test('visual: home hero section', async ({ page }) => {
-  await seedConsent(page)
-  await page.goto('/')
-  await page.waitForLoadState('networkidle')
-  // Hero entrance animations run up to ~1.9s after mount (word stagger + delays)
-  await page.waitForTimeout(2500)
-  await expect(page.locator('section#home')).toHaveScreenshot('home-hero.png', { maxDiffPixels: 500 })
-})
+/**
+ * Walk the whole page before a full-page capture.
+ *
+ * The sweep runs in steps rather than one jump so every position gets frames in
+ * view: the deployment stack is bound to scroll position, and a single jump can
+ * leave it captured mid-transform.
+ */
+async function settlePage(page: Page) {
+  await page.evaluate(async () => {
+    const maxY = document.body.scrollHeight
+    for (let y = 0; y <= maxY; y += 150) {
+      window.scrollTo(0, y)
+      await new Promise((r) => setTimeout(r, 50))
+    }
+    window.scrollTo(0, 0)
+  })
+  await page.waitForTimeout(1500)
+}
+
+/**
+ * There is no desktop capture of the hero, deliberately — and this is the only
+ * place in the suite where a golden was removed rather than fixed.
+ *
+ * The hero is a full-screen composition of type: the nav's links, the trust row,
+ * two 78px headline lines, the subhead, the action and four stat cells at a
+ * 1,430-pixel width. Chromium on Linux rasterises text with the system FreeType,
+ * so the machine that records the golden and the machine that checks it produce
+ * the same layout with different glyph pixels. Measured across CI's three
+ * attempts of this capture: the attempts agree with each other to **33 pixels**
+ * (max channel delta 1) while differing from the recorded golden by **51,339
+ * pixels over pixelmatch's threshold — 4% of the frame — every one of them
+ * inside the text bands**, with the layout identical. Neither hinting off nor
+ * disabling LCD text closes that gap, because the difference is the rasteriser,
+ * not the settings.
+ *
+ * A 500-pixel allowance (0.04% of the frame) cannot absorb 4%, and raising it to
+ * what would absorb it would stop the golden detecting anything at all. So the
+ * hero is pinned by assertions that do not depend on glyph pixels instead:
+ * `e2e/home.spec.ts` holds the CTA above the fold at four widths, the stats band
+ * inside the first screen at three widths, the single accent-filled action, the
+ * statement in one face and one colour, the backdrop's layer order and the dot
+ * field's mask, and the absence of images, client names and claimed rates. The
+ * 390px hero capture below stays: it passes on both machines, and it is the one
+ * that has caught real regressions (CTA placement, overflow).
+ */
 
 test('visual: home capabilities section', async ({ page }) => {
   await seedConsent(page)
@@ -147,41 +116,37 @@ test('visual: home capabilities section', async ({ page }) => {
   await page.waitForLoadState('networkidle')
   const section = page.locator('section#capabilities').first()
   await settleSection(page, section)
-  // Default tab (Converse) renders a static white product panel.
   await expect(section).toHaveScreenshot('home-capabilities.png', { maxDiffPixels: 500 })
 })
 
-test('visual: home measurement section', async ({ page }) => {
+test('visual: home commitments section', async ({ page }) => {
   await seedConsent(page)
   await page.goto('/')
   await page.waitForLoadState('networkidle')
-  const section = page.locator('section#measurement').first()
+  const section = page.locator('section#approach').first()
   await settleSection(page, section)
-  await expect(section).toHaveScreenshot('home-measurement.png', { maxDiffPixels: 500 })
+  await expect(section).toHaveScreenshot('home-approach.png', { maxDiffPixels: 500 })
 })
 
-test('visual: home principles section', async ({ page }) => {
+test('visual: home deployment-pattern grid', async ({ page }) => {
   await seedConsent(page)
   await page.goto('/')
   await page.waitForLoadState('networkidle')
-  // The principles band is the section holding the marquee of principle cards.
-  const section = page.locator('section').filter({ hasText: 'Seven rules we do not bend.' }).first()
+  const section = page.locator('section#deployment-patterns').first()
   await settleSection(page, section)
-  await expect(section).toHaveScreenshot('home-principles.png', { maxDiffPixels: 500 })
+  await expect(section).toHaveScreenshot('home-patterns.png', { maxDiffPixels: 500 })
 })
 
-// NOTE: the pricing section is hidden for now (see HomePage.tsx), so it has no
-// golden. When the operator re-enables it, add a `home-pricing` capture here.
-// Governance, positioning and the deployment model now live on /capabilities
-// and /about, and are covered by those route goldens.
+// Governance, positioning and the deployment model live on /capabilities and
+// /about and are covered by those route goldens.
 
-test('visual: home FAQ section', async ({ page }) => {
+test('visual: FAQ on the capabilities page', async ({ page }) => {
   await seedConsent(page)
-  await page.goto('/')
+  await page.goto('/capabilities')
   await page.waitForLoadState('networkidle')
   const section = page.locator('section#faq').first()
   await settleSection(page, section)
-  await expect(section).toHaveScreenshot('home-faq.png', { maxDiffPixels: 500 })
+  await expect(section).toHaveScreenshot('capabilities-faq.png', { maxDiffPixels: 500 })
 })
 
 test('visual: home footer', async ({ page }) => {
@@ -210,18 +175,16 @@ for (const route of routes) {
     await seedConsent(page)
     await page.goto(route.path)
     await page.waitForLoadState('networkidle')
-    const stillHidden = await settleReveals(page)
-    // Fail loudly if any rendered reveal never fired (see settleReveals note).
-    expect(stillHidden, `${route.name}: ${stillHidden} reveal(s) never fired`).toBe(0)
+    await settlePage(page)
     await expect(page).toHaveScreenshot(`${route.name}.png`, { fullPage: true })
   })
 }
 
 // Mobile-width goldens for the sections that have historically regressed on
-// phones (hero CTA placement, tab-control overflow, the deployment stack,
-// card gutters). Runs in the desktop project at a 390px viewport — the CSS
+// phones (hero CTA placement, horizontal overflow, the deployment stack, card
+// gutters). Runs in the desktop project at a 390px viewport: the CSS
 // breakpoints respond to width, so this catches responsive layout regressions
-// deterministically.
+// deterministically without a device emulator.
 test.describe('mobile widths', () => {
   test.use({ viewport: { width: 390, height: 844 } })
 
@@ -229,9 +192,9 @@ test.describe('mobile widths', () => {
     await seedConsent(page)
     await page.goto('/')
     await page.waitForLoadState('networkidle')
-    await waitFonts(page)
     await page.waitForTimeout(2500)
-    await expect(page.locator('section#home')).toHaveScreenshot('mobile-home-hero.png', { maxDiffPixels: 500 })
+    await freezeLoop(page)
+    await expect(page.locator('section#hero')).toHaveScreenshot('mobile-home-hero.png', { maxDiffPixels: 500 })
   })
 
   test('visual mobile: home capabilities', async ({ page }) => {
@@ -243,20 +206,23 @@ test.describe('mobile widths', () => {
     await expect(section).toHaveScreenshot('mobile-home-capabilities.png', { maxDiffPixels: 500 })
   })
 
-  test('visual mobile: home FAQ', async ({ page }) => {
+  test('visual mobile: FAQ on the capabilities page', async ({ page }) => {
     await seedConsent(page)
-    await page.goto('/')
+    await page.goto('/capabilities')
     await page.waitForLoadState('networkidle')
     const section = page.locator('section#faq').first()
     await settleSection(page, section)
-    await expect(section).toHaveScreenshot('mobile-home-faq.png', { maxDiffPixels: 500 })
+    await expect(section).toHaveScreenshot('mobile-capabilities-faq.png', { maxDiffPixels: 500 })
   })
 
   test('visual mobile: first deployment-pattern panel', async ({ page }) => {
     await seedConsent(page)
-    await page.goto('/')
+    await page.goto('/deployment-patterns')
     await page.waitForLoadState('networkidle')
-    const panel = page.locator('section#deployment-patterns .sticky').first()
+    // The pinned layer of the first panel in src/components/DeploymentStack.tsx.
+    // There is no `#deployment-patterns` section on this route — that id belongs
+    // to the home-page grid — so this selected nothing until it was corrected.
+    const panel = page.locator('div.sticky').first()
     await settleSection(page, panel)
     await expect(panel).toHaveScreenshot('mobile-deployment-panel.png', { maxDiffPixels: 500 })
   })

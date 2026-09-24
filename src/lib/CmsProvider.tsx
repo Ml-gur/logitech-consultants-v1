@@ -1,14 +1,12 @@
-'use client'
-
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import type { BlogPost, CaseStudy } from '../data/content'
+import type { BlogPost, DeploymentPattern } from '../data/content'
 import {
   cmsEnabled,
   fetchBlogPosts,
-  fetchCaseStudies,
+  fetchDeploymentPatterns,
   fetchContactInfo,
   fetchFaqs,
-  staticCaseStudies,
+  staticDeploymentPatterns,
   staticContactInfo,
   staticFaqs,
   staticPosts,
@@ -18,7 +16,7 @@ import {
 
 interface CmsState {
   blogPosts: BlogPost[]
-  caseStudies: CaseStudy[]
+  deploymentPatterns: DeploymentPattern[]
   contactInfo: ContactInfoData
   faqs: FaqItem[]
   /** True once live CMS content has been loaded (even if some fetches fell back). */
@@ -29,7 +27,7 @@ interface CmsState {
 
 const initial: CmsState = {
   blogPosts: staticPosts,
-  caseStudies: staticCaseStudies,
+  deploymentPatterns: staticDeploymentPatterns,
   contactInfo: staticContactInfo,
   faqs: staticFaqs,
   cmsLoaded: false,
@@ -38,12 +36,17 @@ const initial: CmsState = {
 
 const CmsContext = createContext<CmsState>(initial)
 
+/** How long a sync result is considered fresh before another focus re-fetches. */
+const SYNC_INTERVAL_MS = 30_000
+
 /**
  * Loads live content from the Payload CMS and merges it over the bundled
- * static fallbacks. Re-fetches whenever the window regains focus (throttled to
- * once per 30s) so an edit published in the admin panel shows up on the site
- * without a manual reload. Without VITE_CMS_URL this is a no-op and the site
- * renders entirely from the bundled data (identical to before the CMS existed).
+ * fallbacks. Re-syncs when the tab regains focus (throttled, so switching back
+ * and forth does not hammer the API), so an edit published in the admin panel
+ * appears without a manual reload.
+ *
+ * Without VITE_CMS_URL this is a no-op and every consumer renders the bundled
+ * data — the suite tests that path, so the static build is the covered one.
  */
 export function CmsProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<CmsState>(initial)
@@ -56,19 +59,19 @@ export function CmsProvider({ children }: { children: ReactNode }) {
 
     const sync = async () => {
       const now = Date.now()
-      if (now - lastSync < 30_000) return
+      if (now - lastSync < SYNC_INTERVAL_MS) return
       lastSync = now
 
-      const [posts, caseStudies, contactInfo, faqs] = await Promise.all([
+      const [blogPosts, deploymentPatterns, contactInfo, faqs] = await Promise.all([
         fetchBlogPosts(),
-        fetchCaseStudies(),
+        fetchDeploymentPatterns(),
         fetchContactInfo(),
         fetchFaqs(),
       ])
       if (cancelled) return
       setState({
-        blogPosts: posts,
-        caseStudies,
+        blogPosts,
+        deploymentPatterns,
         contactInfo: contactInfo ?? staticContactInfo,
         faqs: faqs ?? staticFaqs,
         cmsLoaded: true,
@@ -79,15 +82,17 @@ export function CmsProvider({ children }: { children: ReactNode }) {
     void sync()
 
     const onFocus = () => void sync()
-    window.addEventListener('focus', onFocus)
-    document.addEventListener('visibilitychange', () => {
+    const onVisibility = () => {
       if (document.visibilityState === 'visible') void sync()
-    })
+    }
+
+    window.addEventListener('focus', onFocus)
+    document.addEventListener('visibilitychange', onVisibility)
 
     return () => {
       cancelled = true
       window.removeEventListener('focus', onFocus)
-      document.removeEventListener('visibilitychange', onFocus)
+      document.removeEventListener('visibilitychange', onVisibility)
     }
   }, [])
 

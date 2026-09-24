@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import Nav from './Nav'
@@ -26,11 +24,11 @@ export default function Layout() {
   }, [pathname, hash])
 
   return (
-    <div className="min-h-screen text-paper" style={{ background: 'var(--color-midnight)' }}>
+    <div className="min-h-screen bg-ink text-ash">
       {/* Skip link, first tab stop (WCAG 2.4.1 bypass blocks) */}
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-5 focus:py-2.5 focus:rounded-[30px] focus:bg-carbon focus:text-paper focus:text-sm focus:font-medium focus:border focus:border-signal"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:px-5 focus:py-2.5 focus:rounded-panel focus:bg-ink focus:text-paper focus:text-sm focus:font-medium focus:border focus:border-lime focus:shadow-lift"
       >
         Skip to content
       </a>

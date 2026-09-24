@@ -1,14 +1,11 @@
-'use client'
-
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useCms } from '../lib/CmsProvider'
-import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
-// The numbered "01/ …" prefix is rendered here (not stored in the data) so
-// static fallback and CMS-sourced FAQs render identically.
-const numbered = (i: number, q: string) => `${String(i + 1).padStart(2, '0')}/ ${q}`
-
+// Questions are stored without any numbering prefix. An earlier revision
+// stamped each one "01/", "02/", which implied a sequence the list does not
+// have. Static and CMS-sourced FAQs render identically because neither is
+// numbered.
 export default function FAQ() {
   const { faqs } = useCms()
   const [openIndex, setOpenIndex] = useState<number | null>(null)
@@ -19,20 +16,12 @@ export default function FAQ() {
         <div className="grid lg:grid-cols-[1fr_560px] gap-12 max-lg:gap-10">
           <div className="max-lg:mb-2">
             <motion.p
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal()}
               className="section-label"
             >
               FAQs
             </motion.p>
 
             <motion.h2
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal(0.06)}
               className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em]"
             >
               Need answers?
@@ -44,11 +33,7 @@ export default function FAQ() {
             {faqs.map((faq, i) => (
               <motion.div
                 key={i}
-                initial={revealInitial}
-                whileInView={revealWhileInView}
-                viewport={revealViewport}
-                transition={springReveal(i * 0.06)}
-                className="rounded-[24px] bg-[#191919] border border-white/10"
+                className="rounded-panel bg-carbon border border-hairline"
               >
                 <button
                   onClick={() => setOpenIndex(openIndex === i ? null : i)}
@@ -57,13 +42,13 @@ export default function FAQ() {
                   className="w-full flex items-center justify-between gap-4 px-6 pt-6 pb-5 text-left"
                 >
                   <span className="text-[16px] font-medium text-paper leading-snug">
-                    {numbered(i, faq.q)}
+                    {faq.q}
                   </span>
-                  {/* Accent plus icon, Signal Violet, rotates 45deg when open */}
+                  {/* Accent plus icon, rotates 45deg when open */}
                   <motion.svg
                     animate={{ rotate: openIndex === i ? 45 : 0 }}
                     transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                    className="w-[14px] h-[14px] shrink-0 ml-4 text-signal"
+                    className="w-[14px] h-[14px] shrink-0 ml-4 text-lime"
                     viewBox="0 0 14 14"
                     fill="none"
                     stroke="currentColor"
@@ -81,7 +66,7 @@ export default function FAQ() {
                   <div
                     id={`faq-panel-${i}`}
                     role="region"
-                    aria-label={numbered(i, faq.q)}
+                    aria-label={faq.q}
                   >
                     <p className="text-[15px] text-fog leading-relaxed pb-6 px-6">
                       {faq.a}

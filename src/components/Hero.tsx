@@ -1,313 +1,336 @@
-'use client'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { motion, useReducedMotion, type Variants } from 'framer-motion'
+import {
+  CalendarClock,
+  FileCheck,
+  ListOrdered,
+  MessagesSquare,
+  Ruler,
+  ShieldCheck,
+  Workflow,
+} from 'lucide-react'
+import { cn } from '../utils'
+import { EASE_OUT } from '../motion'
 
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { motion, useReducedMotion } from 'framer-motion'
-import { CAPABILITIES, SITE } from '../lib/brand'
+/**
+ * Hero.
+ *
+ * One full-bleed screen, in three parts: the statement (with the marks that
+ * stand for what the systems do), one action, and a band of numbers along the
+ * bottom edge. Everything below it on the page is present from first paint; this
+ * is the site's single orchestrated load (ADR-004).
+ *
+ * The backdrop is a dark plate: the one gradient in the system (`.hero-glow`) at
+ * low alpha, a dot field (`.hero-dots`) that is empty through the middle where
+ * the type sits, and a vignette that pulls the edges back to the canvas. All
+ * three are decorative (`aria-hidden`, no pointer events), and the copy is
+ * measured against the plate rather than against whatever hue happens to be
+ * behind it.
+ *
+ * The trust row carries no client logos and the band carries no claimed
+ * outcomes. The company publishes no named references without a client's written
+ * approval, so the marks are the four things a system does and the numbers are
+ * facts about how we work: two from `src/lib/brand.ts` (ten stages, six
+ * measurement dimensions), the published first-deployment window, and the count
+ * of benchmarks we have invented, which is zero.
+ */
 
-const stagger = {
+/**
+ * The background loop, when one has been dropped in beside this component.
+ *
+ * The clip the reference direction opens on is a 14 MB file on a third-party
+ * CDN: shipping that URL would need the production CSP widened to an origin we
+ * do not control, and 14 MB per visitor to a hero backdrop. The same footage is
+ * therefore decoded once, re-framed to the size it is actually used at
+ * (1280×720) and shipped as a 338 kB WebM from our own origin, where it is
+ * hashed, cached immutably, and covered by `media-src 'self'`. With no file
+ * present the hero renders its plate alone, so the backdrop is never broken.
+ */
+const heroLoop = Object.values(
+  import.meta.glob('./hero-loop.{mp4,webm}', {
+    query: '?url',
+    import: 'default',
+    eager: true,
+  }) as Record<string, string>,
+)[0]
+
+/**
+ * The three marks in the trust row, as overlapping rings.
+ *
+ * The reference direction runs a row of client logos in this position
+ * (Microsoft, Amazon, Google) under the line "Trusted by 2000+ Enterprises".
+ * That is the one thing on a page like this that must never be borrowed: the
+ * company publishes no client it cannot name with permission, so the row says
+ * where we build and the marks are what the systems do. The ring treatment is
+ * the visual language, adopted; the borrowed proof is not (see the "Evidence
+ * over claims" rule in AGENTS.md).
+ */
+const MARKS = [MessagesSquare, FileCheck, Workflow] as const
+
+/**
+ * Attach the loop after first paint, and only when the visitor can afford it.
+ *
+ * `preload="none"` alone still spends the bytes: the element exists, so the
+ * browser will fetch the clip on a phone on 2G just as happily as on fibre. The
+ * plate is a complete backdrop on its own, so the video is an enhancement —
+ * skipped entirely under `prefers-reduced-motion` and Data Saver, one step
+ * down the connection table for slow links, and mounted on idle rather than
+ * during load.
+ */
+function useHeroLoop(enabled: boolean): boolean {
+  const [show, setShow] = useState(false)
+
+  useEffect(() => {
+    if (!enabled) return
+
+    const connection = (
+      navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }
+    ).connection
+    if (connection?.saveData) return
+    if (connection?.effectiveType && /(^|-)2g$/.test(connection.effectiveType)) return
+
+    const requestIdle = window.requestIdleCallback?.bind(window)
+    if (requestIdle) {
+      const handle = requestIdle(() => setShow(true), { timeout: 2000 })
+      return () => window.cancelIdleCallback?.(handle)
+    }
+
+    const timer = window.setTimeout(() => setShow(true), 900)
+    return () => window.clearTimeout(timer)
+  }, [enabled])
+
+  return show
+}
+
+const container: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.09, delayChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.075, delayChildren: 0.05 } },
 }
 
-const item = {
-  hidden: { opacity: 0, y: 28 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] as const },
-  },
+/**
+ * Headline lines rise out of their own mask. 130% rather than 100% so the line
+ * starts fully below the wrapper's bottom padding — at 110% the top of the line
+ * box shows through the padding area, which is inside the clip.
+ */
+const line: Variants = {
+  hidden: { y: '130%' },
+  visible: { y: 0, transition: { duration: 0.75, ease: EASE_OUT } },
 }
 
-/** Live-looking status panel that floats in the hero */
-function StatusPanel() {
-  const metrics = [
-    { label: 'Completion rate', value: '94%', delta: '+6pp', up: true },
-    { label: 'Time to answer', value: '< 3s', delta: 'all hours', up: true },
-    { label: 'Hours returned', value: '1,240', delta: 'this quarter', up: true },
-  ]
-  const events = [
-    { time: '09:41', text: 'Voice call resolved · Booking confirmed', ok: true },
-    { time: '09:38', text: 'Knowledge query answered · Source cited', ok: true },
-    { time: '09:35', text: 'Request routed to compliance team', ok: true },
-    { time: '09:31', text: 'Escalation triggered · Agent handed off', ok: false },
-  ]
+const settle: Variants = {
+  hidden: { opacity: 0, y: 14 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE_OUT } },
+}
+
+/**
+ * The band under the statement. Every number is checkable against the rest of
+ * the site: the deployment window is the one the FAQ publishes, the ten stages
+ * are `DEPLOYMENT_MODEL`, the six dimensions are `MEASUREMENT_DIMENSIONS`, and
+ * the last cell is a statement of the brand rule rather than a metric.
+ */
+interface Metric {
+  Icon: typeof CalendarClock
+  value: number
+  suffix?: string
+  label: string
+}
+
+/**
+ * Kept short on purpose. A band of four cells is the most wrap-sensitive thing
+ * on the page: a label that only just fits one line in one browser wraps to two
+ * in another, which pushes the whole band past the fold and re-flows everything
+ * above it. Every label clears its cell by a wide margin at the narrowest width
+ * the four-column layout runs at.
+ */
+const METRICS: Metric[] = [
+  { Icon: CalendarClock, value: 4, suffix: '–8 wks', label: 'To production' },
+  { Icon: ListOrdered, value: 10, label: 'Discovery to product' },
+  { Icon: Ruler, value: 6, label: 'Dimensions we measure' },
+  { Icon: ShieldCheck, value: 0, label: 'Benchmarks we invented' },
+]
+
+/**
+ * Count up to the target once, on load. Not an IntersectionObserver: the band is
+ * in the first viewport, so the trigger is mount. Reduced motion skips straight
+ * to the final value.
+ */
+function useCountUp(target: number, delay: number, still: boolean): number {
+  const [value, setValue] = useState(still ? target : 0)
+
+  useEffect(() => {
+    if (still || target === 0) {
+      setValue(target)
+      return
+    }
+
+    const duration = 1200
+    const start = performance.now() + delay
+    let frame = 0
+
+    const tick = (now: number) => {
+      const progress = Math.min(1, Math.max(0, (now - start) / duration))
+      // easeOutCubic: fast off the line, settled before the next cell starts.
+      setValue(Math.round(target * (1 - Math.pow(1 - progress, 3))))
+      if (progress < 1) frame = requestAnimationFrame(tick)
+    }
+
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [target, delay, still])
+
+  return value
+}
+
+function MetricCell({ metric, index, still }: { metric: Metric; index: number; still: boolean }) {
+  const { Icon, value, suffix, label } = metric
+  const shown = useCountUp(value, 480 + index * 90, still)
+
   return (
-    <div
-      className="relative rounded-[24px] overflow-hidden"
-      style={{
-        background: 'rgba(18,18,26,0.85)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        backdropFilter: 'blur(24px)',
-        boxShadow: '0 32px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)',
-      }}
-    >
-      {/* Panel header */}
-      <div
-        className="flex items-center justify-between px-5 py-3.5"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}
-      >
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#9898a8]">
-            Live deployment
-          </span>
-        </div>
-        <span className="font-mono text-[10px] text-[#52525f]">Nairobi · Active</span>
-      </div>
-
-      {/* Metric row */}
-      <div
-        className="grid grid-cols-3 divide-x"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', divideColor: 'rgba(255,255,255,0.06)' }}
-      >
-        {metrics.map((m) => (
-          <div key={m.label} className="px-4 py-4" style={{ borderRight: '1px solid rgba(255,255,255,0.06)' }}>
-            <div
-              className="font-display text-[22px] font-medium leading-none mb-1"
-              style={{ color: '#f0f0f8' }}
-            >
-              {m.value}
-            </div>
-            <div className="text-[10px] text-[#6d6d7a] mb-1">{m.label}</div>
-            <div
-              className="font-mono text-[10px]"
-              style={{ color: m.up ? '#10b981' : '#ff8b8b' }}
-            >
-              {m.delta}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Event log */}
-      <div className="px-5 py-4 space-y-3">
-        {events.map((ev) => (
-          <div key={ev.time + ev.text} className="flex items-start gap-3">
-            <span className="font-mono text-[10px] text-[#52525f] mt-0.5 shrink-0 tabular-nums">
-              {ev.time}
-            </span>
-            <div
-              className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
-              style={{ background: ev.ok ? '#10b981' : '#7c91ff' }}
-            />
-            <span className="text-[11px] text-[#9898a8] leading-snug">{ev.text}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Bottom gradient fade */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-12 pointer-events-none"
-        style={{ background: 'linear-gradient(to top, rgba(18,18,26,0.9), transparent)' }}
-      />
+    // flex-col-reverse: the DOM reads "label, value" (which is how a screen
+    // reader should hear a definition), the screen reads "mark, value, label" —
+    // the same order the reference direction sets its stat row in. Centred at
+    // every width: a two-by-two block of left-aligned cells looks broken on a
+    // phone, and the band is a footer to the screen rather than a table.
+    <div className="flex flex-col-reverse items-center gap-2 px-3 py-4 text-center sm:px-5 sm:py-5">
+      <dt className="text-[12.5px] leading-snug text-fog">{label}</dt>
+      <dd className="font-mono text-[clamp(19px,2.1vw,26px)] tracking-[-0.025em] text-paper tabular-nums">
+        {shown}
+        {suffix ? <span className="text-fog">{suffix}</span> : null}
+      </dd>
+      <Icon className="h-[17px] w-[17px] text-lime" strokeWidth={1.75} aria-hidden />
     </div>
   )
 }
 
 export default function Hero() {
   const reduce = useReducedMotion()
-  const navigate = useNavigate()
-  const [email, setEmail] = useState('')
-  const [error, setError] = useState('')
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const value = email.trim()
-    if (!value) { setError('Enter a work email so we can reply.'); return }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) { setError('That does not look like a valid email.'); return }
-    setError('')
-    navigate(`/contact?email=${encodeURIComponent(value)}`)
-  }
+  const loop = useHeroLoop(Boolean(heroLoop) && !reduce)
 
   return (
-    <section id="home" className="relative overflow-hidden" style={{ minHeight: '96dvh', display: 'flex', alignItems: 'center' }}>
-
-      {/* Deep layered background */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden>
-        <div className="absolute inset-0" style={{
-          background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(61,85,240,0.2) 0%, transparent 70%)'
-        }} />
-        <div className="absolute inset-0" style={{
-          background: 'radial-gradient(ellipse 40% 40% at 20% 80%, rgba(124,145,255,0.07) 0%, transparent 60%)'
-        }} />
-        {/* Right-side glow for panel */}
-        <div className="absolute inset-0 hidden lg:block" style={{
-          background: 'radial-gradient(ellipse 50% 60% at 80% 50%, rgba(61,85,240,0.12) 0%, transparent 65%)'
-        }} />
-        <div className="absolute top-0 left-0 right-0 h-px" style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(124,145,255,0.4) 30%, rgba(124,145,255,0.6) 50%, rgba(124,145,255,0.4) 70%, transparent 100%)'
-        }} />
+    <section id="hero" className="relative isolate overflow-hidden">
+      {/* Decorative backdrop: a dot field, a low light source over the canvas,
+          a vignette that returns the edges and the strip under the header to
+          the canvas, and a looping video if one has been dropped in. */}
+      <div aria-hidden className="hero-backdrop pointer-events-none absolute inset-0">
+        {heroLoop && loop ? (
+          <video
+            className="hero-video"
+            src={heroLoop}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="none"
+            disablePictureInPicture
+          />
+        ) : null}
+        {/* Scrim, then the plate's texture and its light source, then the
+            vignette: the copy is measured against this stack, never against
+            whatever frame the clip happens to be showing. */}
+        <div className="hero-scrim absolute inset-0" />
+        <div className="hero-dots absolute inset-0" />
+        <div className="hero-glow absolute inset-0" />
+        <div className="hero-vignette absolute inset-0" />
       </div>
 
-      <div className="relative w-full max-w-[1200px] mx-auto px-5 sm:px-8 pt-28 pb-20 landscape:pt-20 landscape:pb-14 md:pt-36 md:pb-28">
-
-        <div className="grid lg:grid-cols-[1fr_440px] gap-12 xl:gap-20 items-center">
-
-          {/* Left: copy */}
-          <motion.div
-            variants={reduce ? undefined : stagger}
-            initial={reduce ? false : 'hidden'}
-            animate={reduce ? undefined : 'visible'}
-          >
-            {/* Eyebrow */}
-            <motion.div variants={reduce ? undefined : item} className="flex items-center gap-3 mb-8 sm:mb-10">
-              <div className="h-px w-8 sm:w-12" style={{ background: 'var(--color-signal)' }} />
-              <span className="font-mono text-[11px] sm:text-[12px] uppercase tracking-[0.2em]" style={{ color: 'var(--color-fog)' }}>
-                Applied AI Systems · Nairobi
-              </span>
-            </motion.div>
-
-            {/* Headline */}
-            <motion.h1 variants={reduce ? undefined : item} className="mb-6 sm:mb-8">
-              <span
-                className="block"
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 400,
-                  fontSize: 'clamp(44px, 7.5vw, 96px)',
-                  lineHeight: 1.0,
-                  letterSpacing: '-0.025em',
-                  color: 'var(--color-paper)',
-                }}
-              >
-                Put intelligence
-              </span>
-              <span
-                className="block"
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontStyle: 'italic',
-                  fontWeight: 300,
-                  fontSize: 'clamp(44px, 7.5vw, 96px)',
-                  lineHeight: 1.0,
-                  letterSpacing: '-0.025em',
-                  color: 'var(--color-signal)',
-                }}
-              >
-                to work.
-              </span>
-            </motion.h1>
-
-            {/* Subtext — concise on mobile */}
-            <motion.p
-              variants={reduce ? undefined : item}
-              className="text-[16px] sm:text-[17px] leading-relaxed mb-8 sm:mb-10 max-w-[520px]"
-              style={{ color: 'var(--color-ash)' }}
-            >
-              Governed AI systems that complete real work inside real organizations — measured, audited, and running in production.
-            </motion.p>
-
-            {/* CTA row */}
-            <motion.div
-              variants={reduce ? undefined : item}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8 sm:mb-10"
-            >
-              <Link
-                to="/contact"
-                className="inline-flex items-center justify-center gap-2 px-7 py-4 text-[14px] font-medium rounded-full text-white transition-all duration-200"
-                style={{ background: 'var(--color-voltage)', minHeight: '52px' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-voltage-hover)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'var(--color-voltage)')}
-              >
-                Book a discovery call
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                  <path d="M6 3l5 5-5 5" />
-                </svg>
-              </Link>
-              <Link
-                to="/deployment-patterns"
-                className="inline-flex items-center justify-center gap-2 px-7 py-4 text-[14px] font-medium rounded-full transition-all duration-200"
-                style={{ border: '1px solid rgba(124,145,255,0.35)', color: 'var(--color-signal)', minHeight: '52px' }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(124,145,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(124,145,255,0.6)' }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(124,145,255,0.35)' }}
-              >
-                See what we deploy
-              </Link>
-            </motion.div>
-
-            {/* Email capture */}
-            <motion.form
-              variants={reduce ? undefined : item}
-              onSubmit={submit}
-              noValidate
-              className="w-full max-w-[520px]"
-            >
-              <div
-                className="flex items-center gap-2 p-1.5 rounded-full"
-                style={{
-                  background: 'var(--color-carbon)',
-                  border: error ? '1px solid var(--color-error)' : '1px solid rgba(255,255,255,0.1)',
-                  boxShadow: '0 0 40px rgba(61,85,240,0.2)',
-                }}
-              >
-                <label htmlFor="hero-email" className="sr-only">Work email</label>
-                <input
-                  id="hero-email"
-                  type="email"
-                  value={email}
-                  onChange={e => { setEmail(e.target.value); if (error) setError('') }}
-                  aria-invalid={!!error}
-                  aria-describedby={error ? 'hero-email-error' : undefined}
-                  placeholder="you@organization.com"
-                  className="flex-1 min-w-0 bg-transparent px-5 py-3 text-white placeholder:text-[var(--color-steel)] focus:outline-none text-[15px]"
-                />
-                <button
-                  type="submit"
-                  className="shrink-0 px-5 sm:px-6 py-3 rounded-full text-white text-[13px] font-medium transition-all duration-200 whitespace-nowrap"
-                  style={{ background: 'var(--color-voltage)' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-voltage-hover)')}
-                  onMouseLeave={e => (e.currentTarget.style.background = 'var(--color-voltage)')}
+      <motion.div
+        className="relative mx-auto flex min-h-[100svh] w-full max-w-[1200px] flex-col px-5 pb-6 pt-[88px] sm:px-8 sm:pb-8 sm:pt-[96px] lg:pt-[104px]"
+        variants={reduce ? undefined : container}
+        initial={reduce ? false : 'hidden'}
+        animate={reduce ? undefined : 'visible'}
+      >
+        <div className="flex flex-1 flex-col items-center justify-center py-5 text-center sm:py-8">
+          {/* Trust row: three overlapping marks, then a pill. The marks are
+              decoration for the pill's sentence, so they are hidden from the
+              accessibility tree rather than described twice. */}
+          <motion.div variants={reduce ? undefined : settle} className="flex items-center">
+            {/* Ring, light disc, dark mark — the reference direction's avatar
+                row, in tokens: `bg-paper` is near-white in the dark theme and
+                near-black in the light one, so the disc always reads as the
+                inverse of the ring it sits in. */}
+            <ul className="flex items-center" aria-hidden>
+              {MARKS.map((Icon, i) => (
+                <li
+                  key={i}
+                  className={cn(
+                    'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-hairline-strong bg-carbon p-[5px] transition-transform duration-300 ease-out hover:-translate-y-0.5',
+                    i > 0 && '-ml-[17px]',
+                  )}
                 >
-                  Start a conversation
-                </button>
-              </div>
-              {error && (
-                <p id="hero-email-error" role="alert" className="text-xs mt-2 pl-5" style={{ color: 'var(--color-error)' }}>
-                  {error}
-                </p>
-              )}
-            </motion.form>
+                  <span className="flex h-full w-full items-center justify-center rounded-full bg-paper">
+                    <Icon className="h-[15px] w-[15px] text-ink" strokeWidth={2} />
+                  </span>
+                </li>
+              ))}
+            </ul>
+            {/* Left padding clears the overlap, so the sentence never sits on
+                the last ring. */}
+            <p className="glass relative z-10 -ml-4 flex min-h-[42px] items-center rounded-pill pl-6 pr-5 text-[13px] text-ash">
+              Applied AI systems, from Nairobi
+            </p>
           </motion.div>
 
-          {/* Right: live deployment panel — desktop only */}
-          <motion.div
-            initial={reduce ? false : { opacity: 0, x: 40, y: 20 }}
-            animate={reduce ? undefined : { opacity: 1, x: 0, y: 0, transition: { delay: 0.55, duration: 0.8, ease: [0.22, 1, 0.36, 1] } }}
-            className="hidden lg:block"
+          {/* Each line is masked by its own wrapper. The wrapper carries 0.22em
+              of bottom padding (descender room, since overflow:hidden clips at
+              the padding box) which is cancelled by an equal negative margin, so
+              the baseline-to-baseline distance is still exactly the line-height. */}
+          <h1 className="mt-7 text-[clamp(34px,6.2vw,78px)] leading-[1.06] tracking-[-0.05em] text-paper">
+            <span className="-mb-[0.22em] block overflow-hidden pb-[0.22em]">
+              <motion.span className="block" variants={reduce ? undefined : line}>
+                Intelligence that
+              </motion.span>
+            </span>
+            {/* The two masked lines are separate block boxes, so nothing
+                separates them in the DOM. Without this explicit space the
+                headline reads "Intelligence thatfinishes the work." when
+                selected, copied, or parsed by anything that flattens block
+                boundaries — and the space is invisible in layout, because
+                whitespace between block boxes collapses. */}
+            {' '}
+            <span className="-mb-[0.22em] block overflow-hidden pb-[0.22em]">
+              <motion.span className="block" variants={reduce ? undefined : line}>
+                finishes the work.
+              </motion.span>
+            </span>
+          </h1>
+
+          {/* Two lines at laptop width, three on a phone, with room to spare at
+              both: the measure is what keeps this hero from re-flowing. */}
+          <motion.p
+            variants={reduce ? undefined : settle}
+            className="mt-5 max-w-[min(500px,92%)] text-[16px] leading-relaxed text-ash sm:text-[17px]"
           >
-            <StatusPanel />
+            Governed AI systems that answer, retrieve and finish the work inside the systems you run.
+          </motion.p>
+
+          {/* One filled action and one quiet text link. The reference
+              direction's hero carries exactly one button; a second one of equal
+              weight is the thing that makes an opening screen look like a
+              template. */}
+          <motion.div
+            variants={reduce ? undefined : settle}
+            className="mt-8 flex w-full max-w-[380px] flex-col items-center gap-4 sm:w-auto sm:max-w-none sm:flex-row sm:gap-6"
+          >
+            <Link to="/contact" className="btn-primary hero-cta w-full px-8 py-4 text-[15px] sm:w-auto">
+              Book a discovery call
+            </Link>
+            <Link to="/deployment-patterns" className="link-quiet text-[14px]">
+              See what we deploy
+            </Link>
           </motion.div>
         </div>
 
-        {/* Capability strip */}
-        <motion.div
-          initial={reduce ? false : { opacity: 0 }}
-          animate={reduce ? undefined : { opacity: 1, transition: { delay: 0.9, duration: 0.6 } }}
-          className="mt-16 sm:mt-20 landscape:mt-10 pt-8 sm:pt-10"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}
+        {/* The band. Four cells, each honest about what it measures. */}
+        <motion.dl
+          variants={reduce ? undefined : settle}
+          className="glass grid grid-cols-2 gap-px overflow-hidden rounded-card sm:grid-cols-4"
         >
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em]" style={{ color: 'var(--color-slate)' }}>
-              {SITE.essence}
-            </span>
-            <span style={{ color: 'var(--color-smoke)' }} aria-hidden>—</span>
-            {CAPABILITIES.map((cap, i) => (
-              <span key={cap.id} className="flex items-center gap-3">
-                <span
-                  className="font-mono text-[11px] uppercase tracking-[0.1em]"
-                  style={{ color: 'var(--color-fog)' }}
-                >
-                  {cap.name}
-                </span>
-                {i < CAPABILITIES.length - 1 && (
-                  <span style={{ color: 'var(--color-graphite)' }} aria-hidden>/</span>
-                )}
-              </span>
-            ))}
-          </div>
-        </motion.div>
-      </div>
+          {METRICS.map((metric, i) => (
+            <MetricCell key={metric.label} metric={metric} index={i} still={!!reduce} />
+          ))}
+        </motion.dl>
+      </motion.div>
     </section>
   )
 }
