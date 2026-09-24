@@ -20,16 +20,14 @@ function ConversationIllustration() {
         <div
           key={t.text}
           className={`max-w-[86%] rounded-[10px] px-3 py-2 text-[11px] leading-snug ${
-            t.mine ? 'self-end bg-[#eef0ff] text-[#1b1b3a]' : 'self-start bg-[#f4f4f6] text-[#111111]'
+            t.mine ? 'self-end bg-[var(--color-warm-white)] text-[var(--color-midnight)]' : 'self-start bg-[var(--color-paper)] text-[var(--color-midnight)]'
           }`}
         >
           <span className="block text-[9px] uppercase tracking-[0.1em] text-[#6d6e71] mb-0.5">{t.who}</span>
           {t.text}
-          {/* #256b45, not a brighter green: this sits on the panel's #eef0ff
-              tint, where anything lighter than ~4.5:1 raises an axe
-              colour-contrast violation at 10px. */}
+          {/* Orange is reserved for the completion signal and key interaction states. */}
           {t.done && (
-            <span className="mt-1 flex items-center gap-1 text-[10px] font-medium text-[#256b45]">
+            <span className="mt-1 flex items-center gap-1 text-[10px] font-medium text-[var(--color-voltage)]">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <path d="M20 6L9 17l-5-5" />
               </svg>
@@ -50,27 +48,27 @@ function KnowledgeIllustration() {
   ]
   return (
     <div className="h-full rounded-[12px] bg-white px-4 py-3 flex flex-col border border-black/5">
-      <div className="rounded-[10px] bg-[#f4f4f6] border border-black/5 px-3 py-2 mb-3">
+      <div className="rounded-[10px] bg-[var(--color-paper)] border border-black/5 px-3 py-2 mb-3">
         <div className="text-[9px] uppercase tracking-[0.1em] text-[#6d6e71] mb-1">Question</div>
         <div className="text-[11px] text-[#111111]">What is the deadline for late applications?</div>
       </div>
-      <div className="rounded-[10px] bg-[#eef0ff] px-3 py-2 mb-3">
+      <div className="rounded-[10px] bg-[var(--color-warm-white)] px-3 py-2 mb-3">
         <div className="text-[9px] uppercase tracking-[0.1em] text-[#3b45a0] mb-1">Answer</div>
-        <div className="text-[11px] text-[#1b1b3a] leading-snug">
+        <div className="text-[11px] text-[var(--color-midnight)] leading-snug">
           31 October, and the late fee applies from 1 November.
         </div>
       </div>
       <div className="mt-auto space-y-1.5">
         <div className="text-[9px] uppercase tracking-[0.1em] text-[#6d6e71]">Sources</div>
         {sources.map((s) => (
-          <div key={s.name} className="flex items-center gap-2 rounded-[8px] bg-[#f4f4f6] px-2.5 py-1.5">
+          <div key={s.name} className="flex items-center gap-2 rounded-[8px] bg-[var(--color-paper)] px-2.5 py-1.5">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-[#6d6e71] shrink-0" aria-hidden>
               <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
               <path d="M14 2v6h6" />
             </svg>
             <span className="text-[10px] text-[#111111] truncate flex-1">{s.name}</span>
             <span className="text-[9px] font-mono text-[#6d6e71] shrink-0">{s.page}</span>
-            <span className="text-[9px] font-mono text-[#256b45] shrink-0">{s.score}</span>
+            <span className="text-[9px] font-mono text-[var(--color-voltage)] shrink-0">{s.score}</span>
           </div>
         ))}
       </div>
@@ -88,7 +86,7 @@ function ActionIllustration() {
   return (
     <div className="h-full rounded-[12px] bg-white px-4 py-3 flex flex-col justify-between border border-black/5">
       {rows.map((row) => (
-        <div key={row.label} className="flex items-center gap-3 rounded-[10px] bg-[#f4f4f6] px-2.5 py-2 border border-black/5">
+        <div key={row.label} className="flex items-center gap-3 rounded-[10px] bg-[var(--color-paper)] px-2.5 py-2 border border-black/5">
           <div className="w-10 h-10 rounded-[10px] bg-[#191919] flex items-center justify-center shrink-0">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white" aria-hidden>
               <path d={row.icon} />
@@ -127,7 +125,7 @@ function OrchestrationIllustration() {
       {/* Connected systems */}
       <div className="grid grid-cols-3 gap-2 mb-3">
         {nodes.map((n) => (
-          <div key={n} className="rounded-[8px] bg-[#f4f4f6] border border-black/5 px-2 py-2 text-center">
+          <div key={n} className="rounded-[8px] bg-[var(--color-paper)] border border-black/5 px-2 py-2 text-center">
             <div className="text-[10px] font-medium text-[#111111] truncate">{n}</div>
             <div className="mt-1 h-[3px] rounded-full bg-[#d8d9e6]">
               <motion.div
@@ -142,7 +140,7 @@ function OrchestrationIllustration() {
       </div>
       <div className="mt-auto flex flex-wrap gap-1.5">
         {['Approval gate', 'Rollback', 'Escalation path'].map((t) => (
-          <span key={t} className="rounded-full bg-[#f4f4f6] border border-black/5 px-2.5 py-1 text-[10px] text-[#111467]">
+          <span key={t} className="rounded-full bg-[var(--color-paper)] border border-black/5 px-2.5 py-1 text-[10px] text-[var(--color-voltage)]">
             {t}
           </span>
         ))}
@@ -163,7 +161,7 @@ function Checklist({ items }: { items: string[] }) {
     <ul className="space-y-4">
       {items.map((item) => (
         <li key={item} className="flex items-start gap-3">
-          {/* Checkmark, Signal Green (design.md Feature Checklist Item) */}
+          {/* Orange completion signal. */}
           <svg
             className="w-5 h-5 mt-0.5 shrink-0 text-signal"
             viewBox="0 0 24 24"
