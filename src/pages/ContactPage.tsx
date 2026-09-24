@@ -163,7 +163,7 @@ export default function ContactPage() {
           },
         ]}
       />
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
+      <div className="contact-page-shell relative max-w-[1200px] mx-auto px-5 sm:px-8">
         <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
           Contact
         </motion.p>
@@ -172,21 +172,19 @@ export default function ContactPage() {
           initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.08)}
           className="text-[clamp(40px,6vw,80px)] leading-[1.02] tracking-[-0.03em] max-w-[700px] mb-6"
         >
-          Tell us what is <span className="text-signal">not working.</span>
+          Connect <span className="text-signal">with us.</span>
         </motion.h1>
 
         <motion.p
           initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.14)}
           className="text-[18px] text-fog max-w-[560px] leading-relaxed mb-16"
         >
-          The best first call is about a specific problem: a queue that never clears, information nobody can
-          find, a handoff that keeps breaking. We will tell you honestly whether an intelligent system is the
-          answer.
+          Let&apos;s start a conversation that moves your business forward. Tell us what you are building, where the workflow is stuck, and what a better outcome looks like.
         </motion.p>
 
-        <div className="grid lg:grid-cols-[1fr_420px] gap-16">
+        <div className="contact-content-grid grid gap-10">
           {/* Form */}
-          <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.1)}>
+          <motion.div className="contact-form-panel order-2" initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.1)}>
             {sent ? (
               <div
                 role="status"
@@ -393,9 +391,9 @@ export default function ContactPage() {
           </motion.div>
 
           {/* Contact info */}
-          <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.14)} className="space-y-4 h-fit">
+          <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.14)} className="contact-info-grid order-1 grid gap-4">
             {contactInfoCards.map((info) => (
-              <div key={info.label} className="rounded-[24px] bg-[#191919] border border-white/10 p-6">
+              <div key={info.label} className="contact-info-card rounded-[24px] bg-[#191919] border border-white/10 p-6">
                 <div className="text-xs uppercase tracking-[0.14em] text-fog mb-2">{info.label}</div>
                 {info.href ? (
                   <a href={info.href} className="text-base font-medium text-paper hover:text-signal transition-colors break-all block py-3 -my-3">
@@ -407,7 +405,7 @@ export default function ContactPage() {
               </div>
             ))}
 
-            <div className="rounded-[24px] bg-[#191919] border border-white/10 p-6">
+            <div className="contact-info-card rounded-[24px] bg-[#191919] border border-white/10 p-6">
               <div className="text-xs uppercase tracking-[0.14em] text-fog mb-2">Response time</div>
               <p className="text-sm text-ash leading-relaxed">
                 We reply within one business day, East Africa Time (UTC+3). If it is urgent, call the number

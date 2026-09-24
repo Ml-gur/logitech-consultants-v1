@@ -620,6 +620,20 @@ html.lenis body {
 .reference-cta-copy { max-width: 620px; }
 .reference-cta-copy h2 { margin: .75rem auto 1.25rem; color: #f2ffc2; font-size: clamp(2rem, 5vw, 4.25rem); line-height: .98; letter-spacing: -.06em; font-weight: 400; }
 .reference-cta-link { color: #f2ffc2; font-size: 1rem; }
+.contact-page-shell { padding-top: clamp(8rem, 15vw, 13rem); padding-bottom: 5rem; }
+.contact-page-shell > .section-label { margin-bottom: 1.5rem; text-align: center; }
+.contact-page-shell > h1 { max-width: 760px; margin-inline: auto; text-align: center; font-size: clamp(3.25rem, 8vw, 7rem); }
+.contact-page-shell > h1 + p { max-width: 680px; margin-inline: auto; text-align: center; }
+.contact-content-grid { max-width: 1160px; margin: 4rem auto 0; }
+.contact-info-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.contact-info-card { min-height: 158px; border-radius: 24px; background: transparent; border-color: rgba(242,255,194,.13); }
+.contact-info-card > div:first-child { color: #f2ffc2; font-size: 1.15rem; letter-spacing: 0; text-transform: none; }
+.contact-info-card > a, .contact-info-card > div:last-child { color: #b9bba9; font-size: 1rem; font-weight: 400; line-height: 1.45; }
+.contact-form-panel { max-width: 760px; width: 100%; margin-inline: auto; padding: clamp(1.25rem, 3vw, 2rem); border-radius: 28px; background: #151817; border: 1px solid rgba(242,255,194,.1); }
+.contact-form-panel form { gap: 1.5rem; }
+.contact-form-panel input, .contact-form-panel select, .contact-form-panel textarea { background: #000; border-color: rgba(255,255,255,.12); border-radius: 12px; }
+.contact-form-panel label { color: #f2ffc2; }
+@media (max-width: 760px) { .contact-page-shell { padding-top: 7rem; } .contact-info-grid { grid-template-columns: 1fr; } .contact-info-card { min-height: auto; } .contact-content-grid { margin-top: 2.5rem; } }
 .reference-cta-link span { margin-left: .65rem; }
 .reference-cta-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
 .reference-cta-action { min-height: 84px; display: flex; align-items: center; gap: 1rem; padding: 1rem 1.25rem; border-radius: 18px; background: #151817; border: 1px solid rgba(242,255,194,.1); color: #f2ffc2; transition: border-color .25s ease, transform .25s ease; }
@@ -719,7 +733,7 @@ footer {
   background: var(--color-steel);
 }
 
-/* ── Display heading italic accent class ──────────────────���──────── */
+/* ── Display heading italic accent class ──────────���───────���──────── */
 .display-italic {
   font-family: var(--font-display);
   font-style: italic;
