@@ -13,8 +13,6 @@ import {
   SITE,
   VISION,
 } from '../lib/brand'
-import FAQ from '../components/FAQ'
-import WhyUs from '../components/WhyUs'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
 export default function AboutPage() {
@@ -40,33 +38,38 @@ export default function AboutPage() {
         ]}
       />
       <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
-        {/* Hero */}
-        <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
-          About us
-        </motion.p>
-        <motion.h1
-          initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.08)}
-          className="text-[clamp(40px,6vw,80px)] leading-[1.02] tracking-[-0.03em] max-w-[820px] mb-6"
-        >
-          Intelligence <span className="text-signal">at work.</span>
-        </motion.h1>
-        <motion.p
-          initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.14)}
-          className="text-[18px] text-fog max-w-[620px] leading-relaxed mb-10"
-        >
-          {DEFINITIONS.external}
-        </motion.p>
-        <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.2)} className="flex flex-wrap gap-4 items-center">
-          <Link to="/contact" className="btn-primary px-7 py-3.5 text-sm">
-            Book a discovery call
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <path d="M6 3l5 5-5 5" />
-            </svg>
-          </Link>
-          <Link to="/capabilities" className="btn-ghost px-7 py-3.5 text-sm">
-            What we build
-          </Link>
-        </motion.div>
+        {/* Reference-led hero */}
+        <div className="about-reference-hero">
+          <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
+            About Naivolabs
+          </motion.p>
+          <motion.h1
+            initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.08)}
+            className="about-reference-title"
+          >
+            Get to know Naivolabs and intelligent systems that work.
+          </motion.h1>
+          <motion.p
+            initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.14)}
+            className="about-reference-intro"
+          >
+            We design, build and deploy governed AI systems that help organizations serve people, use information and operate their workflows in production.
+          </motion.p>
+          <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.2)} className="flex flex-wrap justify-center gap-3">
+            <Link to="/capabilities" className="btn-primary px-7 py-3.5 text-sm">Explore what we build</Link>
+            <Link to="/contact" className="btn-ghost px-7 py-3.5 text-sm">Request a consultation</Link>
+          </motion.div>
+        </div>
+        <div className="about-reference-collage" aria-label="Naivolabs team and systems at work">
+          <div className="about-collage-card about-collage-card-left"><img src="/images/YA3AGELH6hUZToUz17fZAzd0yo.webp" alt="" /></div>
+          <div className="about-collage-card about-collage-card-main"><img src="/images/M5MY3Wk4Y4dsOCa2vifZ9R6pI.webp" alt="" /></div>
+          <div className="about-collage-card about-collage-card-right"><img src="/images/Tf9L4582eDStTX4KSFaUOoUP5Ys.webp" alt="" /></div>
+        </div>
+        <div className="about-reference-stats" aria-label="Naivolabs overview">
+          <div><strong>4</strong><span>systems shipped</span></div>
+          <div><strong>5+</strong><span>operating environments</span></div>
+          <div><strong>100%</strong><span>measured in production</span></div>
+        </div>
 
         {/* The brand tension, three honest contrasts */}
         <div className="grid sm:grid-cols-3 gap-4 mt-20">
@@ -296,15 +299,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Where we sit, positioning belongs with the company story, not on the
-          home page (which stays intentionally minimal). */}
-      <WhyUs />
-
-      <section className="relative">
-        <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
-          <FAQ />
-        </div>
-      </section>
     </>
   )
 }
