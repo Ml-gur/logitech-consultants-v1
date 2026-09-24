@@ -391,6 +391,8 @@ html.lenis body {
 /* Reference-inspired section language: black field, acid-white type, generous pacing,
    and rounded modules that feel like deliberate scroll chapters. */
 .inspiration-shell {
+  content-visibility: auto;
+  contain-intrinsic-size: 900px;
   position: relative;
   overflow: clip;
   background: var(--color-midnight);
@@ -835,6 +837,7 @@ footer {
 .hero-video, .hero-video video, .hero-video-shade { position: absolute; inset: 0; width: 100%; height: 100%; }
 .hero-video { z-index: 0; overflow: hidden; background: var(--color-midnight); }
   .hero-video video { object-fit: cover; pointer-events: none; opacity: .72; filter: grayscale(.55) sepia(.28) hue-rotate(35deg) saturate(1.15); }
+@media (max-width: 720px) { .hero-video video { display: none; } }
 .hero-video-shade { background: linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.5) 55%, rgba(0,0,0,.72)); }
 .hero-inner { position: relative; z-index: 1; width: 100%; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: clamp(90px, 12vh, 130px) clamp(16px, 3vw, 32px) clamp(22px, 4vh, 42px); }
 .hero-nav { position: absolute; inset: 0 0 auto; z-index: 10; display: flex; align-items: center; justify-content: flex-end; min-height: 82px; padding: 8px clamp(24px, 4vw, 72px) 0; gap: clamp(24px, 4vw, 64px); border-top: 3px solid var(--color-signal); background: rgba(18, 20, 26, .96); }

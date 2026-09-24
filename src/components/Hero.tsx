@@ -60,16 +60,18 @@ export default function Hero() {
 
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const narrowViewport = window.matchMedia('(max-width: 720px)').matches
     const saveData = 'connection' in navigator && Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData)
-    if (reducedMotion || saveData) return
+    if (reducedMotion || narrowViewport || saveData) return
 
     const loadVideo = () => setVideoEnabled(true)
-    if ('requestIdleCallback' in window) {
-      const idleId = window.requestIdleCallback(loadVideo, { timeout: 2000 })
-      return () => window.cancelIdleCallback(idleId)
+    const interactionEvents = ['pointerdown', 'keydown', 'scroll', 'touchstart'] as const
+    interactionEvents.forEach((event) => window.addEventListener(event, loadVideo, { once: true, passive: true }))
+    const timeoutId = globalThis.setTimeout(loadVideo, 8000)
+    return () => {
+      interactionEvents.forEach((event) => window.removeEventListener(event, loadVideo))
+      globalThis.clearTimeout(timeoutId)
     }
-    const timeoutId = globalThis.setTimeout(loadVideo, 1200)
-    return () => globalThis.clearTimeout(timeoutId)
   }, [])
 
   return (
