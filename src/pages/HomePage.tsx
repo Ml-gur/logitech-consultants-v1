@@ -12,8 +12,8 @@ export default function HomePage() {
   return (
     <>
       <Seo
-        title="Intelligence Designed To Evolve"
-        description="An applied AI systems company. Naivolabs designs, builds and deploys governed intelligent systems that work inside real organizations, measured."
+        title="Put intelligence to work."
+        description="Naivolabs designs, builds and deploys intelligent AI systems that help organizations serve people, use information and operate their workflows — governed, measured, and running in production."
         path="/"
         jsonLd={[organizationLd(), websiteLd()]}
       />
@@ -21,8 +21,8 @@ export default function HomePage() {
       <main className="inspiration-shell">
         <LogoMarquee />
         <Metrics />
-        <DeploymentPatterns />
         <Principles />
+        <DeploymentPatterns />
         <HomeCTA />
       </main>
     </>

@@ -55,13 +55,16 @@ export default function Hero() {
 
       <div className="hero-inner">
         <h1 id="hero-title" className="hero-headline">
-          <span>Intelligence</span>
-          <span>Designed To Evolve</span>
+          <span>Put intelligence</span>
+          <span>to work.</span>
         </h1>
         <p className="hero-subhead anim" style={{ '--d': '0.28s' } as CSSProperties}>
-          Build applications that reason, adapt and collaborate using a modular AI platform designed for production.
+          Naivolabs designs, builds and deploys intelligent AI systems that help organizations serve people, use information and operate their workflows — governed, measured, and running in production.
         </p>
-        <Link to="/contact" className="hero-cta anim" style={{ '--d': '0.4s' } as CSSProperties}>Get started</Link>
+        <div className="hero-actions anim" style={{ '--d': '0.4s' } as CSSProperties}>
+          <Link to="/contact" className="hero-cta">Schedule a consultation</Link>
+          <Link to="/deployment-patterns" className="hero-cta hero-cta-secondary">See what we deploy</Link>
+        </div>
 
         <div className="hero-stats" aria-label="Platform metrics">
           {metrics.map((metric, index) => <Stat key={metric.label} metric={metric} index={index} />)}
