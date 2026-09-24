@@ -61,9 +61,9 @@ export default function AboutPage() {
           </motion.div>
         </div>
         <div className="about-reference-collage" aria-label="Naivolabs team and systems at work">
-          <div className="about-collage-card about-collage-card-left"><img src="/images/YA3AGELH6hUZToUz17fZAzd0yo.webp" alt="" /></div>
-          <div className="about-collage-card about-collage-card-main"><img src="/images/M5MY3Wk4Y4dsOCa2vifZ9R6pI.webp" alt="" /></div>
-          <div className="about-collage-card about-collage-card-right"><img src="/images/Tf9L4582eDStTX4KSFaUOoUP5Ys.webp" alt="" /></div>
+          <div className="about-collage-card about-collage-card-left"><img src="/images/YA3AGELH6hUZToUz17fZAzd0yo.webp" alt="" loading="lazy" decoding="async" /></div>
+          <div className="about-collage-card about-collage-card-main"><img src="/images/M5MY3Wk4Y4dsOCa2vifZ9R6pI.webp" alt="" loading="lazy" decoding="async" /></div>
+          <div className="about-collage-card about-collage-card-right"><img src="/images/Tf9L4582eDStTX4KSFaUOoUP5Ys.webp" alt="" loading="lazy" decoding="async" /></div>
         </div>
         <div className="about-reference-stats" aria-label="Naivolabs overview">
           <div><strong>4</strong><span>systems shipped</span></div>
@@ -286,7 +286,7 @@ export default function AboutPage() {
                   initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.08)}
                   className="team-reference-card"
                 >
-                  <img src={portraits[i]} alt="" />
+                  <img src={portraits[i]} alt="" loading="lazy" decoding="async" />
                   <div className="team-reference-overlay" />
                   <div className="team-reference-copy">
                     <h3>{member.name}</h3>
