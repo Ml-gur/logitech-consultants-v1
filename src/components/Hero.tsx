@@ -14,6 +14,14 @@ function useCountUp(target: number, decimals: number, delay: number) {
   useEffect(() => {
     const node = ref.current
     if (!node) return
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reducedMotion) {
+      setValue(target)
+      return
+    }
+
+    let frame = 0
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) return
       const start = performance.now()
@@ -21,13 +29,17 @@ function useCountUp(target: number, decimals: number, delay: number) {
       const tick = (now: number) => {
         const progress = Math.min((now - start - delay) / duration, 1)
         if (progress > 0) setValue(target * (1 - Math.pow(1 - progress, 3)))
-        if (progress < 1) requestAnimationFrame(tick)
+        if (progress < 1) frame = requestAnimationFrame(tick)
       }
-      requestAnimationFrame(tick)
+      frame = requestAnimationFrame(tick)
       observer.disconnect()
     }, { threshold: 0.25 })
     observer.observe(node)
-    return () => observer.disconnect()
+
+    return () => {
+      observer.disconnect()
+      cancelAnimationFrame(frame)
+    }
   }, [target, delay])
   return { ref, value: value.toFixed(decimals) }
 }
@@ -44,11 +56,27 @@ function Stat({ metric, index }: { metric: typeof metrics[number]; index: number
 }
 
 export default function Hero() {
+  const [videoEnabled, setVideoEnabled] = useState(false)
+
+  useEffect(() => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const saveData = 'connection' in navigator && Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData)
+    if (reducedMotion || saveData) return
+
+    const loadVideo = () => setVideoEnabled(true)
+    if ('requestIdleCallback' in window) {
+      const idleId = window.requestIdleCallback(loadVideo, { timeout: 2000 })
+      return () => window.cancelIdleCallback(idleId)
+    }
+    const timeoutId = globalThis.setTimeout(loadVideo, 1200)
+    return () => globalThis.clearTimeout(timeoutId)
+  }, [])
+
   return (
     <section id="home" className="hero-stage" aria-labelledby="hero-title">
       <div className="hero-video" aria-hidden="true">
-        <video autoPlay muted loop playsInline poster="/og-image.png">
-          <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260809_012548_ef22562c-c0ae-4816-ad9d-f8922af4e6a7.mp4" type="video/mp4" />
+        <video autoPlay muted loop playsInline preload="none" poster="/og-image.png">
+          {videoEnabled && <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260809_012548_ef22562c-c0ae-4816-ad9d-f8922af4e6a7.mp4" type="video/mp4" />}
         </video>
         <div className="hero-video-shade" />
       </div>
