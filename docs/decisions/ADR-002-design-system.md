@@ -99,6 +99,19 @@ measure carry the hierarchy. Instrument Serif was therefore retired on
 `scripts/fetch-fonts.mjs`. Headlines are never part-coloured and never italicised
 for emphasis.
 
+The direction this design was drawn from sets its headline and its stat marks in
+a retro dot-matrix face loaded from a font CDN. That face is not adopted, for
+three reasons that all point the same way: the production CSP is
+`font-src 'self' data:`, so a remote face silently falls back in production (the
+exact failure that removed Google Fonts); the file is not licensed for a
+commercial site; and a decorative display face on an enterprise page is a
+borrowed mannerism rather than a decision. The *idea* behind it — a screen that
+reads as engineered rather than decorated — is instead carried by a dot field in
+the hero backdrop (`.hero-dots`), which costs about 200 bytes, follows the theme
+through `--color-hairline-strong`, and sets no type. `e2e/home.spec.ts` asserts
+the statement renders in one face, so a display face cannot be reintroduced by
+accident.
+
 The weight list is short on purpose. Inter 600 and 700 and JetBrains Mono 500
 were shipped as files and declared as faces while nothing on the site set them:
 `grep -c font-semibold src` was 0. Type weight is a token like any other;
@@ -141,12 +154,24 @@ their own, and the one action right — a header-level control rather than a nav
 item, because it is the page's action, not a destination. The header CTA is
 outlined, so the hero owns the screen's single filled control.
 
-The hero is one full-bleed panel: the statement set in the accent, the action
-beside it, and a band of what the systems actually do running along the bottom
-edge (`src/components/Hero.tsx`). The band is a marquee — the list is duplicated
-in the DOM and the track translates by exactly -50%, so the loop is seamless with
-no gap and no JS measurement, and it pauses on hover rather than refusing to be
-read. Its entries are capabilities from `src/lib/brand.ts`, not outcome claims.
+The hero is one full-bleed screen in three regions (`src/components/Hero.tsx`):
+a row above the statement, the statement and its single action, and a band of four
+numbers along the bottom edge. Every number is checkable against the rest of the
+site (the published first-deployment window, the stages of the deployment model,
+the dimensions we measure, and the count of benchmarks the company has invented,
+which is zero), and the band counts up once on load and skips straight to the
+final values under `prefers-reduced-motion`.
+
+**The statement is set in `paper`, not in the accent.** The first version of this
+hero set the headline in lime, on the reading that the accent is the statement
+tone. At hero size that turned the accent into decoration — a wall of pale lime
+that said nothing about where the action is, and it competed with the fill the
+hero's button uses. Lime now means "this is the action" or "this is ours"
+(fills, links, marks, the wordmark's second half) and never large display type.
+The hero's own backdrop is a near-black plate: a low light field, a dot field
+that is masked clear where the type sits, and a vignette — lit depth rather than
+a colour wash, which is the one thing a large dark panel needs in order not to
+read as a hole.
 
 Content rules that follow from the brand's evidence-over-claims position:
 
@@ -185,7 +210,8 @@ present. See ADR-004.
 - A single accent means an accent always means the same thing: this is the
   action, or this is ours.
 - The palette is verified by the accessibility suite (`e2e/accessibility.spec.ts`)
-  and by an explicit assertion that the home-page headline renders in one colour
+  and by explicit assertions that the home-page headline renders in one colour and
+  in one face, and that the hero carries exactly one filled action
   (`e2e/home.spec.ts`).
 - `scrollbar-gutter: stable` is set on `html`. Without it the content box is
   ~15px wider on pages short enough not to scroll, so moving between a short page

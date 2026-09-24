@@ -25,8 +25,47 @@ Notable changes to the Naivolabs website and CMS. The format follows
   visibility assertion into a coin flip. The face list is read out of the loaded
   stylesheets so it cannot drift from `src/index.css`.
 
+### Fixed
+
+- **The E2E suite's webfont wait was a no-op, and the first capture of a session
+  could record the fallback face.** `e2e/fonts.ts` read `@font-face` rules off the
+  top level of each stylesheet, but the site's faces are declared inside
+  `@layer base` (`src/index.css`), so the walk found zero faces, `load()` and
+  `document.fonts.ready` resolved instantly against nothing, and every navigation
+  was declared settled while the text was still in a fallback face. It never
+  showed up on a warm machine — the faces arrive in about 100 ms, well inside the
+  2.5 s the visual spec waits before a capture — and it is exactly the
+  `home-hero` golden that failed on every CI run of this branch, with ~88,000
+  differing pixels concentrated on the text rows while every later capture in the
+  same run passed. The walk now descends through grouping rules (`@layer`,
+  `@media`, `@supports`, `@container`), and after loading it verifies each face
+  with `document.fonts.check()`, retrying for up to 3 s and failing loudly rather
+  than recording a golden in the wrong face.
+
 ### Changed
 
+- **The hero reads as a dark plate, and the statement is white.** The backdrop
+  (`src/index.css`) is now a low light field with a dot field over it — a 1px mark
+  on a 22px grid in the hairline colour, masked *clear through the middle* so the
+  type never sits on texture — under a softer vignette. The saturated multi-hue
+  wash it replaced read as lit from nowhere; this reads as depth, which is what a
+  full-bleed dark panel needs. The statement moved out of the accent into
+  `text-paper`: at hero size a wall of pale lime said nothing about where the
+  action is and competed with the button that does. Tracking tightened to
+  `-0.05em` and the display size to `clamp(34px, 6.2vw, 78px)`, so the band still
+  lands inside the first screen at 1024×768 and 390×844. See the amendments to
+  [`ADR-002`](docs/decisions/ADR-002-design-system.md).
+- **The hero's trust row is rings, and it carries one filled action.** The three
+  marks are now dark rings with a `paper` disc inside each — the reference
+  direction's avatar treatment, in tokens, so the disc inverts with the theme —
+  and "See what we deploy" is a quiet text link rather than a second button of
+  equal weight. `e2e/home.spec.ts` asserts exactly one accent-filled control in
+  the hero, that the dot field renders, and that its mask is transparent where
+  the statement sits. What is *not* adopted from that reference is its social
+  proof: "Trusted by 2000+ Enterprises" over Microsoft, Amazon and Google marks,
+  and stat figures (120 ms inference, 99.99% uptime) that nobody measured. The
+  row still says where the company builds, and the band still counts facts that
+  can be checked against `src/lib/brand.ts`.
 - **The hero is one full-bleed screen, and the four capabilities are two
   columns.** The hero (`src/components/Hero.tsx`) is the first viewport rather
   than an inset panel: the lit field and its vignette cover the whole screen, a
@@ -36,7 +75,9 @@ Notable changes to the Naivolabs website and CMS. The format follows
   first-deployment window, the ten stages of the deployment model, the six
   dimensions every deployment is measured against, and the number of benchmarks
   the company has invented, which is zero. The band counts up once on load, and
-  `prefers-reduced-motion` shows the final values immediately. The section below
+  `prefers-reduced-motion` shows the final values immediately. The four labels
+  are kept short enough to hold one line in every browser at the narrowest width
+  the band runs at, so a wrap cannot push the band past the fold. The section below
   it (`src/components/Capabilities.tsx`) follows the same direction in two
   columns: the claim and a media panel on the left, the four actions as hairline
   rows on the right, each row still a link to its depth, closed by one outlined

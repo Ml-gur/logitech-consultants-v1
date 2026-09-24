@@ -107,18 +107,18 @@ test('hero: one screen, a band of defensible numbers, no client logos', async ({
   )
 
   // The four cells, in order: the published first-deployment window, the ten
-  // stages of the deployment model, the six dimensions we measure, and the
+  // steps of the deployment model, the six dimensions we measure, and the
   // number of benchmarks we have made up.
   await expect(hero.locator('dd')).toHaveText(['4–8 wks', '10', '6', '0'])
   await expect(hero.locator('dt')).toHaveText([
-    'To a first production deployment',
-    'Stages, discovery to product',
+    'To production',
+    'Discovery to product',
     'Dimensions we measure',
     'Benchmarks we invented',
   ])
 
   // The row above it names where we build, not who we claim to have worked for.
-  await expect(hero.getByText('Applied AI systems, built in Nairobi')).toBeVisible()
+  await expect(hero.getByText('Applied AI systems, from Nairobi')).toBeVisible()
 
   const text = await hero.innerText()
   expect(text, 'an unqualified rate is a claim we cannot support').not.toMatch(/\d+(\.\d+)?\s*%/)
@@ -164,6 +164,43 @@ test('hero: asks for one thing, and has no competing capture form', async ({ pag
   // The email capture that used to sit here duplicated the contact form and
   // navigated away with a query param. It is gone.
   await expect(hero.locator('input[type="email"]')).toHaveCount(0)
+})
+
+/**
+ * Two things about the first screen that are design decisions, not styling: a
+ * screen answers one question, so it carries one filled action; and the plate
+ * behind the statement is a real layer that is deliberately clear where the
+ * type sits.
+ */
+test('hero: one filled action, over a plate that stays clear of the type', async ({ page }) => {
+  await seedConsent(page)
+  await page.goto('/')
+
+  const hero = page.locator('section#hero')
+
+  // Exactly one control is filled with the accent. The second path forward is a
+  // quiet text link: two buttons of equal weight is what makes an opening
+  // screen read as a template.
+  const accent = await accentRgb(page)
+  const filled = await hero.locator('a').evaluateAll(
+    (links, colour) => links.filter((a) => getComputedStyle(a).backgroundColor === colour).length,
+    accent,
+  )
+  expect(filled, 'more than one filled action in the hero').toBe(1)
+
+  // The dot field renders, and its mask is inverted — transparent through the
+  // middle, drawn toward the edges. A texture behind the statement would be
+  // noise; a texture around it is what gives the plate depth.
+  const dots = hero.locator('.hero-dots')
+  await expect(dots).toHaveCount(1)
+  const mask = await dots.evaluate((el) => {
+    const style = getComputedStyle(el)
+    return style.maskImage || style.webkitMaskImage
+  })
+  expect(mask).toContain('radial-gradient')
+  // The first stop is fully transparent (Chromium computes `transparent` to
+  // `rgba(0, 0, 0, 0)`), so the plate has a clean middle to set type on.
+  expect(mask).toContain('rgba(0, 0, 0, 0)')
 })
 
 test('home stays minimal: five sections, the depth lives on the inner pages', async ({ page }) => {

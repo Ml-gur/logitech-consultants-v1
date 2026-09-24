@@ -320,31 +320,43 @@ html.dark {
   }
 
   /* ── Hero light source ──────────────────────────────────────
-     The only gradient in the system. A near-black panel at hero
-     size reads as a hole without one, and the reference direction
-     is lit rather than filled. A dark scrim sits on top of the
-     colour field, over the copy, so the headline is measured
-     against the panel and not against whatever hue happens to be
-     behind it. Decorative only: `aria-hidden`, no pointer events.
+     The only gradient in the system, and deliberately a low one:
+     two weak sources at opposite corners and a third under the
+     bottom edge, over the near-black plate. It reads as depth, not
+     as a colour wash — a saturated blob at hero size is what makes
+     a page look lit from nowhere, and the reference direction is a
+     dark plate with the type sitting on top of it. Decorative only:
+     `aria-hidden`, no pointer events.
 
-     The light theme gets a wash rather than a light source — a
-     saturated blob on a pale canvas reads as a stain. */
+     The light theme gets the same three sources at ink alpha — a
+     lime blob on a pale canvas reads as a stain. */
   .hero-glow {
     background:
-      radial-gradient(58% 52% at 30% 60%, rgba(251, 252, 245, 0.86) 0%, rgba(251, 252, 245, 0.36) 46%, transparent 74%),
-      radial-gradient(54% 48% at 4% 6%, rgba(77, 92, 15, 0.18) 0%, transparent 60%),
-      radial-gradient(46% 56% at -6% 98%, rgba(150, 96, 40, 0.14) 0%, transparent 64%),
-      radial-gradient(40% 46% at 28% 114%, rgba(150, 60, 90, 0.1) 0%, transparent 62%),
-      radial-gradient(50% 56% at 100% 44%, rgba(70, 90, 150, 0.08) 0%, transparent 60%);
-    filter: blur(48px) saturate(120%);
+      radial-gradient(52% 46% at 18% 12%, rgba(77, 92, 15, 0.16) 0%, transparent 62%),
+      radial-gradient(46% 42% at 92% 88%, rgba(70, 90, 150, 0.1) 0%, transparent 66%),
+      radial-gradient(62% 52% at 52% 110%, rgba(150, 96, 40, 0.1) 0%, transparent 72%);
+    filter: blur(52px) saturate(115%);
   }
   html.dark .hero-glow {
     background:
-      radial-gradient(58% 52% at 30% 60%, rgba(14, 16, 15, 0.82) 0%, rgba(14, 16, 15, 0.34) 46%, transparent 74%),
-      radial-gradient(54% 48% at 4% 6%, rgba(243, 255, 201, 0.42) 0%, transparent 60%),
-      radial-gradient(46% 56% at -6% 98%, rgba(214, 140, 96, 0.38) 0%, transparent 64%),
-      radial-gradient(40% 46% at 28% 114%, rgba(196, 104, 138, 0.26) 0%, transparent 62%),
-      radial-gradient(50% 56% at 100% 44%, rgba(112, 132, 186, 0.2) 0%, transparent 60%);
+      radial-gradient(52% 46% at 18% 10%, rgba(243, 255, 201, 0.14) 0%, transparent 62%),
+      radial-gradient(46% 42% at 92% 90%, rgba(112, 132, 186, 0.12) 0%, transparent 66%),
+      radial-gradient(64% 54% at 50% 112%, rgba(214, 140, 96, 0.12) 0%, transparent 72%);
+  }
+
+  /* ── Hero dot field ────────────────────────────────────────
+     The one texture in the system: a 1px mark on a 22px grid, in
+     the hairline colour, so it follows the theme for free. The mask
+     is inverted — empty through the middle, drawn toward the edges —
+     because the middle is where the statement sits. It gives the
+     plate the engineered quality the reference direction gets from
+     its display face, at no font cost and about 200 bytes. */
+  .hero-dots {
+    background-image: radial-gradient(var(--color-hairline-strong) 1px, transparent 1px);
+    background-size: 22px 22px;
+    background-position: center;
+    mask-image: radial-gradient(66% 58% at 50% 46%, transparent 18%, rgba(0, 0, 0, 1) 82%);
+    -webkit-mask-image: radial-gradient(66% 58% at 50% 46%, transparent 18%, rgba(0, 0, 0, 1) 82%);
   }
 
   /* ── Hero backdrop ─────────────────────────────────────────
@@ -368,13 +380,13 @@ html.dark {
 
   .hero-vignette {
     background:
-      radial-gradient(115% 80% at 50% 42%, transparent 44%, rgba(251, 252, 245, 0.9) 100%),
-      linear-gradient(180deg, rgba(251, 252, 245, 0.8) 0%, transparent 22%);
+      radial-gradient(120% 86% at 50% 42%, transparent 50%, rgba(251, 252, 245, 0.82) 100%),
+      linear-gradient(180deg, rgba(251, 252, 245, 0.72) 0%, transparent 20%);
   }
   html.dark .hero-vignette {
     background:
-      radial-gradient(115% 80% at 50% 42%, transparent 38%, rgba(7, 9, 8, 0.92) 100%),
-      linear-gradient(180deg, rgba(7, 9, 8, 0.86) 0%, transparent 26%);
+      radial-gradient(120% 86% at 50% 42%, transparent 54%, rgba(7, 9, 8, 0.88) 100%),
+      linear-gradient(180deg, rgba(7, 9, 8, 0.76) 0%, transparent 22%);
   }
 
   .hero-video {
@@ -410,6 +422,19 @@ html.dark {
     background: rgba(7, 9, 8, 0.52);
     border-color: rgba(255, 255, 255, 0.14);
     box-shadow: 0 16px 34px -28px rgba(0, 0, 0, 0.9);
+  }
+
+  /* The hero's one action. The reference direction lights it with a soft
+     glow instead of a border; the glow is a shadow, so the label keeps the
+     contrast its token already guarantees. Scoped to the hero on purpose —
+     one glowing control per page. */
+  .hero-cta {
+    box-shadow: 0 0 0 1px var(--color-hairline-strong), 0 0 24px var(--color-lime-soft),
+      0 0 52px var(--color-lime-soft);
+  }
+  .hero-cta:hover {
+    box-shadow: 0 0 0 1px var(--color-hairline-strong), 0 0 30px var(--color-lime-soft),
+      0 0 68px var(--color-lime-soft);
   }
 
   /* Primary action: lime fill. The only solid fill on a page, and the
