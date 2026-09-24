@@ -1,7 +1,6 @@
 'use client'
 
 import Seo, { organizationLd, websiteLd } from '../lib/Seo'
-import { CAPABILITIES } from '../lib/brand'
 import Hero from '../components/Hero'
 import LogoMarquee from '../components/LogoMarquee'
 import Metrics from '../components/Metrics'
@@ -26,12 +25,6 @@ export default function HomePage() {
         <Principles />
         <HomeCTA />
       </main>
-      {/* Capability anchors for deep links like /#capabilities */}
-      <div className="sr-only" aria-hidden>
-        {CAPABILITIES.map((c) => (
-          <span key={c.id} id={c.id} />
-        ))}
-      </div>
     </>
   )
 }
