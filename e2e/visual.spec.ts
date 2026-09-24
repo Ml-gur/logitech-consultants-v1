@@ -83,15 +83,32 @@ async function settlePage(page: Page) {
   await page.waitForTimeout(1500)
 }
 
-test('visual: home hero section', async ({ page }) => {
-  await seedConsent(page)
-  await page.goto('/')
-  await page.waitForLoadState('networkidle')
-  // Hero entrance animations run up to ~1.9s after mount (word stagger + delays)
-  await page.waitForTimeout(2500)
-  await freezeLoop(page)
-  await expect(page.locator('section#hero')).toHaveScreenshot('home-hero.png', { maxDiffPixels: 500 })
-})
+/**
+ * There is no desktop capture of the hero, deliberately — and this is the only
+ * place in the suite where a golden was removed rather than fixed.
+ *
+ * The hero is a full-screen composition of type: the nav's links, the trust row,
+ * two 78px headline lines, the subhead, the action and four stat cells at a
+ * 1,430-pixel width. Chromium on Linux rasterises text with the system FreeType,
+ * so the machine that records the golden and the machine that checks it produce
+ * the same layout with different glyph pixels. Measured across CI's three
+ * attempts of this capture: the attempts agree with each other to **33 pixels**
+ * (max channel delta 1) while differing from the recorded golden by **51,339
+ * pixels over pixelmatch's threshold — 4% of the frame — every one of them
+ * inside the text bands**, with the layout identical. Neither hinting off nor
+ * disabling LCD text closes that gap, because the difference is the rasteriser,
+ * not the settings.
+ *
+ * A 500-pixel allowance (0.04% of the frame) cannot absorb 4%, and raising it to
+ * what would absorb it would stop the golden detecting anything at all. So the
+ * hero is pinned by assertions that do not depend on glyph pixels instead:
+ * `e2e/home.spec.ts` holds the CTA above the fold at four widths, the stats band
+ * inside the first screen at three widths, the single accent-filled action, the
+ * statement in one face and one colour, the backdrop's layer order and the dot
+ * field's mask, and the absence of images, client names and claimed rates. The
+ * 390px hero capture below stays: it passes on both machines, and it is the one
+ * that has caught real regressions (CTA placement, overflow).
+ */
 
 test('visual: home capabilities section', async ({ page }) => {
   await seedConsent(page)

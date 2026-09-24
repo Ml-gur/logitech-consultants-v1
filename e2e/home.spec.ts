@@ -201,6 +201,19 @@ test('hero: one filled action, over a plate that stays clear of the type', async
   // The first stop is fully transparent (Chromium computes `transparent` to
   // `rgba(0, 0, 0, 0)`), so the plate has a clean middle to set type on.
   expect(mask).toContain('rgba(0, 0, 0, 0)')
+
+  // The backdrop's layer order, bottom to top: the loop, the scrim that keeps
+  // the copy readable over it, the dot field, the light source, the vignette.
+  // This is the part a pixel golden would not describe even if it could be
+  // compared across machines — the scrim has to sit between the video and the
+  // type, or the statement is measured against a moving picture.
+  // The loop is attached after first paint, so wait for it rather than assuming
+  // it is in the first HTML the page produces.
+  await expect(hero.locator('.hero-video')).toHaveCount(1)
+  const layers = await hero.locator('.hero-backdrop > *').evaluateAll((nodes: Element[]) =>
+    nodes.map((n) => n.className.split(' ').find((c: string) => c.startsWith('hero-'))),
+  )
+  expect(layers).toEqual(['hero-video', 'hero-scrim', 'hero-dots', 'hero-glow', 'hero-vignette'])
 })
 
 test('home stays minimal: five sections, the depth lives on the inner pages', async ({ page }) => {

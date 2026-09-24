@@ -27,6 +27,20 @@ Notable changes to the Naivolabs website and CMS. The format follows
 
 ### Fixed
 
+- **The desktop hero golden is gone; the hero is pinned geometrically instead.**
+  A full-screen composition of type cannot be compared pixel-by-pixel between the
+  machine that records it and the runner that checks it: Chromium on Linux
+  rasterises text with the system FreeType, and across CI's three attempts of
+  that capture the attempts agreed with each other to 33 pixels (max channel
+  delta 1) while differing from the recorded golden by 51,339 pixels over
+  pixelmatch's threshold — 4% of the frame, every one of them inside a text band,
+  with the layout identical. Hinting off and LCD text off do not close it,
+  because the difference is the rasteriser rather than the settings. `home.spec.ts`
+  now holds what the golden was actually guarding: the backdrop's layer order
+  (loop, scrim, dot field, light source, vignette), alongside the CTA above the
+  fold at four widths, the stats band inside the first screen at three, the
+  statement in one face and one colour, and exactly one accent-filled action. The
+  390px hero capture stays, and it is the one that has caught real regressions.
 - **Visual goldens are recorded with deterministic text rendering.** Two Chromium
   flags (`--font-render-hinting=none`, `--disable-lcd-text`) join the launch
   options in `e2e/chromium-options.ts`. FreeType's hinting and LCD subpixel
