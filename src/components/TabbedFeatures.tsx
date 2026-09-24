@@ -120,7 +120,7 @@ function OrchestrationIllustration() {
       {/* Orchestrator bar */}
       <div className="rounded-[10px] bg-[#191919] px-3 py-2.5 mb-3">
         <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#7084ff]" aria-hidden />
+          <span className="w-1.5 h-1.5 rounded-full bg-white" aria-hidden />
           <span className="text-[11px] font-medium text-white">Workflow orchestrator</span>
           <span className="ml-auto font-mono text-[10px] text-[#a7a9ac]">4 steps live</span>
         </div>
@@ -132,7 +132,7 @@ function OrchestrationIllustration() {
             <div className="text-[10px] font-medium text-[#111111] truncate">{n}</div>
             <div className="mt-1 h-[3px] rounded-full bg-[#d8d9e6]">
               <motion.div
-                className="h-full rounded-full bg-[#405bff]"
+                className="h-full rounded-full bg-white"
                 initial={{ width: 0 }}
                 animate={{ width: '100%' }}
                 transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}

@@ -13,15 +13,15 @@ export default function HomeCTA() {
         <div
           className="relative rounded-[32px] overflow-hidden p-10 sm:p-16 lg:p-20"
           style={{
-            background: 'linear-gradient(135deg, rgba(61,85,240,0.18) 0%, rgba(124,145,255,0.08) 50%, rgba(8,8,16,0.8) 100%)',
-            border: '1px solid rgba(124,145,255,0.2)',
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.04) 50%, rgba(0,0,0,0.8) 100%)',
+            border: '1px solid rgba(255,255,255,0.16)',
           }}
         >
           {/* Background radial */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'radial-gradient(ellipse 70% 80% at 20% 50%, rgba(61,85,240,0.2) 0%, transparent 65%)',
+              background: 'radial-gradient(ellipse 70% 80% at 20% 50%, rgba(255,255,255,0.12) 0%, transparent 65%)',
             }}
             aria-hidden
           />
@@ -94,9 +94,9 @@ export default function HomeCTA() {
               <Link
                 to="/blog"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 text-[14px] font-medium rounded-full transition-all duration-200 whitespace-nowrap"
-                style={{ border: '1px solid rgba(124,145,255,0.3)', color: 'var(--color-signal)', minHeight: '52px' }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(124,145,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(124,145,255,0.5)' }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(124,145,255,0.3)' }}
+                style={{ border: '1px solid rgba(255,255,255,0.3)', color: 'var(--color-signal)', minHeight: '52px' }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)' }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)' }}
               >
                 Read our insights
               </Link>

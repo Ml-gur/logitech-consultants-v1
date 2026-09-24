@@ -19,8 +19,8 @@ function PrincipleCard({ title, index }: { title: string; index: number }) {
         border: '1px solid rgba(255,255,255,0.07)',
       }}
       onMouseEnter={e => {
-        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(124,145,255,0.28)'
-        ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 20px rgba(61,85,240,0.1)'
+        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.28)'
+        ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 20px rgba(255,255,255,0.1)'
       }}
       onMouseLeave={e => {
         (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'

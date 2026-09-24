@@ -91,7 +91,7 @@ export default function Metrics() {
                   fontWeight: 400,
                   lineHeight: 1,
                   letterSpacing: '-0.03em',
-                  background: 'linear-gradient(135deg, #f0f0f8 0%, #7c91ff 100%)',
+                  background: 'linear-gradient(135deg, #ffffff 0%, #8d8d8d 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',

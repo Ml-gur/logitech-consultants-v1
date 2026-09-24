@@ -1,36 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&display=swap');
 @import 'tailwindcss';
 
 /* ============================================
    Naivolabs: Design System
-   Dark canvas with Signal Violet + Voltage Blue
-   accents. Fraunces display serif + Inter body.
+   Dark canvas with monochrome hero-led styling.
+   Bubbledot display + Inter body.
    ============================================ */
 
 @theme {
-  /* Colors */
-  --color-signal: #7c91ff;
-  --color-voltage: #3d55f0;
-  --color-voltage-hover: #2d43d8;
-  --color-plasma: #3dd6f5;
-  --color-midnight: #080810;
-  --color-carbon: #12121a;
-  --color-smoke: #1e1e2a;
-  --color-graphite: #2e2e3d;
-  --color-steel: #52525f;
-  --color-slate: #6d6d7a;
-  --color-fog: #9898a8;
-  --color-ash: #c8c8d4;
-  --color-paper: #f0f0f8;
-  --color-error: #ff8b8b;
-  --color-success: #7ee0a8;
-  --color-gold: #c9a84c;
+  /* Monochrome tokens shared by the video hero and every supporting section. */
+  --color-signal: #ffffff;
+  --color-voltage: #ffffff;
+  --color-voltage-hover: #d8d8d8;
+  --color-plasma: #ffffff;
+  --color-midnight: #000000;
+  --color-carbon: #0b0b0b;
+  --color-smoke: #161616;
+  --color-graphite: #292929;
+  --color-steel: #4b4b4b;
+  --color-slate: #777777;
+  --color-fog: #a1a1a1;
+  --color-ash: #c9c9c9;
+  --color-paper: #ffffff;
+  --color-error: #ff9b9b;
+  --color-success: #b8f0c9;
+  --color-gold: #ffffff;
 
-  --color-signal-gradient: linear-gradient(135deg, #3d55f0 0%, #7c91ff 100%);
+  --color-signal-gradient: linear-gradient(135deg, #ffffff 0%, #8d8d8d 100%);
 
-  /* Typography: Fraunces display + Inter body + JetBrains Mono */
+  /* Typography: Bubbledot display + Inter body + JetBrains Mono */
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-display: 'BubbledotICG-FinePos', 'Inter', ui-sans-serif, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Type scale (design.md) */
@@ -142,7 +141,7 @@
     color: var(--color-paper);
   }
 
-  /* Designed keyboard focus rings: Signal Violet, follows element radius */
+  /* Designed keyboard focus rings: white, follows element radius */
   :focus-visible {
     outline: 2px solid var(--color-signal);
     outline-offset: 3px;
@@ -202,7 +201,7 @@
     transition: background 0.2s ease, transform 0.2s ease;
   }
   .btn-primary:hover {
-    background: #3351e6; /* slightly deeper blue on hover */
+    background: var(--color-voltage-hover);
   }
   .btn-primary:active {
     transform: scale(0.98);

@@ -109,7 +109,7 @@ export default function Process() {
                     {Array.from({ length: i + 1 }).map((_, b) => (
                       <span
                         key={b}
-                        className="h-3 w-[3px] rounded-full bg-gradient-to-b from-[#7084ff] to-[#405bff]"
+                        className="h-3 w-[3px] rounded-full bg-gradient-to-b from-white to-[#777777]"
                       />
                     ))}
                   </span>

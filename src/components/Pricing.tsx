@@ -146,7 +146,7 @@ export default function Pricing() {
                 to="/contact"
                 className={`block text-center py-3.5 rounded-[30px] text-sm font-medium transition-colors duration-200 ${
                   tier.featured
-                    ? 'bg-[#405bff] text-white hover:bg-[#3351e6]'
+                    ? 'bg-white text-black hover:bg-[#d8d8d8]'
                     : 'border border-signal text-signal hover:bg-signal/10'
                 }`}
               >

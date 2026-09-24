@@ -109,7 +109,7 @@ export default function CookieBanner() {
                             type="checkbox"
                             checked
                             disabled
-                            className="mt-1 w-4 h-4 accent-[#7084ff]"
+                            className="mt-1 w-4 h-4 accent-white"
                             aria-describedby="cookie-necessary-help"
                           />
                           <span>
@@ -125,7 +125,7 @@ export default function CookieBanner() {
                             type="checkbox"
                             checked={prefs.analytics}
                             onChange={(e) => setPrefs((p) => ({ ...p, analytics: e.target.checked }))}
-                            className="mt-1 w-4 h-4 accent-[#7084ff]"
+                            className="mt-1 w-4 h-4 accent-white"
                           />
                           <span>
                             <span className="text-paper font-medium">Analytics</span>
@@ -140,7 +140,7 @@ export default function CookieBanner() {
                             type="checkbox"
                             checked={prefs.marketing}
                             onChange={(e) => setPrefs((p) => ({ ...p, marketing: e.target.checked }))}
-                            className="mt-1 w-4 h-4 accent-[#7084ff]"
+                            className="mt-1 w-4 h-4 accent-white"
                           />
                           <span>
                             <span className="text-paper font-medium">Marketing</span>
