@@ -34,7 +34,6 @@ export default function Nav() {
         <div className="hero-nav-pill">
           {links.map((link) => <NavLink key={link.label} to={link.to} end={link.to === '/'}>{link.label}</NavLink>)}
         </div>
-        <Link to="/contact" className="hero-sign-in">Sign in</Link>
       </nav>
       <button className={`hero-menu-button${open ? ' is-open' : ''}`} onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? 'Close menu' : 'Open menu'}>
         <span /><span /><span />
@@ -42,7 +41,6 @@ export default function Nav() {
       {open && <div className="hero-mobile-overlay" onClick={() => setOpen(false)} aria-hidden="true" />}
       <nav id="mobile-menu" className={`hero-mobile-menu${open ? ' is-open' : ''}`} aria-label="Mobile navigation" hidden={!open}>
         {links.map((link) => <NavLink key={link.label} to={link.to} end={link.to === '/'}>{link.label}</NavLink>)}
-        <Link to="/contact" className="hero-mobile-sign-in">Sign in</Link>
       </nav>
     </header>
   )

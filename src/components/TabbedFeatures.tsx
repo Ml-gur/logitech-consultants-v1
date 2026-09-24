@@ -222,43 +222,21 @@ export default function TabbedFeatures() {
 Naivo connects intelligence to the work your organization already does.
           </motion.p>
 
-          {/* Segmented tab control, 30px radius, Carbon fill, active dot */}
           <motion.div
             initial={revealInitial}
             whileInView={revealWhileInView}
             viewport={revealViewport}
             transition={springReveal(0.18)}
-            className="flex justify-center mb-14"
+            className="capability-overview mb-14"
           >
-            <div
-              role="tablist"
-              aria-label="Capabilities"
-              className="inline-flex max-w-full overflow-x-auto rounded-[30px] bg-[#191919] border border-white/10 p-1.5 gap-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            >
-              {CAPABILITIES.map((tab) => {
-                const selected = tab.id === active
-                return (
-                  <button
-                    key={tab.id}
-                    role="tab"
-                    id={`tab-${tab.id}`}
-                    aria-selected={selected}
-                    aria-controls={`panel-${tab.id}`}
-                    onClick={() => setActive(tab.id)}
-                    className={`flex items-center gap-2.5 whitespace-nowrap px-5 py-3 min-h-[44px] rounded-[30px] text-sm transition-colors duration-200 ${
-                      selected ? 'bg-white/5 text-paper' : 'text-ash hover:text-paper'
-                    }`}
-                  >
-                    <span
-                      className={`w-1.5 h-1.5 rounded-full transition-opacity duration-200 ${
-                        selected ? 'bg-signal opacity-100' : 'bg-transparent opacity-0'
-                      }`}
-                      aria-hidden
-                    />
-                    {tab.name}
-                  </button>
-                )
-              })}
+            <div className="capability-overview-grid">
+              {CAPABILITIES.map((capability) => (
+                <article key={capability.id} className="capability-overview-card">
+                  <span className="capability-overview-dot" aria-hidden />
+                  <h3>{capability.headline}</h3>
+                  <p>{capability.description}</p>
+                </article>
+              ))}
             </div>
           </motion.div>
 
