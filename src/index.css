@@ -26,6 +26,12 @@
   --color-success: #f69103;
   --color-gold: var(--color-plasma);
 
+  /* Layout contract: all spacing scales from a predictable 4px rhythm. */
+  --p-density: 1;
+  --space-unit: 4px;
+  --content-gutter: clamp(20px, 4vw, 72px);
+  --content-max: 1200px;
+
   --color-signal-gradient: linear-gradient(135deg, #f69103 0%, #ff7f00 52%, #ea6206 100%);
 
   /* Typography: Inter display/body + JetBrains Mono */
@@ -452,6 +458,8 @@ html.lenis body {
 @media (max-width: 720px) {
   .inspiration-shell h2 { font-size: clamp(2.4rem, 12vw, 4rem); }
   .inspiration-shell section::before { inset-inline: 16px; }
+  .inspiration-shell section { padding-inline: var(--content-gutter); }
+  .reference-page { padding: 6rem var(--content-gutter) 4rem; }
 }
 /* B2bizz-inspired inner pages: compact, image-led chapters with the same
    black / pale-lime system as the home hero. */
@@ -459,7 +467,11 @@ html.lenis body {
   min-height: 100vh;
   overflow: clip;
   background: var(--color-midnight);
-  padding-bottom: 6rem;
+  padding: clamp(6.5rem, 10vw, 9rem) var(--content-gutter) 6rem;
+}
+.reference-page > * {
+  width: min(100%, var(--content-max));
+  margin-inline: auto;
 }
 .reference-page div {
   max-width: 1360px;
@@ -750,7 +762,7 @@ footer {
   }
 }
 
-/* ── Refined scrollbars ─────────�����─���──��──────────────────────��─────── */
+/* ── Refined scrollbars ─────────�����─���──��──────────────────────���─────── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

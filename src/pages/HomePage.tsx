@@ -17,12 +17,12 @@ export default function HomePage() {
         jsonLd={[organizationLd(), websiteLd()]}
       />
       <Hero />
-      <main className="inspiration-shell">
+      <div className="inspiration-shell">
         <LogoMarquee />
-              <Principles />
+        <Principles />
         <DeploymentPatterns />
         <HomeCTA />
-      </main>
+      </div>
     </>
   )
 }
