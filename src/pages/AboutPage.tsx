@@ -272,12 +272,13 @@ export default function AboutPage() {
           </motion.h2>
 
           <div className="team-reference-grid">
-            {team.slice(0, 4).map((member, i) => {
+            {team.slice(0, 5).map((member, i) => {
               const portraits = [
                 '/images/74bgmTCLhG1vjdwC6jrte1Upppk.webp',
                 '/images/Eu8lb04bFCoyCpFuitulq7gxSfM.webp',
                 '/images/IMZdofzqqJ3H2GANrvn50i2D9qo.webp',
                 '/images/J7KZFcCw0ZrENLKo0wuCy6nASg.webp',
+                '/images/segnJi5cGsCMhvZ3MZQnn4lCk5w.webp',
               ]
               return (
                 <motion.article
