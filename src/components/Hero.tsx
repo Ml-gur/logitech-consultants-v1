@@ -37,17 +37,15 @@ import { EASE_OUT } from '../motion'
  */
 
 /**
- * Optional background loop.
+ * The background loop, when one has been dropped in beside this component.
  *
- * The reference for this hero carries a full-bleed video. One is supported here
- * but none is bundled, deliberately: the clip that direction uses lives on a
- * third-party CDN as a ~14 MB file, which would break the 1.5 MB per-route
- * transfer budget in `e2e/performance.spec.ts`, download on every phone, and
- * require widening the production CSP (`media-src`) to an origin we do not
- * control. Drop an optimised loop in this directory as `hero-loop.mp4` or
- * `hero-loop.webm` and it is picked up automatically, hashed and served from our
- * own origin; with no file present the hero renders its lit backdrop alone. The
- * CSS decides where it may run (wide viewports, dark theme, motion allowed).
+ * The clip the reference direction opens on is a 14 MB file on a third-party
+ * CDN: shipping that URL would need the production CSP widened to an origin we
+ * do not control, and 14 MB per visitor to a hero backdrop. The same footage is
+ * therefore decoded once, re-framed to the size it is actually used at
+ * (1280×720) and shipped as a 338 kB WebM from our own origin, where it is
+ * hashed, cached immutably, and covered by `media-src 'self'`. With no file
+ * present the hero renders its plate alone, so the backdrop is never broken.
  */
 const heroLoop = Object.values(
   import.meta.glob('./hero-loop.{mp4,webm}', {
@@ -69,6 +67,41 @@ const heroLoop = Object.values(
  * over claims" rule in AGENTS.md).
  */
 const MARKS = [MessagesSquare, FileCheck, Workflow] as const
+
+/**
+ * Attach the loop after first paint, and only when the visitor can afford it.
+ *
+ * `preload="none"` alone still spends the bytes: the element exists, so the
+ * browser will fetch the clip on a phone on 2G just as happily as on fibre. The
+ * plate is a complete backdrop on its own, so the video is an enhancement —
+ * skipped entirely under `prefers-reduced-motion` and Data Saver, one step
+ * down the connection table for slow links, and mounted on idle rather than
+ * during load.
+ */
+function useHeroLoop(enabled: boolean): boolean {
+  const [show, setShow] = useState(false)
+
+  useEffect(() => {
+    if (!enabled) return
+
+    const connection = (
+      navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }
+    ).connection
+    if (connection?.saveData) return
+    if (connection?.effectiveType && /(^|-)2g$/.test(connection.effectiveType)) return
+
+    const requestIdle = window.requestIdleCallback?.bind(window)
+    if (requestIdle) {
+      const handle = requestIdle(() => setShow(true), { timeout: 2000 })
+      return () => window.cancelIdleCallback?.(handle)
+    }
+
+    const timer = window.setTimeout(() => setShow(true), 900)
+    return () => window.clearTimeout(timer)
+  }, [enabled])
+
+  return show
+}
 
 const container: Variants = {
   hidden: {},
@@ -172,6 +205,7 @@ function MetricCell({ metric, index, still }: { metric: Metric; index: number; s
 
 export default function Hero() {
   const reduce = useReducedMotion()
+  const loop = useHeroLoop(Boolean(heroLoop) && !reduce)
 
   return (
     <section id="hero" className="relative isolate overflow-hidden">
@@ -179,9 +213,22 @@ export default function Hero() {
           a vignette that returns the edges and the strip under the header to
           the canvas, and a looping video if one has been dropped in. */}
       <div aria-hidden className="hero-backdrop pointer-events-none absolute inset-0">
-        {heroLoop ? (
-          <video className="hero-video" src={heroLoop} autoPlay muted loop playsInline preload="none" />
+        {heroLoop && loop ? (
+          <video
+            className="hero-video"
+            src={heroLoop}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="none"
+            disablePictureInPicture
+          />
         ) : null}
+        {/* Scrim, then the plate's texture and its light source, then the
+            vignette: the copy is measured against this stack, never against
+            whatever frame the clip happens to be showing. */}
+        <div className="hero-scrim absolute inset-0" />
         <div className="hero-dots absolute inset-0" />
         <div className="hero-glow absolute inset-0" />
         <div className="hero-vignette absolute inset-0" />

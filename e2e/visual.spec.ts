@@ -38,6 +38,33 @@ async function settleSection(page: Page, section: Locator) {
 }
 
 /**
+ * Freeze the hero's background loop on its first frame.
+ *
+ * `animations: 'disabled'` stops CSS animations and transitions. It does not
+ * stop a video, so a hero captured while the clip runs pins whichever frame
+ * happened to be on screen — a different one on every run, on every machine.
+ * The clip is decoration; the plate and the type over it are the design, so the
+ * capture waits for the element to exist and then holds it at t=0.
+ */
+async function freezeLoop(page: Page) {
+  await page
+    .waitForFunction(() => !!document.querySelector('video.hero-video'), null, { timeout: 4000 })
+    .catch(() => null)
+
+  await page.evaluate(async () => {
+    const video = document.querySelector<HTMLVideoElement>('video.hero-video')
+    if (!video) return
+    video.pause()
+    video.currentTime = 0
+    if (video.readyState >= 2) return
+    await new Promise<void>((resolve) => {
+      video.addEventListener('seeked', () => resolve(), { once: true })
+      window.setTimeout(resolve, 1500)
+    })
+  })
+}
+
+/**
  * Walk the whole page before a full-page capture.
  *
  * The sweep runs in steps rather than one jump so every position gets frames in
@@ -62,6 +89,7 @@ test('visual: home hero section', async ({ page }) => {
   await page.waitForLoadState('networkidle')
   // Hero entrance animations run up to ~1.9s after mount (word stagger + delays)
   await page.waitForTimeout(2500)
+  await freezeLoop(page)
   await expect(page.locator('section#hero')).toHaveScreenshot('home-hero.png', { maxDiffPixels: 500 })
 })
 
@@ -148,6 +176,7 @@ test.describe('mobile widths', () => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
     await page.waitForTimeout(2500)
+    await freezeLoop(page)
     await expect(page.locator('section#hero')).toHaveScreenshot('mobile-home-hero.png', { maxDiffPixels: 500 })
   })
 

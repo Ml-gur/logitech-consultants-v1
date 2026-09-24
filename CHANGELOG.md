@@ -27,6 +27,20 @@ Notable changes to the Naivolabs website and CMS. The format follows
 
 ### Fixed
 
+- **Visual goldens are recorded with deterministic text rendering.** Two Chromium
+  flags (`--font-render-hinting=none`, `--disable-lcd-text`) join the launch
+  options in `e2e/chromium-options.ts`. FreeType's hinting and LCD subpixel
+  filtering follow the host's font configuration, so the same font at the same
+  size lands its glyph edges on different pixels on two machines — a per-glyph
+  difference concentrated exactly on the pixels that carry the type, which no
+  diff threshold can absorb. The brand-asset script already rendered with
+  hinting off for the same reason. Every golden that the change actually moves
+  was regenerated; the twelve that were already stable across machines are
+  untouched, which is the evidence that the flags did what they were added for.
+- **The hero's loop is frozen before a visual capture.** `animations:
+  'disabled'` stops CSS animations and transitions and does nothing to a video,
+  so a hero captured while the clip ran pinned whichever frame happened to be on
+  screen. `freezeLoop()` in `e2e/visual.spec.ts` holds it at t=0.
 - **The E2E suite's webfont wait was a no-op, and the first capture of a session
   could record the fallback face.** `e2e/fonts.ts` read `@font-face` rules off the
   top level of each stylesheet, but the site's faces are declared inside
@@ -44,6 +58,37 @@ Notable changes to the Naivolabs website and CMS. The format follows
 
 ### Changed
 
+- **The header is a paper pill and a circular mark.** The menu bar follows the
+  reference direction (`src/components/Nav.tsx`): a real circular mark — the
+  brand glyph on a `paper` disc — on the left, the links in a pill of their own
+  centred absolutely so a wider mark or action cannot drag them off centre, and
+  the page's action on the right as a raised `carbon` pill. The links carry the
+  current page as **three dots** under the label, drawn from
+  `[aria-current='page']`, which `NavLink` already sets, so the mark cannot fall
+  out of step with the route. On phones the bar collapses to the mark, the theme
+  control and a 48px burger, and the menu is a `paper` sheet over a blurred
+  scrim instead of a strip pushed under the header — 52px rows, the same dots,
+  and the page behind it held still while it is open.
+
+  The pill is the design system's first **inverted surface**, which needed a
+  token pair the ladder did not have: the three text tones are drawn for the
+  canvas, so a `paper` fill had no label colour that cleared AA. `on-paper` is
+  `ink` (they are inverse pairs, so it holds in both themes) and
+  `on-paper-quiet` is a mid-tone that clears 8.0:1 in light and 6.1:1 in dark.
+  `--shadow-nav` is the one persistent shadow in the system, because the header
+  floats over content; it is deliberately the softest one.
+- **The hero ships its background loop.** The clip the reference direction
+  opens on is a 14 MB H.264 file on a third-party CDN, which would need the
+  production CSP widened to an origin we do not control and 14 MB per visitor
+  for a backdrop. The same footage is decoded once, re-framed to 1280×720 and
+  shipped as a **338 kB WebM** from our own origin
+  (`src/components/hero-loop.webm`), where it is hashed, immutable, and covered
+  by `media-src 'self'`. It is attached on idle rather than during load, and
+  skipped entirely under `prefers-reduced-motion`, under Data Saver, and on 2G —
+  the plate is a complete backdrop without it. It runs on phones as well as
+  desktops, and never in the light inversion, where dark copy would sit on a
+  dark clip. The home page transfers 563 kB with the loop playing, inside the
+  1.5 MB per-route budget in `e2e/performance.spec.ts`.
 - **The hero reads as a dark plate, and the statement is white.** The backdrop
   (`src/index.css`) is now a low light field with a dot field over it — a 1px mark
   on a 22px grid in the hairline colour, masked *clear through the middle* so the

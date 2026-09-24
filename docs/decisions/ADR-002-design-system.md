@@ -121,6 +121,13 @@ Type scale, from `--text-caption` (12px) to `--text-display` (84px), is declared
 in `src/index.css`; components use the token names, not raw pixel values. Body
 measure is capped below 80 characters.
 
+The header's pill is the system's one **inverted surface**: a `paper` fill
+carrying `on-paper` (`ink`, its inverse pair) and `on-paper-quiet` for its
+labels. The three text tones are drawn for the canvas and cannot be reused on an
+inverse, so the pair is declared alongside them; the quiet tone clears AA at both
+ends (8.0:1 in the light theme, 6.1:1 in the dark). Anything else inverted needs
+the same two tones, not a new hex.
+
 ### 3. Radii: generous, and pills for actions only
 
 `--radius-panel: 20px`, `--radius-card: 30px`, `--radius-field: 12px`,
@@ -149,10 +156,16 @@ Home is hero → capabilities → deployment patterns → commitments → call t
 action. Depth (the deployment model, governance, positioning, the FAQ) lives on
 `/capabilities` and `/about`. Section rhythm is `clamp(72px, 9vw, 144px)`.
 
-The header is a floating bar: the wordmark left, the links in a centred pill of
-their own, and the one action right — a header-level control rather than a nav
-item, because it is the page's action, not a destination. The header CTA is
-outlined, so the hero owns the screen's single filled control.
+The header is a floating bar: the brand mark — the glyph on a circular `paper`
+button — left, the links in a centred `paper` pill of their own, and the one
+action right as a raised `carbon` pill. The action is a header-level control
+rather than a nav item, because it is the page's action, not a destination, and
+it is filled with `carbon` rather than the accent so the hero keeps the screen's
+single accent fill. The current page is marked with three dots under its label,
+drawn from `[aria-current='page']` so the mark cannot disagree with the route.
+The header is also the only surface that inverts the canvas, and the only one
+carrying a persistent shadow: it floats over content, so `--shadow-nav` is
+structural here rather than decoration.
 
 The hero is one full-bleed screen in three regions (`src/components/Hero.tsx`):
 a row above the statement, the statement and its single action, and a band of four

@@ -114,12 +114,16 @@ of them.
   raw hex value or an arbitrary pixel radius. Panels and cards are generously
   rounded; pills are reserved for actions. Dark is the resting state — the suite
   pins `colorScheme: 'dark'` so the canonical theme is the one under test.
-- **The hero can carry a background loop, but none ships.** Dropping
-  `src/components/hero-loop.mp4` (or `.webm`) turns one on: `Hero.tsx` picks the
-  file up, and the CSS decides where it may run (wide viewports, dark theme, no
-  reduced-motion preference). Keep it small — it is budgeted like any other
-  asset, and the per-route transfer budget in `e2e/performance.spec.ts` counts
-  every byte.
+- **The hero's background loop ships as a 338 kB WebM**
+  (`src/components/hero-loop.webm`), picked up by `Hero.tsx` and attached after
+  first paint — never under `prefers-reduced-motion`, Data Saver or 2G, and never
+  in the light theme. To replace it, drop a new `hero-loop.webm` (or `.mp4`) in
+  that directory and delete the old one; the component takes whichever is
+  present. Keep it small: it is budgeted like any other asset, and the per-route
+  transfer budget in `e2e/performance.spec.ts` counts every byte. The source clip
+  this was cut from is a 14 MB H.264 file on a third-party CDN — do not link it
+  directly: the production CSP is `default-src 'self'`, and 14 MB per visitor for
+  a backdrop is not a trade this site makes.
 - **Motion goes through `src/motion.ts`.** One orchestrated moment per page,
   scroll-linked transforms for anything that moves with the page, and
   `MotionConfig reducedMotion="user"` around every animated component.

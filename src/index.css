@@ -69,6 +69,16 @@
   --color-lime-soft: rgba(77, 92, 15, 0.3);
   --color-on-lime: #f3ffc9;     /* text that sits on a lime fill */
 
+  /* ── The inverted surface ──────────────────────────────────
+     The header's pill is the one surface that inverts the page: paper as
+     a fill. Its labels therefore need the paper-side pair, because every
+     text ladder in this system is drawn for the canvas, not for inverse.
+     `on-paper` is `ink` — they are inverse pairs, so this stays correct
+     in both themes — and the quiet tone is a mid-tone that clears AA on
+     either end of it (8.0:1 in light, 6.1:1 in dark). */
+  --color-on-paper: #fbfcf5;
+  --color-on-paper-quiet: #a9b09d;
+
   /* ── Hairlines and veils ─────────────────────────────────── */
   --color-hairline: rgba(20, 23, 13, 0.12);
   --color-hairline-strong: rgba(20, 23, 13, 0.2);
@@ -109,6 +119,10 @@
 
   /* ── Elevation — depth without glow ──────────────────────── */
   --shadow-lift: 0 24px 60px -34px rgba(20, 23, 13, 0.32);
+  /* The header floats over content, so it is the one surface that carries a
+     persistent shadow rather than a lift on hover. Soft on purpose: a heavy
+     shadow under a pill reads as a second panel. */
+  --shadow-nav: 0 4px 14px rgba(20, 23, 13, 0.16);
 }
 
 /* ── Dark mode ────────────────────────────────────────────────
@@ -134,6 +148,9 @@ html.dark {
   --color-fog: #9aa189;
   --color-slate: #6f7666;
 
+  --color-on-paper: #0e100f;
+  --color-on-paper-quiet: #5b6156;
+
   --color-lime: #f3ffc9;
   --color-lime-bright: #f7ffdd;
   --color-lime-deep: #dcecab;
@@ -149,6 +166,7 @@ html.dark {
   --color-success: #7fb894;
 
   --shadow-lift: 0 22px 48px -28px rgba(0, 0, 0, 0.95);
+  --shadow-nav: 0 6px 18px rgba(0, 0, 0, 0.45);
 }
 
 @layer base {
@@ -344,6 +362,91 @@ html.dark {
       radial-gradient(64% 54% at 50% 112%, rgba(214, 140, 96, 0.12) 0%, transparent 72%);
   }
 
+  /* ── Header ────────────────────────────────────────────────
+     The reference direction opens on a white pill of links and a circular
+     mark, floating over a dark plate. That language is adopted here on
+     tokens: the pill and the mark are `paper` fills, and their labels come
+     from the paper-side tone pair above, so the whole treatment inverts
+     with the theme instead of being a light-only patch. */
+  .nav-mark {
+    display: grid;
+    place-items: center;
+    width: clamp(40px, 4.4vw, 46px);
+    height: clamp(40px, 4.4vw, 46px);
+    border-radius: 999px;
+    background: var(--color-paper);
+    box-shadow: var(--shadow-nav);
+    transition: transform 0.25s ease;
+  }
+  .nav-mark:hover {
+    transform: scale(1.04);
+  }
+
+  .nav-pill {
+    border-radius: 999px;
+    background: var(--color-paper);
+    padding: 4px 8px;
+    box-shadow: var(--shadow-nav);
+  }
+
+  .nav-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    /* 44px: the site's minimum tap target, held here so the pill can stay
+       short without the links becoming unpressable. */
+    min-height: 44px;
+    padding-inline: 14px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--color-on-paper-quiet);
+    transition: color 0.2s ease;
+  }
+  .nav-link:hover {
+    color: var(--color-on-paper);
+  }
+  .nav-link[aria-current='page'] {
+    color: var(--color-on-paper);
+  }
+  /* The active mark: three 3px dots under the label, drawn with box-shadow so
+     it stays one pseudo-element and never inherits a text baseline. */
+  .nav-link[aria-current='page']::after {
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    width: 3px;
+    height: 3px;
+    border-radius: 999px;
+    background: currentColor;
+    transform: translateX(-50%);
+    box-shadow: -5px 0 currentColor, 5px 0 currentColor;
+  }
+
+  /* The header's action: a filled pill in the canvas' raised tone, so it is
+     unmistakably the header's own control while the hero keeps the page's one
+     accent fill. */
+  .nav-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding-inline: 18px;
+    border-radius: 999px;
+    background: var(--color-carbon);
+    color: var(--color-ash);
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: var(--shadow-nav);
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  }
+  .nav-action:hover {
+    background: var(--color-smoke);
+    color: var(--color-paper);
+    transform: translateY(-1px);
+  }
+
   /* ── Hero dot field ────────────────────────────────────────
      The one texture in the system: a 1px mark on a 22px grid, in
      the hairline colour, so it follows the theme for free. The mask
@@ -385,10 +488,16 @@ html.dark {
   }
   html.dark .hero-vignette {
     background:
-      radial-gradient(120% 86% at 50% 42%, transparent 54%, rgba(7, 9, 8, 0.88) 100%),
+      radial-gradient(120% 86% at 50% 42%, transparent 54%, rgba(7, 9, 8, 0.72) 100%),
       linear-gradient(180deg, rgba(7, 9, 8, 0.76) 0%, transparent 22%);
   }
 
+  /* The loop, once one has been dropped in beside the hero component. It runs
+     on phones as well as desktops — the clip is the reference direction's
+     whole opening, and the component only attaches it when the visitor has
+     not asked for reduced motion and is not on a metered or 2G connection —
+     but never in the light inversion, where dark copy would sit on a dark
+     clip. It fades in over the plate so the first frame cannot pop. */
   .hero-video {
     display: none;
     position: absolute;
@@ -396,11 +505,41 @@ html.dark {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.45;
+    opacity: 0.5;
   }
-  @media (min-width: 1024px) {
-    html.dark .hero-video {
-      display: block;
+  html.dark .hero-video {
+    display: block;
+    animation: video-in 1.2s ease-out both;
+  }
+
+  /* The scrim that keeps the copy readable over whatever the clip is doing:
+     strongest through the middle, where the statement and the action sit, and
+     clear at the edges so the footage still reads as footage. Without it the
+     headline is measured against a moving picture, which is not a contrast
+     ratio anyone can hold to. */
+  .hero-scrim {
+    background: radial-gradient(
+      78% 66% at 50% 46%,
+      rgba(251, 252, 245, 0.72) 0%,
+      rgba(251, 252, 245, 0.4) 48%,
+      transparent 100%
+    );
+  }
+  html.dark .hero-scrim {
+    background: radial-gradient(
+      78% 66% at 50% 46%,
+      rgba(7, 9, 8, 0.68) 0%,
+      rgba(7, 9, 8, 0.36) 48%,
+      transparent 100%
+    );
+  }
+
+  @keyframes video-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 0.5;
     }
   }
 
