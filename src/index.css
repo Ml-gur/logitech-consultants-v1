@@ -3,15 +3,15 @@
 /* ============================================
    Naivolabs: Design System
    Dark canvas with monochrome hero-led styling.
-   Bubbledot display + Inter body.
+   Inter display and body, JetBrains Mono for technical detail.
    ============================================ */
 
 @theme {
-  /* Monochrome tokens shared by the video hero and every supporting section. */
-  --color-signal: #ffffff;
-  --color-voltage: #ffffff;
-  --color-voltage-hover: #d8d8d8;
-  --color-plasma: #ffffff;
+  /* Accent tokens shared by the hero and supporting sections. */
+  --color-signal: #7084ff;
+  --color-voltage: #405bff;
+  --color-voltage-hover: #5d73ff;
+  --color-plasma: #9aa8ff;
   --color-midnight: #000000;
   --color-carbon: #0b0b0b;
   --color-smoke: #161616;
@@ -23,13 +23,13 @@
   --color-paper: #ffffff;
   --color-error: #ff9b9b;
   --color-success: #b8f0c9;
-  --color-gold: #ffffff;
+  --color-gold: #f2ffc2;
 
-  --color-signal-gradient: linear-gradient(135deg, #ffffff 0%, #8d8d8d 100%);
+  --color-signal-gradient: linear-gradient(135deg, #7084ff 0%, #405bff 100%);
 
-  /* Typography: Bubbledot display + Inter body + JetBrains Mono */
+  /* Typography: Inter display/body + JetBrains Mono */
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'BubbledotICG-FinePos', 'Inter', ui-sans-serif, sans-serif;
+  --font-display: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Type scale (design.md) */
@@ -719,7 +719,7 @@ footer {
   background: var(--color-steel);
 }
 
-/* ── Display heading italic accent class ─────────────────────────── */
+/* ── Display heading italic accent class ──────────────────���──────── */
 .display-italic {
   font-family: var(--font-display);
   font-style: italic;
