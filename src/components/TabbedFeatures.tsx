@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { motion, AnimatePresence, MotionConfig } from 'framer-motion'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 import { CAPABILITIES } from '../lib/brand'
@@ -185,8 +184,7 @@ function Checklist({ items }: { items: string[] }) {
 }
 
 export default function TabbedFeatures() {
-  const [active, setActive] = useState(CAPABILITIES[0].id)
-  const current = CAPABILITIES.find((t) => t.id === active) ?? CAPABILITIES[0]
+  const current = CAPABILITIES[0]
 
   return (
     <MotionConfig reducedMotion="user">
@@ -244,9 +242,7 @@ Naivo connects intelligence to the work your organization already does.
           <AnimatePresence mode="wait">
             <motion.div
               key={current.id}
-              role="tabpanel"
-              id={`panel-${current.id}`}
-              aria-labelledby={`tab-${current.id}`}
+              aria-label={`${current.headline} capability details`}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}

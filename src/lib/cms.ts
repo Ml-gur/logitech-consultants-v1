@@ -20,7 +20,7 @@ import {
   contactInfo as staticContactInfo,
   faqs as staticFaqs,
 } from '../data/content'
-import type { BlogPost, CaseStudy, DeploymentPattern } from '../data/content'
+import type { BlogPost, DeploymentPattern } from '../data/content'
 
 export const CMS_URL = (import.meta.env.VITE_CMS_URL as string | undefined)?.replace(/\/+$/, '') ?? ''
 export const cmsEnabled = CMS_URL.length > 0
