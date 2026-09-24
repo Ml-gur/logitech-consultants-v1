@@ -20,7 +20,7 @@ export default function Wordmark({
   accentClassName?: string
 }) {
   return (
-    <Tag className={cn('tracking-[-0.02em] select-none', className)} style={{ fontFamily: 'var(--font-display)' }}>
+    <Tag className={cn('tracking-[-0.02em] select-none', className)} style={{ fontFamily: 'var(--font-sans)' }}>
       <span aria-hidden="true">
         {WORDMARK.head}
         <span className={cn(accentClassName)} style={{ color: 'var(--color-signal)', fontStyle: 'italic', fontWeight: 300 }}>{WORDMARK.tail}</span>
