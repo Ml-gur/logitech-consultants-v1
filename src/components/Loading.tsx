@@ -37,7 +37,7 @@ export function LoadingAnnouncer({ label = 'Loading content' }: { label?: string
 /** Skeleton for a blog card (image band + title + meta lines). */
 export function CardSkeleton() {
   return (
-    <div className="rounded-[30px] bg-[#191919] border border-white/10 overflow-hidden">
+    <div className="rounded-[30px] bg-raised border border-white/10 overflow-hidden">
       <Skeleton className="w-full aspect-[16/10] rounded-none" />
       <div className="p-6 space-y-3">
         <Skeleton className="h-3 w-20" />
@@ -52,7 +52,7 @@ export function CardSkeleton() {
 /** Skeleton for a deployment-pattern card. */
 export function PatternSkeleton() {
   return (
-    <div className="rounded-[30px] bg-[#191919] border border-white/10 overflow-hidden grid grid-cols-1 md:grid-cols-2">
+    <div className="rounded-[30px] bg-raised border border-white/10 overflow-hidden grid grid-cols-1 md:grid-cols-2">
       <Skeleton className="w-full min-h-[240px] md:min-h-[380px] rounded-none" />
       <div className="p-8 md:p-12 space-y-4">
         <Skeleton className="h-3 w-24" />
@@ -89,7 +89,7 @@ export default function RouteFallback() {
   return (
     <div className="pt-32" aria-busy="true">
       <LoadingAnnouncer label="Loading page" />
-      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 space-y-6">
+      <div className="shell space-y-6">
         <Skeleton className="h-3 w-28" />
         <Skeleton className="h-12 w-[min(560px,90%)]" />
         <Skeleton className="h-4 w-[min(420px,80%)]" />

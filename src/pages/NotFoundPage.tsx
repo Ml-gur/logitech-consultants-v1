@@ -37,7 +37,7 @@ export default function NotFoundPage() {
       {/* Ambient glow, consistent with the hero */}
       <div className="glow-violet-center inset-0" aria-hidden />
 
-      <div className="relative w-full max-w-[1200px] mx-auto px-5 sm:px-8">
+      <div className="relative shell">
         <div className="max-w-[720px]">
           <motion.p
             initial={reduce ? false : { opacity: 0, y: 12 }}
@@ -52,7 +52,7 @@ export default function NotFoundPage() {
             initial={reduce ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.05 }}
-            className="text-[clamp(40px,7vw,84px)] leading-[1.02] tracking-[-0.03em] mb-6"
+            className="text-heading-band-lg leading-[1.02] tracking-[-0.03em] mb-6"
           >
             Nothing here.
           </motion.h1>
@@ -107,7 +107,7 @@ export default function NotFoundPage() {
             >
               <Link
                 to={d.to}
-                className="group flex flex-col h-full rounded-[24px] bg-[#191919] border border-white/10 p-6 transition-colors duration-300 hover:border-signal/40"
+                className="group flex flex-col h-full rounded-[24px] bg-raised border border-white/10 p-6 transition-colors duration-300 hover:border-signal/40"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-base font-medium text-paper">{d.label}</span>

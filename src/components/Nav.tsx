@@ -6,6 +6,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '../utils'
 import Wordmark from './Wordmark'
 
+/**
+ * Floating navigation pill.
+ *
+ * It uses the same `.shell` as page content, so the wordmark sits on the same
+ * optical left edge as the h1 below it. It previously ran a 1100px measure
+ * against a 1200px content grid, which read as a misaligned header — the kind
+ * of drift that is invisible in isolation and obvious on a full page.
+ */
+
 const navLinks = [
   { label: 'Capabilities', to: '/capabilities' },
   { label: 'Deployments', to: '/deployment-patterns' },
@@ -41,10 +50,10 @@ export default function Nav() {
       className="fixed top-0 inset-x-0 z-50"
       style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}
     >
-      <div className="px-3 sm:px-5">
+      <div className="shell">
         {/* Floating nav pill */}
         <div
-          className="nav-pill mx-auto max-w-[1100px] rounded-full flex items-center justify-between transition-all duration-300"
+          className="nav-pill w-full rounded-full flex items-center justify-between transition-all duration-300"
           style={{
             height: '60px',
             paddingLeft: '12px',
@@ -98,12 +107,13 @@ export default function Nav() {
               </NavLink>
             ))}
 
+            {/* Hover lives in CSS. The previous `onMouseEnter` handler mutated
+                `style.background`, which meant the nav's primary action could
+                only be seen to respond to a mouse: no keyboard focus state, and
+                no press state on touch. */}
             <Link
               to="/contact"
-              className="ml-2 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-white text-[13px] font-medium transition-all duration-200"
-              style={{ background: 'var(--color-voltage)' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-voltage-hover)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'var(--color-voltage)')}
+              className="ml-2 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-voltage text-white text-[13px] font-medium transition-all duration-200 hover:bg-voltage-hover active:scale-[0.98]"
             >
               Book a call
             </Link>
@@ -111,14 +121,11 @@ export default function Nav() {
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden flex items-center justify-center rounded-full transition-colors duration-200"
-            style={{ width: '44px', height: '44px', color: 'var(--color-ash)' }}
+            className="md:hidden flex items-center justify-center rounded-full w-11 h-11 text-ash transition-colors duration-200 hover:bg-white/[0.06] hover:text-paper active:scale-[0.96]"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               {mobileOpen
@@ -139,56 +146,57 @@ export default function Nav() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: -8 }}
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            className="md:hidden absolute inset-x-0 mt-2 px-3 sm:px-5"
+            className="md:hidden absolute inset-x-0 mt-2"
           >
-            <nav
-              className="mx-auto max-w-[1100px] rounded-[24px] flex flex-col overflow-hidden"
-              style={{
-                background: 'rgba(18,18,26,0.97)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
-              }}
-              aria-label="Mobile"
-            >
-              {/* Nav links */}
-              <div className="px-4 py-3">
-                {navLinks.map((link, i) => (
-                  <NavLink
-                    key={link.label}
-                    to={link.to}
-                    className={({ isActive }) =>
-                      cn(
-                        'flex items-center justify-between py-4 text-[15px] font-medium transition-colors duration-200',
-                        i < navLinks.length - 1 ? 'border-b' : '',
-                        isActive ? 'text-white' : 'text-[var(--color-ash)] hover:text-white'
-                      )
-                    }
-                    style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+            <div className="shell">
+              <nav
+                className="w-full rounded-[24px] flex flex-col overflow-hidden"
+                style={{
+                  background: 'rgba(18,18,26,0.97)',
+                  backdropFilter: 'blur(24px)',
+                  WebkitBackdropFilter: 'blur(24px)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
+                }}
+                aria-label="Mobile"
+              >
+                {/* Nav links */}
+                <div className="px-4 py-3">
+                  {navLinks.map((link, i) => (
+                    <NavLink
+                      key={link.label}
+                      to={link.to}
+                      className={({ isActive }) =>
+                        cn(
+                          'flex items-center justify-between py-4 text-[15px] font-medium transition-colors duration-200',
+                          i < navLinks.length - 1 ? 'border-b' : '',
+                          isActive ? 'text-white' : 'text-[var(--color-ash)] hover:text-white'
+                        )
+                      }
+                      style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+                    >
+                      {link.label}
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-signal)', opacity: 0.7 }}>
+                        <path d="M6 3l5 5-5 5" />
+                      </svg>
+                    </NavLink>
+                  ))}
+                </div>
+
+                {/* CTA row */}
+                <div className="px-4 pt-2 pb-4">
+                  <Link
+                    to="/contact"
+                    className="flex items-center justify-center gap-2 w-full py-4 rounded-full bg-voltage text-white text-sm font-medium transition-all duration-200 hover:bg-voltage-hover active:scale-[0.99]"
                   >
-                    {link.label}
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-signal)', opacity: 0.7 }}>
+                    Book a discovery call
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <path d="M6 3l5 5-5 5" />
                     </svg>
-                  </NavLink>
-                ))}
-              </div>
-
-              {/* CTA row */}
-              <div className="px-4 pt-2 pb-4">
-                <Link
-                  to="/contact"
-                  className="flex items-center justify-center gap-2 w-full py-4 rounded-full text-white text-[14px] font-medium transition-all duration-200"
-                  style={{ background: 'var(--color-voltage)' }}
-                >
-                  Book a discovery call
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                    <path d="M6 3l5 5-5 5" />
-                  </svg>
-                </Link>
-              </div>
-            </nav>
+                  </Link>
+                </div>
+              </nav>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

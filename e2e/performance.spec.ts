@@ -79,18 +79,25 @@ test('perf: home meets LCP / INP / CLS budgets', async ({ page }) => {
     () => (window as unknown as { __perf: { lcp: number; cls: number; interactions: number[] } }).__perf,
   )
 
-  // Simulate real interactions to measure INP: FAQ accordion toggle (no nav).
+  // Simulate real interactions to measure INP: switch the capability tabs (no
+  // navigation).
+  //
+  // This used to toggle the FAQ accordion, but that band renders on /contact,
+  // not on the home page (ContactPage.tsx renders it as a sibling of its own
+  // shell) — so `getByText('Need answers?')` never resolved here and the test
+  // could only ever time out. The tab control is the home page's own
+  // interactive widget, in the same below-the-fold region the FAQ used to
+  // occupy, so the measurement stays a home-page interaction.
+  //
   // Settle first: the long scroll fires one-shot reveal springs and the
   // scroll-driven stack transforms; a click landing mid-animation measures
   // scroll work instead of the interaction itself.
-  await page.getByText('Need answers?').scrollIntoViewIfNeeded()
+  await page.locator('section#capabilities').scrollIntoViewIfNeeded()
   await page.waitForTimeout(1900)
-  const faqBtn = page
-    .getByRole('button', { name: /01\/ What does Naivolabs actually do\?/ })
-    .first()
-  await faqBtn.click()
+  const tablist = page.getByRole('tablist', { name: 'Capabilities' })
+  await tablist.getByRole('tab', { name: 'Understand' }).click()
   await page.waitForTimeout(250)
-  await faqBtn.click()
+  await tablist.getByRole('tab', { name: 'Converse' }).click()
 
   const after = await page.evaluate(
     () => (window as unknown as { __perf: { lcp: number; cls: number; interactions: number[] } }).__perf,

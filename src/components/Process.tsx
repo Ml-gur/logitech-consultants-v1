@@ -43,7 +43,7 @@ const phases = [
 export default function Process() {
   return (
     <section id="process" className="relative">
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-20 sm:py-28">
+      <div className="relative band">
         <div className="grid lg:grid-cols-[1fr_560px] gap-16 max-lg:gap-12">
           <div className="max-lg:mb-4">
             <motion.p
@@ -61,7 +61,7 @@ export default function Process() {
               whileInView={revealWhileInView}
               viewport={revealViewport}
               transition={springReveal(0.06)}
-              className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] mb-6"
+              className="text-heading-band mb-6"
             >
               From real work to reusable product.
             </motion.h2>
@@ -71,7 +71,7 @@ export default function Process() {
               whileInView={revealWhileInView}
               viewport={revealViewport}
               transition={springReveal(0.1)}
-              className="text-[17px] text-fog max-w-md leading-relaxed mb-10"
+              className="text-lede text-fog max-w-[52ch] leading-relaxed mb-10"
             >
               Ten stages, run the same way every time. Each one is designed so that what we learn is kept, as
               templates, evaluation suites, documentation and integration adapters, instead of leaving with the
@@ -84,7 +84,7 @@ export default function Process() {
               whileInView={revealWhileInView}
               viewport={revealViewport}
               transition={springReveal(0.14)}
-              className="rounded-[24px] bg-[#191919] border border-signal/30 p-6 max-w-md"
+              className="rounded-[24px] bg-raised border border-signal/30 p-6 max-w-md"
             >
               <p className="text-xs uppercase tracking-[0.14em] text-fog mb-3">Operating principle</p>
               <p className="font-display text-[20px] leading-snug text-paper">{FLYWHEEL_PRINCIPLE}</p>

@@ -3,14 +3,18 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
+import { Band, SectionHeader } from './Section'
 
 export default function HomeCTA() {
+  // The second hairline: the argument has ended, and what follows is the one
+  // thing the page asks the reader to do.
+  //
+  // `attached`: the ask hugs the rule above it (the hairline belongs to the band
+  // it introduces, not to the one it closes), which leaves the whole wide seam
+  // on the other side of the rule.
   return (
-    <section className="relative">
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
-
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-24 sm:py-32">
-        <div
+    <Band rule tone="attached">
+      <div
           className="relative rounded-[32px] overflow-hidden p-10 sm:p-16 lg:p-20"
           style={{
             background: 'linear-gradient(135deg, rgba(61,85,240,0.18) 0%, rgba(124,145,255,0.08) 50%, rgba(8,8,16,0.8) 100%)',
@@ -27,50 +31,23 @@ export default function HomeCTA() {
           />
 
           <div className="relative grid lg:grid-cols-[1fr_auto] gap-10 items-center">
-            <div>
-              <motion.p
-                initial={revealInitial}
-                whileInView={revealWhileInView}
-                viewport={revealViewport}
-                transition={springReveal()}
-                className="section-label"
-              >
-                Ready to deploy
-              </motion.p>
-
-              <motion.h2
-                initial={revealInitial}
-                whileInView={revealWhileInView}
-                viewport={revealViewport}
-                transition={springReveal(0.06)}
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 400,
-                  fontSize: 'clamp(32px, 5vw, 64px)',
-                  lineHeight: 1.05,
-                  letterSpacing: '-0.025em',
-                  color: 'var(--color-paper)',
-                  marginBottom: '16px',
-                }}
-              >
-                Start with a real problem,
-                <br />
-                <em style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--color-signal)' }}>
-                  not a demo.
-                </em>
-              </motion.h2>
-
-              <motion.p
-                initial={revealInitial}
-                whileInView={revealWhileInView}
-                viewport={revealViewport}
-                transition={springReveal(0.1)}
-                className="text-[16px] max-w-[520px] leading-relaxed"
-                style={{ color: 'var(--color-fog)' }}
-              >
-                A discovery call costs an hour. We scope the work honestly: what we can build, what we'll measure, and what it will cost to get to production.
-              </motion.p>
-            </div>
+            {/* The closing ask holds h1 rank: `size="lg"` is the same token the
+                page titles use, so the last thing on the page is as loud as the
+                first thing on a page, and nothing in between is louder. */}
+            <SectionHeader
+              size="lg"
+              label="Ready to deploy"
+              title={
+                <>
+                  Start with a real problem,
+                  <br />
+                  <em style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--color-signal)' }}>
+                    not a demo.
+                  </em>
+                </>
+              }
+              lede="A discovery call costs an hour. We scope the work honestly: what we can build, what we'll measure, and what it will cost to get to production."
+            />
 
             <motion.div
               initial={revealInitial}
@@ -81,10 +58,8 @@ export default function HomeCTA() {
             >
               <Link
                 to="/contact"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-[14px] font-medium rounded-full text-white transition-all duration-200 whitespace-nowrap"
-                style={{ background: 'var(--color-voltage)', minHeight: '52px' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-voltage-hover)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'var(--color-voltage)')}
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-sm font-medium rounded-full bg-voltage text-white transition-all duration-200 whitespace-nowrap hover:bg-voltage-hover active:scale-[0.98]"
+                style={{ minHeight: '52px' }}
               >
                 Book a discovery call
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -93,17 +68,14 @@ export default function HomeCTA() {
               </Link>
               <Link
                 to="/blog"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-[14px] font-medium rounded-full transition-all duration-200 whitespace-nowrap"
-                style={{ border: '1px solid rgba(124,145,255,0.3)', color: 'var(--color-signal)', minHeight: '52px' }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(124,145,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(124,145,255,0.5)' }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(124,145,255,0.3)' }}
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 text-sm font-medium rounded-full border border-signal/30 text-signal transition-all duration-200 whitespace-nowrap hover:bg-signal/10 hover:border-signal/50 active:scale-[0.98]"
+                style={{ minHeight: '52px' }}
               >
                 Read our insights
               </Link>
             </motion.div>
           </div>
         </div>
-      </div>
-    </section>
+    </Band>
   )
 }

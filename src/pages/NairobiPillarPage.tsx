@@ -71,14 +71,14 @@ export default function NairobiPillarPage() {
           },
         ]}
       />
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
+      <div className="relative shell">
         {/* Hero */}
         <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
           Nairobi, Kenya
         </motion.p>
         <motion.h1
           initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.08)}
-          className="text-[clamp(38px,6vw,76px)] leading-[1.02] tracking-[-0.03em] max-w-[860px] mb-6"
+          className="text-heading-band-lg leading-[1.02] tracking-[-0.03em] max-w-[860px] mb-6"
         >
           Built in Nairobi. Designed for the <span className="text-signal">real conditions.</span>
         </motion.h1>
@@ -103,13 +103,13 @@ export default function NairobiPillarPage() {
         </motion.div>
 
         {/* Operating realities */}
-        <div className="pt-24">
+        <div className="pt-[var(--band-y)]">
           <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
             The operating environment
           </motion.p>
           <motion.h2
             initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
-            className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] max-w-[760px] mb-16"
+            className="text-heading-band max-w-[760px] mb-16"
           >
             What building from Nairobi actually teaches you.
           </motion.h2>
@@ -130,13 +130,13 @@ export default function NairobiPillarPage() {
         </div>
 
         {/* What we deploy here */}
-        <div className="pt-24">
+        <div className="pt-[var(--band-y)]">
           <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
             What we deploy
           </motion.p>
           <motion.h2
             initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
-            className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] max-w-[720px] mb-16"
+            className="text-heading-band max-w-[720px] mb-16"
           >
             Systems that complete work, not conversations.
           </motion.h2>
@@ -149,7 +149,7 @@ export default function NairobiPillarPage() {
               >
                 <Link
                   to={c.to}
-                  className="group flex flex-col h-full rounded-[30px] bg-[#191919] border border-white/10 p-7 transition-colors duration-300 hover:border-signal/40"
+                  className="group flex flex-col h-full rounded-[30px] bg-raised border border-white/10 p-7 transition-colors duration-300 hover:border-signal/40"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-medium text-paper">{c.title}</h3>
@@ -165,13 +165,13 @@ export default function NairobiPillarPage() {
         </div>
 
         {/* How to start */}
-        <div className="pt-24">
+        <div className="pt-[var(--band-y)]">
           <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
             Getting started
           </motion.p>
           <motion.h2
             initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
-            className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] max-w-[720px] mb-16"
+            className="text-heading-band max-w-[720px] mb-16"
           >
             From a real problem to a live system.
           </motion.h2>
@@ -185,7 +185,7 @@ export default function NairobiPillarPage() {
               <motion.div
                 key={s.step}
                 initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.08)}
-                className="rounded-[30px] bg-[#191919] border border-white/10 p-7"
+                className="rounded-[30px] bg-raised border border-white/10 p-7"
               >
                 <p className="font-mono text-sm text-signal mb-6">{s.step}</p>
                 <h3 className="text-lg font-medium mb-3">{s.title}</h3>
@@ -196,9 +196,9 @@ export default function NairobiPillarPage() {
 
           <motion.div
             initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.1)}
-            className="mt-16 rounded-[30px] border border-white/10 bg-[#191919] p-10 text-center"
+            className="mt-16 rounded-[30px] border border-white/10 bg-raised p-10 text-center"
           >
-            <h3 className="font-display text-[clamp(24px,3.5vw,36px)] font-medium mb-4">
+            <h3 className="font-display text-heading-feature font-medium mb-4">
               Bring us a problem, not a brief.
             </h3>
             <p className="text-fog max-w-[520px] mx-auto mb-8">
@@ -213,9 +213,12 @@ export default function NairobiPillarPage() {
             </Link>
           </motion.div>
         </div>
-
-        <FAQ />
       </div>
+
+      {/* Sibling of the page shell, not a child of it: the FAQ band carries its
+          own measure, so nesting it would make it narrower than every band
+          above it. */}
+      <FAQ />
     </section>
   )
 }

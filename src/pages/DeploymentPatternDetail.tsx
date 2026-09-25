@@ -44,7 +44,7 @@ export default function DeploymentPatternDetail() {
           },
         ]}
       />
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
+      <div className="relative shell">
         <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()}>
           <Link to="/deployment-patterns" className="inline-flex items-center gap-2 text-sm text-fog hover:text-paper transition-colors mb-8">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -60,7 +60,7 @@ export default function DeploymentPatternDetail() {
             <span className="tag-pill px-3 py-1.5 text-signal border-signal/40">{c.category}</span>
             <span className="text-xs text-fog">{c.timeframe}</span>
           </div>
-          <h1 className="text-[clamp(38px,6vw,72px)] leading-[1.03] tracking-[-0.03em] max-w-[820px] mb-6">
+          <h1 className="text-heading-band-lg leading-[1.03] tracking-[-0.03em] max-w-[820px] mb-6">
             {c.name}
           </h1>
           <p className="text-lg text-fog max-w-[620px] leading-relaxed mb-8">{c.tagline}</p>
@@ -84,7 +84,7 @@ export default function DeploymentPatternDetail() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={revealViewport}
           transition={springReveal(0.1)}
-          className="rounded-[20px] overflow-hidden mb-20 aspect-[16/9] bg-[#191919] border border-white/10"
+          className="rounded-[20px] overflow-hidden mb-20 aspect-[16/9] bg-raised border border-white/10"
         >
           {c.image ? (
             <img
@@ -116,7 +116,7 @@ export default function DeploymentPatternDetail() {
               <p className="section-label">What we measure</p>
               <div className="space-y-4">
                 {c.measures.map((m) => (
-                  <div key={m.metric} className="rounded-[20px] border border-white/10 p-5 bg-[#191919]">
+                  <div key={m.metric} className="rounded-[20px] border border-white/10 p-5 bg-raised">
                     <div className="text-[16px] font-medium text-paper mb-1.5">{m.metric}</div>
                     <div className="text-sm text-fog leading-relaxed">{m.detail}</div>
                   </div>
@@ -147,7 +147,7 @@ export default function DeploymentPatternDetail() {
             transition={springReveal(0.1)}
             className="lg:sticky lg:top-28 h-fit space-y-4"
           >
-            <div className="rounded-[24px] bg-[#191919] border border-white/10 p-7">
+            <div className="rounded-[24px] bg-raised border border-white/10 p-7">
               <p className="text-xs uppercase tracking-[0.14em] text-fog mb-4">Connects to</p>
               <ul className="space-y-3">
                 {c.integrations.map((i) => (
@@ -159,7 +159,7 @@ export default function DeploymentPatternDetail() {
               </ul>
             </div>
 
-            <div className="rounded-[24px] bg-[#191919] border border-signal/30 p-7">
+            <div className="rounded-[24px] bg-raised border border-signal/30 p-7">
               <p className="text-base font-medium text-paper mb-2">Is this close to your problem?</p>
               <p className="text-sm text-fog leading-relaxed mb-6">
                 A 30-minute call is enough for us to tell you whether it is, and roughly what it would take.

@@ -12,9 +12,20 @@
     <link rel="apple-touch-icon" href="/favicon-180.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- Preload the critical display + body fonts: the hero h1 (Inter 500) is
-         the LCP element; fetching fonts during HTML parse removes them from the
-         text-paint critical path. -->
+    <!-- Font hosts. The display face (Fraunces) and the body faces (Inter,
+         JetBrains Mono) are the site's two type roles; Inter and JetBrains
+         Mono are self-hosted and preloaded below, while Fraunces arrives
+         through the @import at the top of src/index.css, so its two hosts are
+         preconnected here. The hero used to pull a retro dot-matrix face and an
+         icon font from two further CDNs; both went with the hero's template
+         copy, which also takes two third-party origins out of the first
+         render. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Preload the critical body weights: the hero's subhead and the rest of
+         the site's prose are Inter, so fetching those files during HTML parse
+         removes them from the text-paint critical path. -->
     <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/5A3Ce6C9YYmCjpQx9M4inSaKU.woff2" />
     <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/5vvr9Vy74if2I6bQbJvbw7SY1pQ.woff2" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />

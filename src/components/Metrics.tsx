@@ -1,145 +1,109 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { MEASUREMENT_DIMENSIONS } from '../lib/brand'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
+import { BAND_CONTENT, Band, SectionHeader } from './Section'
 
-const stats = [
-  { value: '94%', label: 'Completion rate', sub: 'requests finished end-to-end' },
-  { value: '< 3s', label: 'Time to first answer', sub: 'including after-hours calls' },
-  { value: '10×', label: 'Deployment velocity', sub: 'second build vs. first' },
-  { value: '0', label: 'Silent failures', sub: 'every drop surfaced to a person' },
-]
-
-const dimensions = [
-  { metric: 'Completion rate', detail: 'Share of requests the system finishes end to end without a human stepping in.' },
-  { metric: 'Escalation accuracy', detail: 'How often the system hands off to a person, and whether it was the right call.' },
-  { metric: 'Time to first response', detail: 'From the moment a person makes contact to a useful answer.' },
-  { metric: 'Answer groundedness', detail: 'Whether an answer traces back to a source document.' },
-  { metric: 'Cost per completed task', detail: 'What the work costs now, against what it cost before.' },
-  { metric: 'Hours returned to the team', detail: 'Staff time moved off repetitive handling and back onto judgement work.' },
-]
-
+/**
+ * Measurement: what success is defined as, before anything is built.
+ *
+ * This band used to open with a row of four large figures, `94% completion`,
+ * `< 3s to first answer`, `10× deployment velocity`, `0 silent failures`,
+ * sitting directly under the lede that says "No invented ROI figures." The four
+ * numbers were invented, none had a measurement behind it, and the labels read
+ * as results rather than as targets, so the band contradicted itself in the
+ * first thing a visitor read and broke the brand rule that governs every other
+ * page: no outcome metric without evidence. They are gone.
+ *
+ * What is left is the honest version of the same claim: the six dimensions
+ * every deployment is instrumented against, sourced from
+ * `MEASUREMENT_DIMENSIONS` in `src/lib/brand.ts` rather than retyped here. The
+ * local copy that used to live in this file had already drifted from the
+ * canonical one ("checked against an evaluation set" had gone missing), which
+ * is what a second source of truth for the same six strings always does. It
+ * also meant the same metric name rendered twice in one band, an invented
+ * figure above and a real dimension below, which is what made the section
+ * ambiguous to read and to test.
+ *
+ * The band's job is order, not decoration: what we measure, then why each one
+ * matters, then the note about what happens when a target is missed.
+ */
 export default function Metrics() {
   return (
-    <section id="measurement" className="relative">
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+    // No rule above this band: it is the second half of the same movement as
+    // Capabilities ("what we build", then "how we prove it"), so interval alone
+    // separates the two. The page's two hairlines mark its two real register
+    // changes: before Principles, and before the closing ask.
+    //
+    // `loose`: the movement changes here — the page stops describing what it
+    // builds and starts describing how it proves it. That seam is the widest on
+    // the page and has no hairline to announce it, which is exactly why it is
+    // the one that needs the air.
+    //
+    // No label either. The heading is the claim and the lede is the qualifier,
+    // so a third line above them only delays the sentence (see the eyebrow
+    // budget in HomePage.tsx).
+    <Band id="measurement" tone="loose">
+      <SectionHeader
+        title={
+          <>
+            We agree what success means{' '}
+            <em style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--color-signal)' }}>
+              before
+            </em>{' '}
+            we build.
+          </>
+        }
+        lede="No invented ROI figures. Every deployment is instrumented against these six dimensions before the first user touches the system, with the target agreed in writing. Where we miss, we say so."
+      />
 
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-24 sm:py-32">
-
-        {/* Header */}
-        <div className="grid lg:grid-cols-[1fr_1.5fr] gap-12 lg:gap-20 items-end mb-16 sm:mb-20">
-          <div>
-            <motion.p
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal()}
-              className="section-label"
-            >
-              Measurement
-            </motion.p>
-            <motion.h2
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal(0.06)}
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontWeight: 400,
-                fontSize: 'clamp(32px, 4.5vw, 52px)',
-                lineHeight: 1.1,
-                letterSpacing: '-0.02em',
-              }}
-            >
-              We agree what success means{' '}
-              <em style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--color-signal)' }}>
-                before
-              </em>{' '}
-              we build.
-            </motion.h2>
-          </div>
-          <motion.p
+      {/* The six dimensions. Two columns up to lg and three beyond, which fills
+          both grids exactly: six items never leave a hole, and each card is a
+          plain data row rather than a third undifferentiated feature tile. */}
+      <div className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-4 ${BAND_CONTENT}`}>
+        {MEASUREMENT_DIMENSIONS.map((d, i) => (
+          <motion.div
+            key={d.metric}
             initial={revealInitial}
             whileInView={revealWhileInView}
             viewport={revealViewport}
-            transition={springReveal(0.1)}
-            className="text-[16px] leading-relaxed self-end"
-            style={{ color: 'var(--color-fog)' }}
+            transition={springReveal(i * 0.05)}
+            className="flex gap-4 rounded-[16px] p-5"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
           >
-            No invented ROI figures. Every deployment is instrumented against agreed targets before the first user touches the system. Where we miss, we say so.
-          </motion.p>
-        </div>
-
-        {/* Large stat row */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px mb-16 overflow-hidden rounded-[24px]" style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.08)' }}>
-          {stats.map((s, i) => (
-            <motion.div
-              key={s.label}
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal(i * 0.07)}
-              className="flex flex-col justify-between p-6 sm:p-8 transition-colors duration-300"
-              style={{ background: 'var(--color-carbon)' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1a1a26' }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'var(--color-carbon)' }}
-            >
-              <div
-                className="font-display mb-3"
-                style={{
-                  fontSize: 'clamp(36px, 5vw, 64px)',
-                  fontWeight: 400,
-                  lineHeight: 1,
-                  letterSpacing: '-0.03em',
-                  background: 'linear-gradient(135deg, #f0f0f8 0%, #7c91ff 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                {s.value}
-              </div>
-              <div>
-                <div className="text-[13px] font-medium text-paper mb-1">{s.label}</div>
-                <div className="text-[12px] text-fog">{s.sub}</div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Dimension list — what we measure */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {dimensions.map((d, i) => (
-            <motion.div
-              key={d.metric}
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal(i * 0.05)}
-              className="flex gap-4 rounded-[16px] p-5"
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
-            >
-              <div className="w-1 rounded-full shrink-0 mt-1" style={{ background: 'linear-gradient(to bottom, var(--color-voltage), var(--color-signal))', minHeight: '40px' }} />
-              <div>
-                <div className="text-[13px] font-medium text-paper mb-1">{d.metric}</div>
-                <div className="text-[12px] leading-relaxed text-fog">{d.detail}</div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        <motion.p
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal(0.14)}
-          className="text-[13px] mt-10 max-w-[560px]"
-          style={{ color: 'var(--color-slate)', borderLeft: '2px solid var(--color-graphite)', paddingLeft: '16px' }}
-        >
-          Where a deployment does not meet its agreed target, we say so and either change the
-          approach or stop. Publishing only the wins would make this page worthless.
-        </motion.p>
+            <div
+              className="w-1 rounded-full shrink-0 mt-1"
+              style={{
+                background: 'linear-gradient(to bottom, var(--color-voltage), var(--color-signal))',
+                minHeight: '40px',
+              }}
+              aria-hidden
+            />
+            <div>
+              <div className="text-[13px] font-medium text-paper mb-1">{d.metric}</div>
+              <div className="text-[12px] leading-relaxed text-fog">{d.detail}</div>
+            </div>
+          </motion.div>
+        ))}
       </div>
-    </section>
+
+      <motion.p
+        initial={revealInitial}
+        whileInView={revealWhileInView}
+        viewport={revealViewport}
+        transition={springReveal(0.14)}
+        className="text-[13px] mt-10 max-w-[66ch]"
+        // `fog`, not `slate`. The site's own ADR-008 rules that small text on a
+        // dark surface uses ash or fog "never slate for small text", and this
+        // aside was the exception: #6d6d7a at 13px on Midnight measures 3.9:1,
+        // under the 4.5:1 floor. Fog measures 7.1:1 and is still the quieter of
+        // the two text tokens, so the note keeps its rank.
+        style={{ color: 'var(--color-fog)', borderLeft: '2px solid var(--color-graphite)', paddingLeft: '16px' }}
+      >
+        Where a deployment does not meet its agreed target, we say so and either change the
+        approach or stop. Publishing only the wins would make this page worthless.
+      </motion.p>
+    </Band>
   )
 }

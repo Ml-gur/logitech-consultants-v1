@@ -22,6 +22,20 @@
   --color-fog: #9898a8;
   --color-ash: #c8c8d4;
   --color-paper: #f0f0f8;
+  /* Raised surface: a card that sits *on* the Midnight canvas. This was a raw
+     #191919 repeated across the pattern cards, the FAQ rows, the capability tab
+     control and the skeletons, while `.card-dark` used `--color-carbon`
+     (#12121a). Two near-identical blacks for one job is why grouped items
+     stopped reading as a group. Cards use `bg-raised`; inset panels nested
+     inside a card use `bg-carbon`.
+
+     The value is tinted, not neutral. It used to be `#191919`, a pure grey, in
+     a system where the canvas (#080810), Carbon (#12121a) and Smoke (#1e1e2a)
+     all carry the same cool hue. On a tinted canvas a neutral card reads as
+     slightly warm, so the surface meant to sit *on* the page was the one
+     surface that looked like it belonged to a different palette. Raised now
+     keeps that hue offset and sits between Carbon and Smoke. */
+  --color-raised: #17171f;
   --color-error: #ff8b8b;
   --color-success: #7ee0a8;
   --color-gold: #c9a84c;
@@ -32,16 +46,35 @@
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-
   /* Type scale (design.md) */
   --text-caption: 12px;
   --text-body-sm: 14px;
   --text-body: 16px;
+  --text-lede: 17px;
   --text-subheading: 20px;
   --text-heading-sm: 24px;
   --text-heading: 36px;
   --text-heading-lg: 66px;
   --text-display: 100px;
+
+  /* Band heading scale. Two sizes, ranked by position rather than by
+     per-component clamps: `heading-band` for an h2 inside a narrative band,
+     `heading-band-lg` for the page h1 / closing ask. Every band heading used
+     to carry its own clamp() (32/34/52/56/64px), which is why headings that
+     hold the same rank rendered at different sizes. */
+  --text-heading-band: clamp(30px, 4.4vw, 52px);
+  --text-heading-band-lg: clamp(34px, 5vw, 64px);
+
+  /* The one display size in the system: the home page statement. */
+  --text-hero: clamp(44px, 7.5vw, 96px);
+
+  /* Sub-band ranks. `heading-feature` is a heading *inside* a band (a card or
+     a capability block); `heading-quote` is display text that is a statement
+     rather than a title. With the two band ranks above, these close the
+     display scale at five steps, so a heading's size is decided by what it is
+     rather than by which file it happens to live in. */
+  --text-heading-feature: clamp(26px, 3.4vw, 42px);
+  --text-heading-quote: clamp(20px, 2.6vw, 30px);
 
   /* Radii: pill language */
   --radius-card: 30px;      /* cards, tags, buttons */
@@ -104,6 +137,37 @@
 
   :root {
     color-scheme: dark;
+
+    /* Vertical rhythm: one three-step scale, and the *relationship* between two
+       bands decides which steps are used.
+
+       The page had two intervals and a claim that they produced a cadence. They
+       did not. Every narrative band took `--band-y` on both sides, so every
+       seam on the page was the same 208px and the page read as a metronome —
+       the one seam that should have been loudest (evidence → principles) was
+       indistinguishable from a band continuing its own sentence.
+
+       Rhythm comes from the *gap*, and the gap is the band above's bottom step
+       plus this band's top step. That is why the steps are applied per side by
+       the `.band-*` roles below and why a band never picks a size for taste:
+       `attached` hugs what it continues, `loose` opens after a register change,
+       and the seams then differ by design instead of collapsing to one value:
+       measured on the home page at 1440px they are 128 / 231 / 165 / 231 / 165.
+       (They used to be 208, five times.) */
+    --band-y-tight: clamp(40px, 4.5vw, 64px);
+    --band-y: clamp(64px, 7vw, 104px);
+    --band-y-loose: clamp(88px, 9vw, 136px);
+
+    /* One content measure and one gutter for the whole site. The floating nav
+       uses the same shell, so the wordmark lines up with the body text. */
+    --container-max: 1200px;
+    --gutter: 20px;
+  }
+
+  @media (min-width: 640px) {
+    :root {
+      --gutter: 32px;
+    }
   }
 
   html {
@@ -135,6 +199,13 @@
     letter-spacing: -0.01em;
     color: var(--color-paper);
     text-wrap: balance;
+  }
+
+  /* Prose: headings already balance (above), body copy is where a single
+     orphaned word lands on the last line. `pretty` is the same idea for a
+     paragraph, and it is ignored by engines that do not support it. */
+  p {
+    text-wrap: pretty;
   }
 
   ::selection {
@@ -184,11 +255,6 @@
     background: radial-gradient(45% 45% at 50% 40%, rgba(64, 91, 255, 0.28) 0%, rgba(112, 132, 255, 0.06) 55%, transparent 100%);
   }
 
-  /* Hairline border: 1px white-alpha on near-black */
-  .hairline {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
   /* Primary action: Voltage Blue is the only correct CTA fill */
   .btn-primary {
     display: inline-flex;
@@ -202,10 +268,14 @@
     transition: background 0.2s ease, transform 0.2s ease;
   }
   .btn-primary:hover {
-    background: #3351e6; /* slightly deeper blue on hover */
+    background: var(--color-voltage-hover);
   }
   .btn-primary:active {
     transform: scale(0.98);
+  }
+  .btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   /* Ghost / outlined action: Signal Violet echo of the primary CTA */
@@ -282,10 +352,10 @@
     display: inline-block;
   }
 
-  /* Dark card: Carbon fill, hairline border, 30px radius, soft glow hover */
+  /* Dark card: raised fill, hairline border, 30px radius, soft glow hover */
   .card-dark {
     border-radius: var(--radius-card);
-    background: var(--color-carbon);
+    background: var(--color-raised);
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
   }
@@ -309,11 +379,57 @@
     color: var(--color-fog);
   }
 
-  /* Container: design.md page max-width 1200px */
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 24px;
+  /* Page shell: the single content measure + gutter for the entire site
+     (design.md page max-width 1200px). Named `.shell` rather than
+     `.container` so it can never be shadowed by a framework `container`
+     utility in the utilities layer. */
+  .shell {
+    width: 100%;
+    max-width: var(--container-max);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  /* A band is one idea on a page, and its interval says what that idea is doing
+     relative to its neighbours. Four roles, named for the relationship rather
+     than for a size:
+
+       .band           stands on its own — equal air on both sides.
+       .band-tight     a support strip that belongs to its neighbour (the tool
+                       strip under the hero).
+       .band-attached  continues the band above it: the seam between the two is
+                       the tight step, and the air below belongs to the next
+                       band.
+       .band-loose     opens a movement after a register change: the loose step
+                       above, the band step below.
+
+     A component that wants a different interval is expressing a different
+     relationship, not a different taste, so it has to say which of these it is.
+     Every band previously set its own padding (py-12/14, py-20/28, py-24/32,
+     pt-24 …), which is why no two bands carried the same weight. */
+  .band {
+    padding-block: var(--band-y);
+  }
+
+  .band-tight {
+    padding-block: var(--band-y-tight);
+  }
+
+  .band-attached {
+    padding-block: var(--band-y-tight) var(--band-y);
+  }
+
+  .band-loose {
+    padding-block: var(--band-y-loose) var(--band-y);
+  }
+
+  /* Hairline rule between bands of equal weight. Was an inline
+     `<div style={{ borderTop: … }} />` copied per band, at three different
+     alphas. */
+  .rule {
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin: 0;
   }
 }
 
@@ -399,42 +515,20 @@ footer {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* ── Mobile typography: prevent text-heavy blocks from wall-of-texting ── */
+/* ── Mobile refinements ──────────────────────────────────────────────
+   Band headings already ramp down through `--text-heading-band`, so no
+   `!important` override is needed here. */
 @media (max-width: 639px) {
-  /* Section headings are never too large on a phone */
-  h2 {
-    font-size: clamp(28px, 7vw, 40px) !important;
-  }
-
-  /* Section vertical spacing: tighter on mobile */
-  section {
-    --section-py: 64px;
-  }
-
   /* Cards: full-width on a phone, no tiny side-by-sides */
   .card-dark {
     border-radius: 20px;
-  }
-
-  /* Stat panels: ensure legible at small width */
-  .stat-value {
-    font-size: clamp(32px, 10vw, 48px);
   }
 }
 
 /* ── Landscape / orientation tweaks ───────────────────────────────── */
 @media (max-height: 520px) and (orientation: landscape) {
-  /* Hero shrinks on short landscape viewports */
-  #home {
-    min-height: 100dvh;
-    padding-top: 72px !important;
-    padding-bottom: 40px !important;
-  }
-  /* Reduce hero heading size for landscape phones */
-  #home h1 {
-    font-size: clamp(32px, 7vw, 64px) !important;
-  }
-  /* Nav pill stays compact */
+  /* Nav pill stays compact. The hero's own short-landscape treatment lives with
+     the rest of the hero, at the end of this file. */
   header .nav-pill {
     height: 52px !important;
   }
@@ -456,33 +550,6 @@ footer {
   background: var(--color-steel);
 }
 
-/* ── Display heading italic accent class ─────────────────────────── */
-.display-italic {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 300;
-}
-
-/* ── Gold accent for premium emphasis ───────────────────────────── */
-.text-gold {
-  color: var(--color-gold);
-}
-
-/* ── Section divider hairline ────────────────────────────────────── */
-.section-divider {
-  border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  margin: 0;
-}
-
-/* ── Gradient text utility ──────────────────────────────────────── */
-.gradient-text {
-  background: var(--color-signal-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 /* Dograh widget: override body overflow-x:hidden so the fixed-position
    widget is not clipped on mobile browsers (Safari creates a scroll
    container from overflow-x:hidden that clips position:fixed children). */
@@ -495,4 +562,258 @@ footer {
 }
 #dograh-widget-root * {
   box-sizing: border-box;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Hero: single-viewport video statement
+   ══════════════════════════════════════════════════════════════════
+   The home hero is the site's one *statement*, not a band inside an argument,
+   so it carries its own composition instead of the shared band rhythm: a
+   looping video fills the viewport, and headline → subhead → two actions stack
+   on a single centred axis. Three elements, centred on the viewport's own
+   vertical centre, which is what makes it read as one screen rather than the
+   first item of a scroll.
+
+   Two inherited elements were removed in the pass that produced this shape: an
+   eyebrow (`Applied AI systems · Nairobi`, a locale strip that spent a third
+   of the vertical budget before the headline) and a capability strip pinned to
+   the bottom of the viewport (`Intelligence at work. / Converse / Understand /
+   Act / Orchestrate`), which looked like a second navigation but contained no
+   links and repeated the band directly below it. What is left is the offer, one
+   sentence about it, and the two things a visitor can do about it.
+   Only the *composition* is hero-local. The type is the site's — Fraunces via
+   `--font-display` at `--text-hero`, Inter for everything else — and every
+   colour below is a token from `@theme`, so the first screen cannot drift from
+   the pages beneath it. Earlier passes were not: a dot-matrix display face from
+   a CDN and a live-figures row, neither of which survives the site's own CSP
+   (`font-src 'self' data:`) or the brand rule against unverifiable claims. */
+
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Text sits directly on the video, so a two-stop scrim holds contrast (the
+   subhead stays readable on a bright frame) without flattening the footage
+   into a wash. Radial centre, linear top/bottom shade for the header and the
+   figure row. */
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 75% 60% at 50% 52%,
+      rgba(0, 0, 0, 0.6) 0%,
+      rgba(0, 0, 0, 0.34) 55%,
+      rgba(0, 0, 0, 0.62) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0) 32%,
+      rgba(0, 0, 0, 0) 68%,
+      rgba(0, 0, 0, 0.6) 100%
+    );
+}
+
+/* ── Headline ──────────────────────────────────────────────────────
+   The site display face (Fraunces) at the system's one display size,
+   `--text-hero` — the token that exists for exactly this band — set on the two
+   lines the brand idea was written for. The second line takes the Signal
+   Violet accent the site uses for the qualifying half of a heading (HomeCTA,
+   Wordmark). Neither line is `nowrap`: the headline wraps rather than
+   overflowing, which is what keeps it intact at 320px and in a longer
+   translation. */
+.hero-headline {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--text-hero);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  color: var(--color-paper);
+  margin-bottom: clamp(20px, 2.8vh, 30px);
+}
+
+.hero-headline-accent {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--color-signal);
+}
+
+/* ── Subhead ───────────────────────────────────────────────────────
+   Body copy in the site's own face and colour, on the ~52-character measure
+   the other ledes use.
+
+   The measure is deliberately *narrower* than the headline. At 1440 the h1 sets
+   533px wide and the subhead used to set 560px, so the composition widened as
+   it descended — the supporting line was the widest thing on the screen, which
+   is the opposite of what the hierarchy says. A narrower measure turns the
+   stack into a funnel (headline widest, then a tighter supporting line, then
+   the action pair) and costs no extra line: the sentence already sets at three
+   lines either way. */
+.hero-sub {
+  max-width: 52ch;
+  font-family: var(--font-sans);
+  font-size: clamp(16px, 1.7vw, 17px);
+  line-height: 1.6;
+  color: var(--color-ash);
+  margin-bottom: clamp(26px, 3.6vh, 38px);
+}
+
+/* ── Actions ───────────────────────────────────────────────────────
+   The site's two action classes, unmodified: one filled primary in Voltage
+   Blue, one outlined ghost. Only the size is hero-specific.
+
+   No trailing margin: this is the last element on the axis, and any space under
+   it would push the centred block up out of optical centre. The gaps that
+   matter are the ones above it. */
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.hero-action {
+  min-height: 52px;
+  padding: 14px 28px;
+  font-size: 14px;
+}
+
+/* ── Shared entrance ───────────────────────────────────────────────
+   `.hero-anim` starts hidden and reveals on mount; the per-element delay is
+   data via the `--d` custom property, so the cascade is one keyframe pair
+   instead of a duplicated block per element. */
+@keyframes heroReveal {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.98);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+.hero-anim {
+  opacity: 0;
+  animation: heroReveal 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--d, 0s);
+}
+
+/* ── Hero breakpoints ────────────────────────────────────────────── */
+/* Phones: the action pair stacks full width rather than sitting side by side in
+   a 292px measure, where both labels wrap. */
+@media (max-width: 480px) {
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  .hero-action {
+    width: 100%;
+  }
+}
+
+/* Short viewports (landscape phones, small laptops): tighten the intervals so
+   the strip still lands inside the first viewport. Only the intervals move —
+   the type keeps the shared scale instead of switching to a hero-only size. */
+@media (max-height: 700px) {
+  .hero-headline {
+    margin-bottom: 14px;
+  }
+  .hero-sub {
+    margin-bottom: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-anim {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Landscape phones.
+   A 360px-tall viewport cannot hold the portrait composition at portrait
+   spacing. The nav clearance is counted exactly once, on the band itself (68px
+   clears the 52px pill and its 12px inset), and the type steps down one rank so
+   the whole statement still lands inside one screen. The offset used to be
+   counted twice, band padding *and* a stage offset, which grew the band to
+   607px inside a 360px screen; the stage no longer carries a vertical offset of
+   its own, so that failure cannot recur. */
+@media (max-height: 520px) and (orientation: landscape) {
+  #home {
+    padding-top: 68px;
+    padding-bottom: 20px;
+  }
+
+  .hero-headline {
+    font-size: clamp(26px, 4.4vw, 38px);
+    margin-bottom: 8px;
+  }
+
+  /* Wider measure, smaller type: the same sentence in two lines instead of
+     four, which is the whole difference between fitting and not. */
+  .hero-sub {
+    max-width: 680px;
+    font-size: 14px;
+    line-height: 1.45;
+    margin-bottom: 12px;
+  }
+
+  .hero-action {
+    min-height: 44px;
+    padding: 10px 22px;
+    font-size: 13px;
+  }
+}
+
+/* The tight portrait axis, in the two shapes it comes in.
+
+   `max-width: 340px` is narrow: the base 44px floor on `--text-hero` sets "Put
+   intelligence" wider than the 280px measure a 320px screen leaves, so the
+   headline breaks to three lines and the composition crowds the edges.
+
+   `max-width: 400px and max-height: 640px` is short: a 320×568 screen has room
+   for two headline lines but not for the subhead at its 16px body size, which
+   sets the same sentence on five 280px lines. Here the subhead is the element
+   that suffers first.
+
+   Stepping the statement down one rank fixes both: a smaller headline and, on
+   the short axis, the subhead in the 14px body-sm size on the same measure. The
+   order, the axis and the type roles are unchanged; only their size is. Two
+   clauses rather than one because these are two different shapes of small, and
+   a phone that is merely narrow should not also lose its body size. */
+@media (orientation: portrait) and (max-width: 340px),
+  (orientation: portrait) and (max-width: 400px) and (max-height: 640px) {
+  .hero-headline {
+    font-size: clamp(32px, 9.5vw, 40px);
+    margin-bottom: 10px;
+  }
+
+  .hero-sub {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  .hero-action {
+    min-height: 46px;
+    padding: 12px 22px;
+    font-size: 13px;
+  }
 }

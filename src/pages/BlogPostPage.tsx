@@ -54,7 +54,7 @@ export default function BlogPostPage() {
           },
         ]}
       />
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
+      <div className="relative shell">
         <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()}>
           <Link to="/blog" className="inline-flex items-center gap-2 text-sm text-fog hover:text-paper transition-colors mb-8">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -71,7 +71,7 @@ export default function BlogPostPage() {
             <span className="w-1 h-1 rounded-full bg-white/15" />
             <span>{post.date}</span>
           </div>
-          <h1 className="text-[clamp(32px,5vw,56px)] leading-[1.05] tracking-[-0.02em]">
+          <h1 className="text-heading-band-lg leading-[1.05] tracking-[-0.02em]">
             {post.title}
           </h1>
         </motion.div>
@@ -82,7 +82,7 @@ export default function BlogPostPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={revealViewport}
           transition={springReveal(0.1)}
-          className="rounded-[20px] overflow-hidden mb-12 aspect-[16/9] bg-[#191919] border border-white/10"
+          className="rounded-[20px] overflow-hidden mb-12 aspect-[16/9] bg-raised border border-white/10"
         >
           {post.image ? (
             <img
@@ -149,7 +149,7 @@ export default function BlogPostPage() {
             {others.map((o, i) => (
               <motion.div key={o.slug} initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.08)}>
                 <Link to={`/blog/${o.slug}`} className="group block h-full">
-                  <div className="aspect-[4/5] rounded-[20px] overflow-hidden mb-4 bg-[#191919] border border-white/10">
+                  <div className="aspect-[4/5] rounded-[20px] overflow-hidden mb-4 bg-raised border border-white/10">
                     {o.image ? (
                       <img
                         src={o.image}

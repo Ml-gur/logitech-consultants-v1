@@ -3,10 +3,15 @@ import { seedConsent } from './consent'
 
 /**
  * Visual regression goldens (per playwright-best-practices/visual-regression.md).
- * Covers the key home-page sections (hero, capabilities, governance,
- * measurement, deployment stack, principles, positioning, deployment model,
- * pricing, FAQ, footer) and every route (full page). Runs in the
- * desktop-chromium project.
+ * Covers the key home-page sections (hero, capabilities, measurement,
+ * deployment stack, principles, footer), the FAQ band where it actually lives
+ * (/contact), and every route (full page). Runs in the desktop-chromium
+ * project.
+ *
+ * Governance, positioning, the deployment model, insights and pricing are not
+ * captured here as sections: the first three live on /capabilities and /about
+ * and are covered by those route goldens, insights moved to /blog, and pricing
+ * is not rendered.
  *
  * Determinism strategy:
  * - CSS animations/transitions (the marquees) are frozen by the global
@@ -14,6 +19,9 @@ import { seedConsent } from './consent'
  * - JS-driven framer-motion reveals are one-shot: we scroll the section (or the
  *   whole page) into view and wait for the springs to settle before capturing.
  * - Cookie consent is pre-seeded so the fixed banner never overlays a capture.
+ * - Third-party/moving media is blocked rather than waited out: the vendor
+ *   voice widget and the hero's looping MP4 (see the two aborts in the
+ *   `beforeEach` below, each with its own note).
  *
  * Regenerate after an intentional visual change:
  *   npx playwright test e2e/visual.spec.ts --update-snapshots
@@ -39,7 +47,26 @@ test.describe.configure({ mode: 'serial' })
  */
 test.beforeEach(async ({ page }) => {
   await page.route('**/*dograh*', (route) => route.abort())
+  await page.route('**/*.mp4', (route) => route.abort())
 })
+
+/*
+ * Why the `.mp4` abort above is there. The hero's ground is a looping 13.8 MB
+ * MP4 on CloudFront (`VIDEO_SRC`, src/components/Hero.tsx). `animations:
+ * 'disabled'` freezes CSS animations but not a *decoding video*, so a capture
+ * landed on whatever frame happened to be on screen at that instant:
+ * `home-hero.png` failed 36% of its pixels against a run seconds earlier, in the
+ * same environment, with no source change. A golden of a moving plate asserts
+ * nothing reproducible.
+ *
+ * Aborting the request removes the variable the same way the vendor-widget abort
+ * does: the hero then paints its own `poster`, which is same-origin, static and
+ * identical in every environment — the state a visitor sees at first paint, and
+ * the state a `prefers-reduced-motion` visitor stays in (`preload="none"`, no
+ * autoplay; see `useLoopingVideo`). What the hero goldens still assert is the
+ * composition: the headline/subhead/action stack, its centring, the scrim, and
+ * the band's height.
+ */
 
 /** Wait for font-display: swap repaints so text metrics/line heights are final. */
 async function waitFonts(page: Page) {
@@ -136,7 +163,9 @@ test('visual: home hero section', async ({ page }) => {
   await seedConsent(page)
   await page.goto('/')
   await page.waitForLoadState('networkidle')
-  // Hero entrance animations run up to ~1.9s after mount (word stagger + delays)
+  // Hero entrance animations run up to ~1.9s after mount (word stagger +
+  // delays) and toHaveScreenshot then fast-forwards the CSS keyframes to their
+  // final state; the plate under them is the poster (the .mp4 abort above).
   await page.waitForTimeout(2500)
   await expect(page.locator('section#home')).toHaveScreenshot('home-hero.png', { maxDiffPixels: 500 })
 })
@@ -175,13 +204,16 @@ test('visual: home principles section', async ({ page }) => {
 // Governance, positioning and the deployment model now live on /capabilities
 // and /about, and are covered by those route goldens.
 
-test('visual: home FAQ section', async ({ page }) => {
+// The FAQ band is a sibling of the contact page shell, not part of the home
+// page (see ContactPage.tsx). Capturing it at / used to resolve the same
+// locator to nothing and time the test out.
+test('visual: FAQ section', async ({ page }) => {
   await seedConsent(page)
-  await page.goto('/')
+  await page.goto('/contact')
   await page.waitForLoadState('networkidle')
   const section = page.locator('section#faq').first()
   await settleSection(page, section)
-  await expect(section).toHaveScreenshot('home-faq.png', { maxDiffPixels: 500 })
+  await expect(section).toHaveScreenshot('contact-faq.png', { maxDiffPixels: 500 })
 })
 
 test('visual: home footer', async ({ page }) => {
@@ -243,13 +275,13 @@ test.describe('mobile widths', () => {
     await expect(section).toHaveScreenshot('mobile-home-capabilities.png', { maxDiffPixels: 500 })
   })
 
-  test('visual mobile: home FAQ', async ({ page }) => {
+  test('visual mobile: FAQ section', async ({ page }) => {
     await seedConsent(page)
-    await page.goto('/')
+    await page.goto('/contact')
     await page.waitForLoadState('networkidle')
     const section = page.locator('section#faq').first()
     await settleSection(page, section)
-    await expect(section).toHaveScreenshot('mobile-home-faq.png', { maxDiffPixels: 500 })
+    await expect(section).toHaveScreenshot('mobile-contact-faq.png', { maxDiffPixels: 500 })
   })
 
   test('visual mobile: first deployment-pattern panel', async ({ page }) => {

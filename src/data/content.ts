@@ -40,7 +40,7 @@ export const deploymentPatterns: DeploymentPattern[] = [
     image: '/images/M5MY3Wk4Y4dsOCa2vifZ9R6pI.webp',
     tagline:
       'An intelligent first point of contact that answers, understands, retrieves and completes, then hands off to a person when it should.',
-    timeframe: '4–6 weeks to first live deployment',
+    timeframe: '4-6 weeks to first live deployment',
     stack: ['Converse', 'Understand', 'Act'],
     problem:
       'A small team fields the same questions all day, hours, fees, meeting dates, application status, directions. Calls arrive faster than anyone can answer them, so members wait, calls go unanswered, and the staff who should be doing judgement work spend their day repeating themselves. After hours, the organization simply goes silent.',
@@ -73,7 +73,7 @@ export const deploymentPatterns: DeploymentPattern[] = [
     image: '/images/vl5w99JCKqkuvW49lyswomsyhnY.webp',
     tagline:
       'Answers drawn from the institution\u2019s own documents, cited back to the source, scoped to who is asking.',
-    timeframe: '6–8 weeks to first live deployment',
+    timeframe: '6-8 weeks to first live deployment',
     stack: ['Understand', 'Act', 'Orchestrate'],
     problem:
       'The answer exists, but it lives in a policy PDF, a staff intranet page, a spreadsheet and the memory of one person who is on leave. Staff and students ask the same questions across email, phone and a helpdesk, and someone senior has to go and find the document every single time. When that person leaves, the knowledge leaves with them.',
@@ -105,7 +105,7 @@ export const deploymentPatterns: DeploymentPattern[] = [
     image: '/images/Tf9L4582eDStTX4KSFaUOoUP5Ys.webp',
     tagline:
       'Requests captured, understood and routed to the right queue in the systems of record, with the status visible to the requester.',
-    timeframe: '5–7 weeks to first live deployment',
+    timeframe: '5-7 weeks to first live deployment',
     stack: ['Converse', 'Act', 'Orchestrate'],
     problem:
       'Requests arrive through every channel at once and land in one shared inbox. Someone reads each one, guesses the right team, retypes the details into the ticketing system and replies to the requester. Requests get misrouted, duplicated or lost between systems, and nobody, including the person who asked, can say where any given request stands.',
@@ -137,7 +137,7 @@ export const deploymentPatterns: DeploymentPattern[] = [
     image: '/images/J7KZFcCw0ZrENLKo0wuCy6nASg.webp',
     tagline:
       'Documents received, read, validated and filed into the right system, with anything uncertain flagged for a person.',
-    timeframe: '6–8 weeks to first live deployment',
+    timeframe: '6-8 weeks to first live deployment',
     stack: ['Understand', 'Act', 'Orchestrate'],
     problem:
       'Forms, referrals, claims and correspondence arrive as scans, photos and attachments in many different layouts. Staff open each one, read it, retype the fields into a system and file the original. Volume swings between quiet and overwhelming, and every transcription is a chance to introduce an error that only surfaces much later.',

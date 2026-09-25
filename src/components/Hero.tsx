@@ -1,312 +1,178 @@
 'use client'
 
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { motion, useReducedMotion } from 'framer-motion'
-import { CAPABILITIES, SITE } from '../lib/brand'
+import { type CSSProperties, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { DEFINITIONS, SITE } from '../lib/brand'
 
-const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.09, delayChildren: 0.1 } },
-}
+/**
+ * Hero: the single-viewport statement.
+ *
+ * This is the one place on the site that is a *statement* rather than a band
+ * inside an argument, so it fills the first viewport with a looping video and
+ * stacks one composition on a centred axis: headline → subhead → two actions.
+ * Three elements, and the whole screen is the composition.
+ *
+ * Type and content are the site's, not the hero's own. The headline is the
+ * site display face (`--font-display`, the same face every heading uses), the
+ * body copy is `--font-sans`, and every string comes from `src/lib/brand.ts`:
+ * the headline from `SITE.brandIdea` and the subhead from
+ * `DEFINITIONS.descriptive`. Nothing here is hero-local copy, so the first
+ * screen cannot drift from what the rest of the site claims.
+ *
+ * History, because it explains the shape. A mocked "Live deployment" panel used
+ * to float beside the headline, spending 440px of the widest band describing a
+ * system nobody had bought before the visitor was told what the offer was; it
+ * was removed and the copy column re-centred. A later pass rebuilt the band
+ * from an unrelated single-viewport template, a retro dot-matrix display face
+ * and an icon font from two more CDNs, a "Trusted by 2000+ Enterprises" badge
+ * over three invented client marks, and four invented runtime figures (120ms,
+ * 99.99% uptime); the faces never loaded under the site's own CSP
+ * (`font-src 'self' data:`), and the claims broke the brand rule that governs
+ * every other page. A third pass then kept two more inherited elements:
+ *
+ *   1. An eyebrow, `Applied AI systems · Nairobi`. That is a locale strip with
+ *      a middle dot, the shape every agency portfolio uses to signal "we are a
+ *      studio, somewhere". It also spent a third of the vertical budget before
+ *      the headline while telling the visitor nothing the subhead does not.
+ *   2. A capability strip pinned to the bottom of the viewport, `Intelligence
+ *      at work. / Converse / Understand / Act / Orchestrate`. It read as a
+ *      second navigation but none of it was a link, and the same four actions
+ *      open the very next band, so the first screen was spending its last line
+ *      on a table of contents for a page the visitor had not started.
+ *
+ * Both are gone. What is left is the offer, one sentence about the offer, and
+ * the two things a visitor can do about it: three elements, centred on the
+ * viewport's own axis rather than on the space left over after a header and a
+ * footer strip. This is also why the band carries no top offset for the
+ * floating nav: centring in the full viewport is what keeps the composition
+ * balanced at every width, and the nav is an overlay that the centred block
+ * clears by construction (checked at 320 through 1920 wide, and at 740×360).
+ *
+ * The values below are hero-local on purpose, the composition is the only
+ * place on the site that is a statement, so it must not leak into the shared
+ * band rhythm or the shared scale.
+ */
 
-const item = {
-  hidden: { opacity: 0, y: 28 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] as const },
-  },
-}
+/** Exact looping background plate. Hero-local because the home hero is its
+ *  only consumer.
+ *
+ *  It is 13.8 MB, so the plate is the one request on this page that can decide
+ *  how the first screen looks. Three things keep that from being a black box:
+ *  the `media-src` directive in `deploy/nginx-security-headers.conf` allows
+ *  this host (without it `default-src 'self'` blocks the video outright), the
+ *  poster below paints the plate's own first frame before a byte of video
+ *  arrives, and reduced-motion users never start the download at all. */
+const VIDEO_SRC =
+  'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260809_012548_ef22562c-c0ae-4816-ad9d-f8922af4e6a7.mp4'
 
-/** Live-looking status panel that floats in the hero */
-function StatusPanel() {
-  const metrics = [
-    { label: 'Completion rate', value: '94%', delta: '+6pp', up: true },
-    { label: 'Time to answer', value: '< 3s', delta: 'all hours', up: true },
-    { label: 'Hours returned', value: '1,240', delta: 'this quarter', up: true },
-  ]
-  const events = [
-    { time: '09:41', text: 'Voice call resolved · Booking confirmed', ok: true },
-    { time: '09:38', text: 'Knowledge query answered · Source cited', ok: true },
-    { time: '09:35', text: 'Request routed to compliance team', ok: true },
-    { time: '09:31', text: 'Escalation triggered · Agent handed off', ok: false },
-  ]
-  return (
-    <div
-      className="relative rounded-[24px] overflow-hidden"
-      style={{
-        background: 'rgba(18,18,26,0.85)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        backdropFilter: 'blur(24px)',
-        boxShadow: '0 32px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)',
-      }}
-    >
-      {/* Panel header */}
-      <div
-        className="flex items-center justify-between px-5 py-3.5"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}
-      >
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#9898a8]">
-            Live deployment
-          </span>
-        </div>
-        <span className="font-mono text-[10px] text-[#52525f]">Nairobi · Active</span>
-      </div>
+/** One frame of the plate, same-origin, so the hero is never empty. */
+const VIDEO_POSTER = '/images/hero-poster.jpg'
 
-      {/* Metric row */}
-      <div
-        className="grid grid-cols-3 divide-x"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', divideColor: 'rgba(255,255,255,0.06)' }}
-      >
-        {metrics.map((m) => (
-          <div key={m.label} className="px-4 py-4" style={{ borderRight: '1px solid rgba(255,255,255,0.06)' }}>
-            <div
-              className="font-display text-[22px] font-medium leading-none mb-1"
-              style={{ color: '#f0f0f8' }}
-            >
-              {m.value}
-            </div>
-            <div className="text-[10px] text-[#6d6d7a] mb-1">{m.label}</div>
-            <div
-              className="font-mono text-[10px]"
-              style={{ color: m.up ? '#10b981' : '#ff8b8b' }}
-            >
-              {m.delta}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Event log */}
-      <div className="px-5 py-4 space-y-3">
-        {events.map((ev) => (
-          <div key={ev.time + ev.text} className="flex items-start gap-3">
-            <span className="font-mono text-[10px] text-[#52525f] mt-0.5 shrink-0 tabular-nums">
-              {ev.time}
-            </span>
-            <div
-              className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
-              style={{ background: ev.ok ? '#10b981' : '#7c91ff' }}
-            />
-            <span className="text-[11px] text-[#9898a8] leading-snug">{ev.text}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Bottom gradient fade */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-12 pointer-events-none"
-        style={{ background: 'linear-gradient(to top, rgba(18,18,26,0.9), transparent)' }}
-      />
-    </div>
+/**
+ * Whether the plate should loop.
+ *
+ * A decorative background that never stops moving is the classic motion trigger,
+ * and the site's own rule is to respect `prefers-reduced-motion`. There is no
+ * way to honour that in CSS for a video, so the element itself is switched:
+ * with the setting on, the poster stays and the video is not fetched
+ * (`preload="none"`), which also spares the 13.8 MB.
+ */
+function useLoopingVideo(): boolean {
+  const [loops, setLoops] = useState(() =>
+    typeof window === 'undefined' || !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   )
+
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const sync = () => setLoops(!query.matches)
+    query.addEventListener('change', sync)
+    return () => query.removeEventListener('change', sync)
+  }, [])
+
+  return loops
 }
+
+/**
+ * The brand idea, set on the two lines it was written for: "Put intelligence" /
+ * "to work.", with the second line carrying the Signal Violet accent the site
+ * uses for the qualifying half of a heading (see HomeCTA and Wordmark).
+ *
+ * The lines are derived from `SITE.brandIdea` rather than retyped, so the
+ * promise has one source; if the copy is ever reworded without the " to "
+ * break, the tail is empty and the headline renders as the single line it now
+ * is instead of as a broken fragment.
+ */
+function headlineLines(idea: string): { lead: string; tail: string } {
+  const at = idea.indexOf(' to ')
+  if (at === -1) return { lead: idea, tail: '' }
+  return { lead: idea.slice(0, at), tail: idea.slice(at + 1) }
+}
+
+const HEADLINE = headlineLines(SITE.brandIdea)
 
 export default function Hero() {
-  const reduce = useReducedMotion()
-  const navigate = useNavigate()
-  const [email, setEmail] = useState('')
-  const [error, setError] = useState('')
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const value = email.trim()
-    if (!value) { setError('Enter a work email so we can reply.'); return }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) { setError('That does not look like a valid email.'); return }
-    setError('')
-    navigate(`/contact?email=${encodeURIComponent(value)}`)
-  }
+  const loops = useLoopingVideo()
 
   return (
-    <section id="home" className="relative overflow-hidden" style={{ minHeight: '96dvh', display: 'flex', alignItems: 'center' }}>
+    // `bg-midnight`, not `bg-black`: the video's own frame is the ground, and
+    // under it (poster still loading, a blocked `media-src`, reduced motion)
+    // the band has to fall back to the site's canvas rather than to #000000.
+    // Pure black was the one surface on the site outside the token set, and it
+    // read as a hole punched in a page whose canvas is #080810.
+    <section id="home" className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-midnight">
+      {/* Ground: one looping plate behind everything, plus the scrim that keeps
+          the type readable on a bright frame. The poster sits under the video,
+          so the first frame is the plate rather than the canvas black. */}
+      <video
+        className="hero-video"
+        poster={VIDEO_POSTER}
+        autoPlay={loops}
+        loop={loops}
+        muted
+        playsInline
+        preload={loops ? 'auto' : 'none'}
+        aria-hidden
+        tabIndex={-1}
+      >
+        <source src={VIDEO_SRC} type="video/mp4" />
+      </video>
+      <div className="hero-scrim" aria-hidden />
 
-      {/* Deep layered background */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden>
-        <div className="absolute inset-0" style={{
-          background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(61,85,240,0.2) 0%, transparent 70%)'
-        }} />
-        <div className="absolute inset-0" style={{
-          background: 'radial-gradient(ellipse 40% 40% at 20% 80%, rgba(124,145,255,0.07) 0%, transparent 60%)'
-        }} />
-        {/* Right-side glow for panel */}
-        <div className="absolute inset-0 hidden lg:block" style={{
-          background: 'radial-gradient(ellipse 50% 60% at 80% 50%, rgba(61,85,240,0.12) 0%, transparent 65%)'
-        }} />
-        <div className="absolute top-0 left-0 right-0 h-px" style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(124,145,255,0.4) 30%, rgba(124,145,255,0.6) 50%, rgba(124,145,255,0.4) 70%, transparent 100%)'
-        }} />
-      </div>
+      <div className="relative z-10 flex flex-1 flex-col px-[clamp(14px,3vw,32px)] py-[clamp(16px,2.4vh,28px)]">
+        {/* The statement, centred on the axis and on the viewport's own
+            vertical centre, so it stays balanced whether the band is 360px or
+            1080px tall. No vertical padding of its own: the band above owns the
+            nav clearance, and counting it in both places is what used to push
+            the composition off a landscape phone. */}
+        <div className="mx-auto flex w-full max-w-[900px] flex-1 flex-col items-center justify-center text-center">
+          <h1 className="hero-headline hero-anim" style={{ '--d': '0.06s' } as CSSProperties}>
+            <span className="block">{HEADLINE.lead}</span>
+            {HEADLINE.tail && (
+              <>
+                {/* The space is real text, not a layout gap: the two lines are
+                    separate blocks, and without it the h1's text content reads
+                    "Put intelligenceto work." to anything that does not lay the
+                    page out (screen readers, search crawlers, copy-paste). */}
+                {' '}
+                <span className="hero-headline-accent block">{HEADLINE.tail}</span>
+              </>
+            )}
+          </h1>
 
-      <div className="relative w-full max-w-[1200px] mx-auto px-5 sm:px-8 pt-28 pb-20 landscape:pt-20 landscape:pb-14 md:pt-36 md:pb-28">
+          <p className="hero-sub hero-anim" style={{ '--d': '0.18s' } as CSSProperties}>
+            {DEFINITIONS.descriptive}
+          </p>
 
-        <div className="grid lg:grid-cols-[1fr_440px] gap-12 xl:gap-20 items-center">
-
-          {/* Left: copy */}
-          <motion.div
-            variants={reduce ? undefined : stagger}
-            initial={reduce ? false : 'hidden'}
-            animate={reduce ? undefined : 'visible'}
-          >
-            {/* Eyebrow */}
-            <motion.div variants={reduce ? undefined : item} className="flex items-center gap-3 mb-8 sm:mb-10">
-              <div className="h-px w-8 sm:w-12" style={{ background: 'var(--color-signal)' }} />
-              <span className="font-mono text-[11px] sm:text-[12px] uppercase tracking-[0.2em]" style={{ color: 'var(--color-fog)' }}>
-                Applied AI Systems · Nairobi
-              </span>
-            </motion.div>
-
-            {/* Headline */}
-            <motion.h1 variants={reduce ? undefined : item} className="mb-6 sm:mb-8">
-              <span
-                className="block"
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 400,
-                  fontSize: 'clamp(44px, 7.5vw, 96px)',
-                  lineHeight: 1.0,
-                  letterSpacing: '-0.025em',
-                  color: 'var(--color-paper)',
-                }}
-              >
-                Put intelligence
-              </span>
-              <span
-                className="block"
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontStyle: 'italic',
-                  fontWeight: 300,
-                  fontSize: 'clamp(44px, 7.5vw, 96px)',
-                  lineHeight: 1.0,
-                  letterSpacing: '-0.025em',
-                  color: 'var(--color-signal)',
-                }}
-              >
-                to work.
-              </span>
-            </motion.h1>
-
-            {/* Subtext — concise on mobile */}
-            <motion.p
-              variants={reduce ? undefined : item}
-              className="text-[16px] sm:text-[17px] leading-relaxed mb-8 sm:mb-10 max-w-[520px]"
-              style={{ color: 'var(--color-ash)' }}
-            >
-              Governed AI systems that complete real work inside real organizations — measured, audited, and running in production.
-            </motion.p>
-
-            {/* CTA row */}
-            <motion.div
-              variants={reduce ? undefined : item}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8 sm:mb-10"
-            >
-              <Link
-                to="/contact"
-                className="inline-flex items-center justify-center gap-2 px-7 py-4 text-[14px] font-medium rounded-full text-white transition-all duration-200"
-                style={{ background: 'var(--color-voltage)', minHeight: '52px' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-voltage-hover)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'var(--color-voltage)')}
-              >
-                Book a discovery call
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                  <path d="M6 3l5 5-5 5" />
-                </svg>
-              </Link>
-              <Link
-                to="/deployment-patterns"
-                className="inline-flex items-center justify-center gap-2 px-7 py-4 text-[14px] font-medium rounded-full transition-all duration-200"
-                style={{ border: '1px solid rgba(124,145,255,0.35)', color: 'var(--color-signal)', minHeight: '52px' }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(124,145,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(124,145,255,0.6)' }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(124,145,255,0.35)' }}
-              >
-                See what we deploy
-              </Link>
-            </motion.div>
-
-            {/* Email capture */}
-            <motion.form
-              variants={reduce ? undefined : item}
-              onSubmit={submit}
-              noValidate
-              className="w-full max-w-[520px]"
-            >
-              <div
-                className="flex items-center gap-2 p-1.5 rounded-full"
-                style={{
-                  background: 'var(--color-carbon)',
-                  border: error ? '1px solid var(--color-error)' : '1px solid rgba(255,255,255,0.1)',
-                  boxShadow: '0 0 40px rgba(61,85,240,0.2)',
-                }}
-              >
-                <label htmlFor="hero-email" className="sr-only">Work email</label>
-                <input
-                  id="hero-email"
-                  type="email"
-                  value={email}
-                  onChange={e => { setEmail(e.target.value); if (error) setError('') }}
-                  aria-invalid={!!error}
-                  aria-describedby={error ? 'hero-email-error' : undefined}
-                  placeholder="you@organization.com"
-                  className="flex-1 min-w-0 bg-transparent px-5 py-3 text-white placeholder:text-[var(--color-steel)] focus:outline-none text-[15px]"
-                />
-                <button
-                  type="submit"
-                  className="shrink-0 px-5 sm:px-6 py-3 rounded-full text-white text-[13px] font-medium transition-all duration-200 whitespace-nowrap"
-                  style={{ background: 'var(--color-voltage)' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-voltage-hover)')}
-                  onMouseLeave={e => (e.currentTarget.style.background = 'var(--color-voltage)')}
-                >
-                  Start a conversation
-                </button>
-              </div>
-              {error && (
-                <p id="hero-email-error" role="alert" className="text-xs mt-2 pl-5" style={{ color: 'var(--color-error)' }}>
-                  {error}
-                </p>
-              )}
-            </motion.form>
-          </motion.div>
-
-          {/* Right: live deployment panel — desktop only */}
-          <motion.div
-            initial={reduce ? false : { opacity: 0, x: 40, y: 20 }}
-            animate={reduce ? undefined : { opacity: 1, x: 0, y: 0, transition: { delay: 0.55, duration: 0.8, ease: [0.22, 1, 0.36, 1] } }}
-            className="hidden lg:block"
-          >
-            <StatusPanel />
-          </motion.div>
-        </div>
-
-        {/* Capability strip */}
-        <motion.div
-          initial={reduce ? false : { opacity: 0 }}
-          animate={reduce ? undefined : { opacity: 1, transition: { delay: 0.9, duration: 0.6 } }}
-          className="mt-16 sm:mt-20 landscape:mt-10 pt-8 sm:pt-10"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}
-        >
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em]" style={{ color: 'var(--color-slate)' }}>
-              {SITE.essence}
-            </span>
-            <span style={{ color: 'var(--color-smoke)' }} aria-hidden>—</span>
-            {CAPABILITIES.map((cap, i) => (
-              <span key={cap.id} className="flex items-center gap-3">
-                <span
-                  className="font-mono text-[11px] uppercase tracking-[0.1em]"
-                  style={{ color: 'var(--color-fog)' }}
-                >
-                  {cap.name}
-                </span>
-                {i < CAPABILITIES.length - 1 && (
-                  <span style={{ color: 'var(--color-graphite)' }} aria-hidden>/</span>
-                )}
-              </span>
-            ))}
+          {/* One filled primary, one outlined ghost, the site's action pair. */}
+          <div className="hero-actions hero-anim" style={{ '--d': '0.3s' } as CSSProperties}>
+            <Link to="/contact" className="btn-primary hero-action">
+              Book a discovery call
+            </Link>
+            <Link to="/deployment-patterns" className="btn-ghost hero-action">
+              See what we deploy
+            </Link>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

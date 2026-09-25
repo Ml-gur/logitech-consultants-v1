@@ -32,9 +32,13 @@ export default function LogoMarquee() {
   const reduce = useReducedMotion()
   const items = [...logos, ...logos]
 
+  // `band-tight`: this strip supports the hero's claim, it does not start a new
+  // idea, so it sits closer to the band above it than a full band would. It is
+  // deliberately not a `<Band>`: the marquee's fade edges are meant to run to
+  // the viewport edge, not to the 1200px measure.
   return (
-    <section className="relative overflow-hidden py-12 sm:py-14" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 mb-8">
+    <section className="band-tight relative overflow-hidden border-y border-white/[0.06]">
+      <div className="shell mb-8">
         <p className="text-center text-xs text-fog uppercase tracking-[0.14em]">
           We build on the platforms your organization already trusts
         </p>
