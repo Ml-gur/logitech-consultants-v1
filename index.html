@@ -17,10 +17,6 @@
          text-paint critical path. -->
     <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/5A3Ce6C9YYmCjpQx9M4inSaKU.woff2" />
     <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/5vvr9Vy74if2I6bQbJvbw7SY1pQ.woff2" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-    <link href="https://db.onlinewebfonts.com/c/8cb707a9b8a73f8a7403336b861c3074?family=BubbledotICG-FinePos" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0e0e0e" />
     <meta name="color-scheme" content="dark" />
@@ -114,18 +110,18 @@
     -->
     <script>
       (function (d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0]
-        if (d.getElementById(id)) return
-        js = d.createElement(s)
-        js.id = id
-        js.src =
-          'https://app.dograh.com/embed/dograh-widget.js?token=emb_XV9X2N9U2oy1WzIuiwtVHRQlkYQMybFcO60_yKbfwMc&environment=production&apiEndpoint=https://api.dograh.com'
-        js.setAttribute(
-          'data-dograh-context',
-          JSON.stringify({ page_url: window.location.href, today: new Date().toISOString().slice(0, 10) })
-        )
-        js.async = true
-        fjs.parentNode.insertBefore(js, fjs)
+        var load = function () {
+          if (d.getElementById(id)) return
+          var js = d.createElement(s), fjs = d.getElementsByTagName(s)[0]
+          js.id = id
+          js.src = 'https://app.dograh.com/embed/dograh-widget.js?token=emb_XV9X2N9U2oy1WzIuiwtVHRQlkYQMybFcO60_yKbfwMc&environment=production&apiEndpoint=https://api.dograh.com'
+          js.setAttribute('data-dograh-context', JSON.stringify({ page_url: window.location.href, today: new Date().toISOString().slice(0, 10) }))
+          js.async = true
+          fjs.parentNode.insertBefore(js, fjs)
+        }
+        var events = ['pointerdown', 'keydown', 'touchstart']
+        events.forEach(function (event) { window.addEventListener(event, load, { once: true, passive: true }) })
+        window.setTimeout(load, 8000)
       })(document, 'script', 'dograh-widget')
     </script>
   </body>
