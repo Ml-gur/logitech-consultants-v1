@@ -78,7 +78,7 @@ export default function CookieBanner() {
             role="region"
             aria-label="Cookie consent"
             tabIndex={-1}
-            className="mx-auto max-w-[1100px] rounded-[24px] bg-[#191919] border border-white/10 shadow-[0_-8px_40px_rgba(0,0,0,0.5)] p-5 sm:p-6 outline-none"
+            className="cookie-panel mx-auto max-w-[1100px] rounded-[24px] bg-[#191919] border border-white/10 shadow-[0_-8px_40px_rgba(0,0,0,0.5)] p-5 sm:p-6 outline-none"
           >
             <div className="flex flex-col lg:flex-row lg:items-start gap-5">
               <div className="flex-1 min-w-0">

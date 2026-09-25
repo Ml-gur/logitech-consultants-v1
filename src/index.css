@@ -25,6 +25,8 @@
   --color-error: #d66b6b;
   --color-success: #f69103;
   --color-gold: var(--color-plasma);
+  --color-line: rgba(245, 244, 240, 0.14);
+  --color-line-warm: rgba(255, 122, 0, 0.24);
 
   /* Layout contract: all spacing scales from a predictable 4px rhythm. */
   --p-density: 1;
@@ -401,8 +403,22 @@ html.lenis body {
   contain-intrinsic-size: 900px;
   position: relative;
   overflow: clip;
-  background: var(--color-midnight);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 122, 0, .07), transparent 26rem),
+    linear-gradient(180deg, #080909 0%, #0b0d0c 48%, #080909 100%);
 }
+.inspiration-shell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .28;
+  background-image: linear-gradient(var(--color-line) 1px, transparent 1px), linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: linear-gradient(to bottom, transparent, black 12%, black 80%, transparent);
+}
+.inspiration-shell > * { position: relative; z-index: 1; }
+.inspiration-shell section { scroll-margin-top: 6rem; }
 .inspiration-shell section {
   position: relative;
   isolation: isolate;
@@ -412,9 +428,16 @@ html.lenis body {
   position: absolute;
   inset: 0 5% auto;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.14), transparent);
+  background: linear-gradient(90deg, transparent, var(--color-line-warm), transparent);
   pointer-events: none;
 }
+.inspiration-shell section:nth-child(even)::before {
+  background: linear-gradient(90deg, transparent, var(--color-line), transparent);
+}
+.inspiration-shell section > div {
+  transition: transform .5s cubic-bezier(.22,1,.36,1);
+}
+.inspiration-shell section:hover > div { transform: translateY(-2px); }
 .inspiration-shell h2 {
   font-family: var(--font-sans);
   font-size: clamp(2.25rem, 5.4vw, 6.4rem);
@@ -464,9 +487,15 @@ html.lenis body {
   filter: saturate(1.08) contrast(1.03);
 }
 @media (max-width: 720px) {
+  .cookie-panel { border-radius: 22px; padding: 22px 20px; }
+  .cookie-panel h2 { font-size: 1.05rem; }
+  .cookie-panel p { font-size: .8125rem; line-height: 1.55; }
+  .cookie-panel button { min-height: 46px; }
   .inspiration-shell h2 { font-size: clamp(2.4rem, 12vw, 4rem); }
   .inspiration-shell section::before { inset-inline: 16px; }
   .inspiration-shell section { padding-inline: var(--content-gutter); }
+  .inspiration-shell::after { background-size: 48px 48px; opacity: .18; }
+  .inspiration-shell section:hover > div { transform: none; }
   .reference-page { padding: 6rem var(--content-gutter) 4rem; }
 }
 /* B2bizz-inspired inner pages: compact, image-led chapters with the same
