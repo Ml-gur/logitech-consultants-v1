@@ -4,10 +4,10 @@ import { motion } from 'framer-motion'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 
 const stats = [
-  { value: '94%', label: 'Completion rate', sub: 'requests finished end-to-end' },
-  { value: '< 3s', label: 'Time to first answer', sub: 'including after-hours calls' },
-  { value: '10×', label: 'Deployment velocity', sub: 'second build vs. first' },
-  { value: '0', label: 'Silent failures', sub: 'every drop surfaced to a person' },
+  { value: '01', label: 'Completion rate', sub: 'work finished end to end' },
+  { value: '02', label: 'Escalation accuracy', sub: 'the right handoff at the right time' },
+  { value: '03', label: 'Answer groundedness', sub: 'responses trace to approved sources' },
+  { value: '04', label: 'Hours returned', sub: 'time moved back to judgement work' },
 ]
 
 const dimensions = [

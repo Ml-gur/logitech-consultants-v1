@@ -1,55 +1,18 @@
 import { Link } from 'react-router-dom'
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 
 const metrics = [
-  { icon: '<', target: 120, suffix: 'ms', decimals: 0, label: 'Inference time' },
-  { icon: '%', target: 99.99, suffix: '%', decimals: 2, label: 'Platform uptime' },
-  { icon: '*', target: 24, suffix: '/7', decimals: 0, label: 'Autonomous runtime' },
-  { icon: '#', target: 2.4, suffix: 'M', decimals: 1, label: 'Context windows' },
+  { value: '01', label: 'Completion rate' },
+  { value: '02', label: 'Escalation accuracy' },
+  { value: '03', label: 'Answer groundedness' },
+  { value: '04', label: 'Hours returned' },
 ]
 
-function useCountUp(target: number, decimals: number, delay: number) {
-  const [value, setValue] = useState(0)
-  const ref = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const node = ref.current
-    if (!node) return
-
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reducedMotion) {
-      setValue(target)
-      return
-    }
-
-    let frame = 0
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return
-      const start = performance.now()
-      const duration = 1500
-      const tick = (now: number) => {
-        const progress = Math.min((now - start - delay) / duration, 1)
-        if (progress > 0) setValue(target * (1 - Math.pow(1 - progress, 3)))
-        if (progress < 1) frame = requestAnimationFrame(tick)
-      }
-      frame = requestAnimationFrame(tick)
-      observer.disconnect()
-    }, { threshold: 0.25 })
-    observer.observe(node)
-
-    return () => {
-      observer.disconnect()
-      cancelAnimationFrame(frame)
-    }
-  }, [target, delay])
-  return { ref, value: value.toFixed(decimals) }
-}
-
 function Stat({ metric, index }: { metric: typeof metrics[number]; index: number }) {
-  const counter = useCountUp(metric.target, metric.decimals, 480 + index * 90)
   return (
-    <div ref={counter.ref} className="hero-stat" style={{ animationDelay: `${0.5 + index * 0.08}s` }}>
-      <span className="hero-stat-icon" aria-hidden="true">{metric.icon}</span>
-      <span className="hero-stat-value">{counter.value}<small>{metric.suffix}</small></span>
+    <div className="hero-stat" style={{ animationDelay: `${0.5 + index * 0.08}s` }}>
+      <span className="hero-stat-icon" aria-hidden="true">{metric.value}</span>
+      <span className="hero-stat-value">Defined</span>
       <span className="hero-stat-label">{metric.label}</span>
     </div>
   )
@@ -92,8 +55,8 @@ export default function Hero() {
           Naivolabs designs, builds and deploys intelligent AI systems that help organizations serve people, use information and operate their workflows — governed, measured, and running in production.
         </p>
         <div className="hero-actions anim" style={{ '--d': '0.4s' } as CSSProperties}>
-          <Link to="/contact" className="hero-cta">Schedule a consultation</Link>
-          <Link to="/deployment-patterns" className="hero-cta hero-cta-secondary">See what we deploy</Link>
+          <Link to="/contact" className="hero-cta">Book a scoping conversation</Link>
+          <Link to="/deployment-patterns" className="hero-cta hero-cta-secondary">See how the pilot works</Link>
         </div>
 
         <div className="hero-stats" aria-label="Platform metrics">

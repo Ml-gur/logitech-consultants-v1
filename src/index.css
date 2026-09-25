@@ -431,6 +431,21 @@ html.lenis body {
   background: linear-gradient(90deg, transparent, var(--color-line-warm), transparent);
   pointer-events: none;
 }
+.strategy-section { max-width: 1200px; margin-inline: auto; padding: clamp(5rem, 10vw, 9rem) var(--content-gutter); }
+.strategy-section__intro { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(280px, .7fr); gap: 4rem; align-items: end; margin-bottom: 3rem; }
+.strategy-section h2 { margin: .75rem 0 0; font-size: clamp(2.8rem, 6vw, 5.8rem); line-height: .92; letter-spacing: -.055em; }
+.strategy-section h2 em { color: var(--color-signal); font-style: normal; }
+.strategy-section__lede { max-width: 32rem; margin: 0; color: var(--color-fog); font-size: 1.05rem; line-height: 1.7; }
+.strategy-section__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--color-line); border-left: 1px solid var(--color-line); }
+.strategy-card { min-height: 250px; padding: 1.4rem; border-right: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); background: rgba(255,255,255,.025); transition: background .25s ease, transform .25s ease; }
+.strategy-card:hover { background: rgba(255,122,0,.08); transform: translateY(-4px); }
+.strategy-card__number { display: block; margin-bottom: 4.5rem; color: var(--color-signal); font-size: .75rem; font-variant-numeric: tabular-nums; }
+.strategy-card h3 { margin: 0 0 .75rem; color: var(--color-paper); font-size: 1.15rem; letter-spacing: -.02em; }
+.strategy-card p { margin: 0; color: var(--color-fog); font-size: .92rem; line-height: 1.6; }
+.strategy-section__footer { display: flex; justify-content: space-between; gap: 2rem; align-items: center; padding-top: 1.25rem; color: var(--color-fog); font-size: .85rem; }
+.strategy-section__footer p { max-width: 38rem; margin: 0; }
+.text-link { color: var(--color-paper); text-decoration: none; white-space: nowrap; }
+.text-link:hover { color: var(--color-signal); }
 .inspiration-shell section:nth-child(even)::before {
   background: linear-gradient(90deg, transparent, var(--color-line), transparent);
 }
@@ -501,7 +516,16 @@ html.lenis body {
   transform: scale(1.035);
   filter: saturate(1.08) contrast(1.03);
 }
+@media (max-width: 820px) {
+  .strategy-section__intro { grid-template-columns: 1fr; gap: 1.5rem; }
+  .strategy-section__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 @media (max-width: 720px) {
+  .strategy-section { padding-block: 5rem; }
+  .strategy-section__grid { grid-template-columns: 1fr; }
+  .strategy-card { min-height: auto; padding: 1.25rem; }
+  .strategy-card__number { margin-bottom: 3rem; }
+  .strategy-section__footer { align-items: flex-start; flex-direction: column; gap: 1rem; }
   .cookie-panel { border-radius: 22px; padding: 22px 20px; }
   .cookie-panel h2 { font-size: 1.05rem; }
   .cookie-panel p { font-size: .8125rem; line-height: 1.55; }

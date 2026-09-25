@@ -5,6 +5,7 @@ import Hero from '../components/Hero'
 import LogoMarquee from '../components/LogoMarquee'
 import DeploymentPatterns from '../components/DeploymentPatterns'
 import Principles from '../components/Principles'
+import StrategySection from '../components/StrategySection'
 import HomeCTA from '../components/HomeCTA'
 
 export default function HomePage() {
@@ -20,6 +21,7 @@ export default function HomePage() {
       <div className="inspiration-shell">
         <LogoMarquee />
         <Principles />
+        <StrategySection />
         <DeploymentPatterns />
         <HomeCTA />
       </div>

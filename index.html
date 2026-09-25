@@ -99,30 +99,5 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
 
-    <!-- Voice agent widget.
-         TODO(operator): this embed still points at the previous brand's Dograh
-         workflow/token. Re-point it at the Naivolabs agent (or remove the
-         block) before launch, an unreviewed third-party embed on a governed
-         product is exactly the kind of thing this brand says it does not ship.
-         LOCAL TUNNEL variant (commented, kept for rollback):
-         token emb__IpndMeQHvpyCrtLZNNrN-uuvvQZcIrDveO6Y0Ox4YY → workflow 7 def 36,
-         vendored at /public/dograh-widget.js; see scripts/update-dograh-tunnel.sh.
-    -->
-    <script>
-      (function (d, s, id) {
-        var load = function () {
-          if (d.getElementById(id)) return
-          var js = d.createElement(s), fjs = d.getElementsByTagName(s)[0]
-          js.id = id
-          js.src = 'https://app.dograh.com/embed/dograh-widget.js?token=emb_XV9X2N9U2oy1WzIuiwtVHRQlkYQMybFcO60_yKbfwMc&environment=production&apiEndpoint=https://api.dograh.com'
-          js.setAttribute('data-dograh-context', JSON.stringify({ page_url: window.location.href, today: new Date().toISOString().slice(0, 10) }))
-          js.async = true
-          fjs.parentNode.insertBefore(js, fjs)
-        }
-        var events = ['pointerdown', 'keydown', 'touchstart']
-        events.forEach(function (event) { window.addEventListener(event, load, { once: true, passive: true }) })
-        window.setTimeout(load, 8000)
-      })(document, 'script', 'dograh-widget')
-    </script>
   </body>
 </html>
