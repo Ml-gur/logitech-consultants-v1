@@ -124,7 +124,11 @@ export default function ContactPage() {
   }
 
   const fieldClasses = (hasError: boolean) =>
-    `w-full px-5 py-3.5 rounded-[10px] bg-[#191919] border text-base text-paper placeholder:text-slate focus:outline-none focus:ring-2 transition-colors ${
+    // `placeholder:text-fog`, not slate: a placeholder is 16px text on The
+    // Carbon field, where #6d6d7a measures 3.7:1 — below AA, and against the
+    // rule ADR-008 already states for small text. Fog measures 6.6:1 and still
+    // reads as a hint against the `text-paper` value the visitor types.
+    `w-full px-5 py-3.5 rounded-[10px] bg-raised border text-base text-paper placeholder:text-fog focus:outline-none focus:ring-2 transition-colors ${
       hasError
         ? 'border-error focus:ring-error/30'
         : 'border-steel focus:border-signal focus:ring-signal/20'
@@ -163,14 +167,14 @@ export default function ContactPage() {
           },
         ]}
       />
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
+      <div className="relative shell">
         <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
           Contact
         </motion.p>
 
         <motion.h1
           initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.08)}
-          className="text-[clamp(40px,6vw,80px)] leading-[1.02] tracking-[-0.03em] max-w-[700px] mb-6"
+          className="text-heading-band-lg leading-[1.02] tracking-[-0.03em] max-w-[700px] mb-6"
         >
           Tell us what is <span className="text-signal">not working.</span>
         </motion.h1>
@@ -190,7 +194,7 @@ export default function ContactPage() {
             {sent ? (
               <div
                 role="status"
-                className="rounded-[30px] border border-signal/30 bg-[#191919] p-10 text-center shadow-[0_0_40px_rgba(112,132,255,0.12)]"
+                className="rounded-[30px] border border-signal/30 bg-raised p-10 text-center shadow-[0_0_40px_rgba(112,132,255,0.12)]"
               >
                 <div className="w-12 h-12 rounded-full bg-signal/15 text-signal flex items-center justify-center mx-auto mb-5">
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
@@ -307,11 +311,11 @@ export default function ContactPage() {
                       aria-describedby={errors.interest ? 'interest-error' : undefined}
                       className={`${fieldClasses(!!errors.interest)} appearance-none ${values.interest ? '' : 'text-fog'}`}
                     >
-                      <option value="" disabled className="bg-[#191919] text-paper">
+                      <option value="" disabled className="bg-raised text-paper">
                         Select an option
                       </option>
                       {ENGAGEMENTS.map((p) => (
-                        <option key={p} value={p} className="bg-[#191919] text-paper">
+                        <option key={p} value={p} className="bg-raised text-paper">
                           {p}
                         </option>
                       ))}
@@ -395,7 +399,7 @@ export default function ContactPage() {
           {/* Contact info */}
           <motion.div initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.14)} className="space-y-4 h-fit">
             {contactInfoCards.map((info) => (
-              <div key={info.label} className="rounded-[24px] bg-[#191919] border border-white/10 p-6">
+              <div key={info.label} className="rounded-[24px] bg-raised border border-white/10 p-6">
                 <div className="text-xs uppercase tracking-[0.14em] text-fog mb-2">{info.label}</div>
                 {info.href ? (
                   <a href={info.href} className="text-base font-medium text-paper hover:text-signal transition-colors break-all block py-3 -my-3">
@@ -407,7 +411,7 @@ export default function ContactPage() {
               </div>
             ))}
 
-            <div className="rounded-[24px] bg-[#191919] border border-white/10 p-6">
+            <div className="rounded-[24px] bg-raised border border-white/10 p-6">
               <div className="text-xs uppercase tracking-[0.14em] text-fog mb-2">Response time</div>
               <p className="text-sm text-ash leading-relaxed">
                 We reply within one business day, East Africa Time (UTC+3). If it is urgent, call the number
@@ -416,9 +420,12 @@ export default function ContactPage() {
             </div>
           </motion.div>
         </div>
-
-        <FAQ />
       </div>
+
+      {/* Sibling of the page shell, not a child of it: the FAQ band carries its
+          own measure, so nesting it would make it narrower than every band
+          above it. */}
+      <FAQ />
     </section>
   )
 }

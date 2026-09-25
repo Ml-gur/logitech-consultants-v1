@@ -37,7 +37,7 @@ export default function DeploymentPatternsPage() {
           },
         ]}
       />
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
+      <div className="relative shell">
         <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
           Deployment patterns
         </motion.p>
@@ -47,7 +47,7 @@ export default function DeploymentPatternsPage() {
           whileInView={revealWhileInView}
           viewport={revealViewport}
           transition={springReveal(0.08)}
-          className="text-[clamp(36px,6vw,72px)] leading-[1.02] tracking-[-0.03em] max-w-[820px] mb-6"
+          className="text-heading-band-lg leading-[1.02] tracking-[-0.03em] max-w-[820px] mb-6"
         >
           Patterns, not <span className="text-signal">promises.</span>
         </motion.h1>
@@ -69,7 +69,7 @@ export default function DeploymentPatternsPage() {
           whileInView={revealWhileInView}
           viewport={revealViewport}
           transition={springReveal(0.18)}
-          className="rounded-[24px] bg-[#191919] border border-white/10 p-6 max-w-[720px] mb-20"
+          className="rounded-[24px] bg-raised border border-white/10 p-6 max-w-[720px] mb-20"
         >
           <p className="text-sm text-fog leading-relaxed">
             <span className="text-paper font-medium">Why no client logos?</span> Because we do not have

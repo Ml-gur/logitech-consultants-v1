@@ -48,9 +48,9 @@ export default function LegalPage({
           ]),
         ]}
       />
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
+      <div className="relative shell">
         <p className="section-label">Legal</p>
-        <h1 className="text-[clamp(36px,5.5vw,64px)] leading-[1.05] tracking-[-0.03em] max-w-[720px] mb-5">
+        <h1 className="text-heading-band-lg leading-[1.05] tracking-[-0.03em] max-w-[720px] mb-5">
           {title}
         </h1>
         <p className="text-[17px] text-fog max-w-[640px] leading-relaxed mb-3">{summary}</p>
@@ -85,7 +85,7 @@ export default function LegalPage({
               </div>
             ))}
 
-            <div className="rounded-[24px] bg-[#191919] border border-white/10 p-6">
+            <div className="rounded-[24px] bg-raised border border-white/10 p-6">
               <p className="text-sm text-fog leading-relaxed">
                 Questions about this document? Write to{' '}
                 <a href={`mailto:${SITE.email}`} className="text-signal underline underline-offset-2">

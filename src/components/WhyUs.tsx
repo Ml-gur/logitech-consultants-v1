@@ -13,7 +13,7 @@ import { COMPETITIVE_LANDSCAPE } from '../lib/brand'
 export default function WhyUs() {
   return (
     <section id="why-us" className="relative">
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-20 sm:py-28">
+      <div className="relative band">
         <motion.p
           initial={revealInitial}
           whileInView={revealWhileInView}
@@ -29,7 +29,7 @@ export default function WhyUs() {
           whileInView={revealWhileInView}
           viewport={revealViewport}
           transition={springReveal(0.06)}
-          className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] text-center max-w-[700px] mx-auto mb-4"
+          className="text-heading-band text-center max-w-[700px] mx-auto mb-4"
         >
           Between the platform and the work.
         </motion.h2>
@@ -39,7 +39,7 @@ export default function WhyUs() {
           whileInView={revealWhileInView}
           viewport={revealViewport}
           transition={springReveal(0.1)}
-          className="text-[17px] text-fog text-center max-w-[520px] mx-auto mb-16"
+          className="text-lede text-fog text-center max-w-[52ch] mx-auto mb-16"
         >
           Platforms supply capability. Agencies supply bespoke projects. Neither is a governed system running
           inside your operations.
@@ -55,10 +55,15 @@ export default function WhyUs() {
                 whileInView={revealWhileInView}
                 viewport={revealViewport}
                 transition={springReveal(i * 0.08)}
+                // The two alternative columns sit on `bg-carbon`, the inset
+                // surface the system already uses inside a card. They used to
+                // be a raw `#121212`, a third near-identical near-black next to
+                // `bg-raised` and `bg-carbon` — which is what stopped the three
+                // columns reading as one comparison.
                 className={`rounded-[30px] p-7 flex flex-col ${
                   accent
-                    ? 'bg-[#191919] border border-signal/40 shadow-[0_0_32px_rgba(112,132,255,0.19)]'
-                    : 'bg-[#121212] border border-white/10'
+                    ? 'bg-raised border border-signal/40 shadow-[0_0_32px_rgba(112,132,255,0.19)]'
+                    : 'bg-carbon border border-white/10'
                 }`}
               >
                 <h3 className={`text-xl font-medium mb-8 ${accent ? 'text-paper' : 'text-ash'}`}>{col.title}</h3>

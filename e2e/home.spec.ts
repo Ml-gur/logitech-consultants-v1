@@ -51,34 +51,56 @@ test('hero: headline splits white and Signal Violet lines', async ({ page }) => 
   const h1 = page.getByRole('heading', { level: 1 })
   await expect(h1).toContainText('Put intelligence')
   await expect(h1).toContainText('to work.')
-  await expect(h1.getByText('to work.', { exact: true })).toHaveCSS('color', 'rgb(112, 132, 255)')
+
+  // The accent line is the Signal Violet *token*, not a frozen hex. A literal
+  // `rgb(…)` here rots the moment the token moves (it did: #7084ff → #7c91ff),
+  // and it would pin the hero to a colour no other accent on the site uses.
+  const signal = await page.evaluate(() => {
+    const value = getComputedStyle(document.documentElement).getPropertyValue('--color-signal').trim()
+    const probe = document.createElement('span')
+    probe.style.color = value
+    // A colour is only comparable once serialised the way the browser reports it.
+    document.body.appendChild(probe)
+    const rgb = getComputedStyle(probe).color
+    probe.remove()
+    return rgb
+  })
+  await expect(h1.getByText('to work.', { exact: true })).toHaveCSS('color', signal)
 
   // The full idea is exposed to assistive tech as one sentence.
   await expect(h1.getByText('Put intelligence to work.', { exact: true })).toHaveCount(1)
 })
 
-test('hero: email capture validates, then hands off to the contact form', async ({ page }) => {
+/**
+ * The hero holds one statement, not a feature list.
+ *
+ * There used to be a test here for an email-capture form inside the hero. That
+ * form is gone: the hero is a single-viewport statement over a full-bleed
+ * plate, and a second offer competing with the primary CTA was the thing
+ * making the first screen read as two screens. The test went with the feature
+ * rather than being left asserting a form the page no longer renders (it was
+ * one of five in this file failing against the current implementation).
+ *
+ * What replaces it is the shape the hero is supposed to keep: three elements on
+ * one axis, one primary ask, and no strip of extra text pinned to the bottom of
+ * the viewport pretending to be a second navigation. If a fourth element is
+ * ever added, this fails and the decision gets made deliberately.
+ */
+test('hero: one statement, three elements, no bottom strip', async ({ page }) => {
   await seedConsent(page)
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/')
 
-  const email = page.getByLabel('Work email')
-  const submit = page.getByRole('button', { name: 'Start a conversation' })
+  const hero = page.locator('section#home')
+  await expect(hero.getByRole('heading', { level: 1 })).toBeVisible()
 
-  // Empty → error state
-  await submit.click()
-  await expect(page.getByText('Enter a work email so we can reply.')).toBeVisible()
-  await expect(email).toHaveAttribute('aria-invalid', 'true')
+  // Headline, subhead, action pair. Nothing else carries text.
+  await expect(hero.locator('p')).toHaveCount(1)
+  await expect(hero.locator('a')).toHaveCount(2)
 
-  // Invalid → different message
-  await email.fill('not-an-email')
-  await submit.click()
-  await expect(page.getByText('That does not look like a valid email address.')).toBeVisible()
-
-  // Valid → carries the address into the contact route
-  await email.fill('jane@organization.org')
-  await submit.click()
-  await expect(page).toHaveURL(/\/contact\?email=jane%40organization\.org$/)
+  // No capture form, no eyebrow, no capability strip.
+  await expect(hero.locator('form')).toHaveCount(0)
+  await expect(hero.locator('.hero-strip, .hero-eyebrow')).toHaveCount(0)
 })
 
 test('capabilities: four tabs switch the working system panel', async ({ page }) => {
@@ -112,18 +134,30 @@ test('home stays minimal: the deep sections live on the inner pages', async ({ p
   await seedConsent(page)
   await page.goto('/')
 
-  // The brand's depth is one level down, not stacked on the landing page.
-  for (const id of ['#governance', '#why-us', '#process', '#pricing', '#resources']) {
+  // The brand's depth is one level down, not stacked on the landing page. The
+  // insights index and the FAQ moved off the home page with the rest of the
+  // depth, so they belong on this list rather than on the one below it.
+  for (const id of [
+    '#blog',
+    '#faq',
+    '#governance',
+    '#why-us',
+    '#process',
+    '#pricing',
+    '#resources',
+  ]) {
     await expect(page.locator(`section${id}`), `${id} should not be on the home page`).toHaveCount(0)
   }
 
   // The sections the home page does carry.
-  for (const id of ['#home', '#capabilities', '#measurement', '#deployment-patterns', '#principles', '#blog', '#faq']) {
+  for (const id of ['#home', '#capabilities', '#measurement', '#deployment-patterns', '#principles']) {
     await expect(page.locator(`section${id}`).first(), `${id} missing from the home page`).toBeVisible()
   }
 
-  // A short, scannable page: 8 sections, nothing more.
-  await expect(page.locator('section')).toHaveCount(8)
+  // A short, scannable page: five identified bands plus the tool strip and the
+  // closing ask, and nothing else. Scoped to the page body so a section added
+  // to the footer does not silently satisfy this.
+  await expect(page.locator('#main > section')).toHaveCount(7)
 })
 
 test('measurement: publishes the dimensions, not invented ROI figures', async ({ page }) => {
@@ -132,11 +166,33 @@ test('measurement: publishes the dimensions, not invented ROI figures', async ({
   const section = await scrollToSection(page, 'section#measurement')
 
   await expect(section.getByRole('heading', { name: /We agree what success means/ })).toBeVisible()
-  await expect(section.getByText('Completion rate', { exact: true })).toBeVisible()
-  await expect(section.getByText('Escalation accuracy', { exact: true })).toBeVisible()
-  await expect(section.getByText('Cost per completed task', { exact: true })).toBeVisible()
 
-  // No unverifiable stats anywhere in the section.
+  // Each dimension renders exactly once. It used to render twice: once as an
+  // invented figure above ('94%' over the label 'Completion rate') and once as
+  // the real dimension below, which is what made this assertion ambiguous.
+  await expect(section.getByText('Completion rate', { exact: true })).toHaveCount(1)
+  await expect(section.getByText('Escalation accuracy', { exact: true })).toHaveCount(1)
+  await expect(section.getByText('Cost per completed task', { exact: true })).toHaveCount(1)
+
+  // The six canonical dimensions, from src/lib/brand.ts.
+  for (const metric of [
+    'Completion rate',
+    'Escalation accuracy',
+    'Time to first response',
+    'Answer groundedness',
+    'Cost per completed task',
+    'Hours returned to the team',
+  ]) {
+    await expect(section.getByText(metric, { exact: true })).toBeVisible()
+  }
+
+  // And no invented outcome figures: the band states what is measured, not
+  // what has been achieved. These are the four that used to sit at the top of
+  // the section, under a lede promising no invented ROI figures.
+  for (const invented of ['94%', '< 3s', '10×', 'Silent failures']) {
+    await expect(section.getByText(invented, { exact: true }), `invented figure ${invented}`).toHaveCount(0)
+  }
+
   const text = await section.innerText()
   expect(text).not.toMatch(/\d+% (ROI|faster|increase)/i)
 })
@@ -268,7 +324,21 @@ test('positioning: Naivolabs column is the accent one', async ({ page }) => {
   // …and our column with a Signal Violet checkmark.
   await expect(naivolabs.locator('svg')).toHaveCount(5)
   expect(await naivolabs.locator('svg path').first().getAttribute('d')).toContain('M20 6L9 17l-5-5')
-  await expect(naivolabs.locator('svg').first()).toHaveCSS('color', 'rgb(112, 132, 255)')
+
+  // The accent is the `--color-signal` token, not a frozen hex. A literal here
+  // rots the moment the token moves (it did: #7084ff → #7c91ff, which is what
+  // this assertion was failing on), and pinning a test to a colour that no
+  // component uses is how the drift goes unnoticed.
+  const signal = await page.evaluate(() => {
+    const value = getComputedStyle(document.documentElement).getPropertyValue('--color-signal').trim()
+    const probe = document.createElement('span')
+    probe.style.color = value
+    document.body.appendChild(probe)
+    const rgb = getComputedStyle(probe).color
+    probe.remove()
+    return rgb
+  })
+  await expect(naivolabs.locator('svg').first()).toHaveCSS('color', signal)
 })
 
 test('deployment model: the ten-stage process and flywheel principle render', async ({ page }) => {
@@ -296,9 +366,12 @@ test('pricing: the section is hidden for now', async ({ page }) => {
 
 
 
+// The FAQ band is a sibling of the contact page shell (see ContactPage.tsx),
+// not part of the home page: the landing page stays a seven-band argument and
+// the questions live where the visitor is already being asked to act.
 test('FAQ accordion opens and closes', async ({ page }) => {
   await seedConsent(page)
-  await page.goto('/')
+  await page.goto('/contact')
   const section = await scrollToSection(page, 'section#faq')
 
   const firstButton = section.getByRole('button', { name: /01\/ What does Naivolabs actually do\?/ })

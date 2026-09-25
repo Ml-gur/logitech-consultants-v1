@@ -108,33 +108,48 @@ test('home page emits Organization + WebSite structured data', async ({ page }) 
   expect(jsonLd).toContain('naivolabs.com')
 })
 
-test('nav links navigate to every section', async ({ page }) => {
+test('nav links reach every destination, and the wordmark returns home', async ({ page }) => {
   await seedConsent(page)
   await page.goto('/')
 
   const nav = page.getByRole('navigation', { name: 'Primary' })
   await expect(nav).toBeVisible()
 
+  // These are the labels the pill actually ships. `Deployments` is the nav's
+  // short form of the `/deployment-patterns` route — the full phrase does not
+  // fit the pill's 430px measure at the 13px nav size — so the assertion names
+  // the destination in the label's own words rather than re-deriving it from
+  // the component's route table. (It previously expected `Deployment patterns`,
+  // which is the *route's* name, not the link's.)
   const links = [
     { label: 'Capabilities', path: '/capabilities' },
-    { label: 'Deployment patterns', path: '/deployment-patterns' },
+    { label: 'Deployments', path: '/deployment-patterns' },
     { label: 'Insights', path: '/blog' },
     { label: 'About', path: '/about' },
-    { label: 'Home', path: '/' },
   ]
 
   for (const { label, path } of links) {
     await nav.getByRole('link', { name: label, exact: true }).click()
-    await expect(page).toHaveURL(new RegExp(`${path === '/' ? '/$' : `${path}$`}`))
+    await expect(page, `${label} did not reach ${path}`).toHaveURL(new RegExp(`${path}$`))
   }
+
+  // Home is the wordmark, not a pill link, and it sits *beside* the <nav>
+  // rather than inside it — that placement is what keeps the mark on the same
+  // optical left edge as the page's h1. Asserting it through `nav` could never
+  // resolve, so it is asserted where it lives.
+  await page.goto('/about')
+  await page.getByRole('link', { name: 'Naivolabs home' }).click()
+  await expect(page).toHaveURL(/\/$/)
 })
 
 test('nav CTA books a discovery call', async ({ page }) => {
   await seedConsent(page)
   await page.goto('/')
+  // The pill's short form of the same ask: "Book a call" here, "Book a
+  // discovery call" on the page-level CTAs. Both land on /contact.
   await page
     .getByRole('navigation', { name: 'Primary' })
-    .getByRole('link', { name: 'Book a discovery call' })
+    .getByRole('link', { name: 'Book a call' })
     .click()
   await expect(page).toHaveURL(/\/contact$/)
 })
@@ -143,9 +158,21 @@ test('nav CTA books a discovery call', async ({ page }) => {
  * Every "Book a discovery call" on the site must actually arrive at the form —
  * a CTA that dead-ends is worse than no CTA. This walks each page that ships
  * one and clicks it.
+ *
+ * `/deployment-patterns` is not on the list because the listing page does not
+ * ship the CTA: it closes on the pattern stack and sends the reader into a
+ * pattern, whose own detail page carries the ask (that route is asserted
+ * instead). The list is the pages that render the link, not the pages that
+ * ought to.
  */
 test('every "Book a discovery call" CTA lands on the contact form', async ({ page }) => {
-  const pagesWithCta = ['/', '/about', '/capabilities', '/deployment-patterns', '/ai-automation-nairobi']
+  const pagesWithCta = [
+    '/',
+    '/about',
+    '/capabilities',
+    '/deployment-patterns/ai-voice-receptionist',
+    '/ai-automation-nairobi',
+  ]
 
   for (const path of pagesWithCta) {
     await seedConsent(page)

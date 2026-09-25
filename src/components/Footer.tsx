@@ -57,7 +57,7 @@ export default function Footer() {
 
   return (
     <footer className="text-paper" style={{ background: 'var(--color-carbon)', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-10">
+      <div className="shell pt-16 sm:pt-20 pb-10">
         {/* Newsletter */}
         <motion.div
           initial={revealInitial}
@@ -116,7 +116,7 @@ export default function Footer() {
             <button
               type="submit"
               disabled={status === 'loading'}
-              className="px-6 py-3 h-fit rounded-[30px] bg-[#405bff] text-white text-sm font-medium transition-colors duration-200 hover:bg-[#3351e6] disabled:opacity-60 disabled:cursor-not-allowed"
+              className="px-6 py-3 h-fit rounded-[30px] bg-voltage text-white text-sm font-medium transition-colors duration-200 hover:bg-voltage-hover disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {status === 'loading' ? 'Subscribing…' : status === 'done' ? 'Subscribed' : 'Subscribe'}
             </button>

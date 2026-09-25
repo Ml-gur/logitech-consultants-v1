@@ -6,6 +6,7 @@ import { useCms } from '../lib/CmsProvider'
 import DeploymentStack from './DeploymentStack'
 import { ListSkeleton } from './Loading'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
+import { BAND_CONTENT, Band, SectionHeader } from './Section'
 
 /**
  * Deployment patterns (formerly the case-studies section).
@@ -18,39 +19,17 @@ export default function DeploymentPatterns() {
   const { caseStudies: patterns, cmsEnabled, cmsLoaded } = useCms()
 
   return (
-    <section id="deployment-patterns" className="relative">
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-20 sm:py-28">
-        <motion.p
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal()}
-          className="section-label"
-        >
-          Deployment patterns
-        </motion.p>
+    // `attached`: the evidence follows the claim without a pause. The stack
+    // pins and scrolls over 2,800px, so the band does not need air on top of
+    // that — it needs to start.
+    <Band id="deployment-patterns" tone="attached">
+      <SectionHeader
+        label="Deployment patterns"
+        title="What we deploy, and what it has to prove."
+        lede="Each pattern below is a class of system we build: the problem it exists for, how it is put together, and the measurement dimensions agreed before it goes live."
+      />
 
-        <motion.h2
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal(0.06)}
-          className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] max-w-[720px] mb-6"
-        >
-          What we deploy, and what it has to prove.
-        </motion.h2>
-
-        <motion.p
-          initial={revealInitial}
-          whileInView={revealWhileInView}
-          viewport={revealViewport}
-          transition={springReveal(0.1)}
-          className="text-[17px] text-fog max-w-[620px] mb-16"
-        >
-          Each pattern below is a class of system we build: the problem it exists for, how it is put together,
-          and the measurement dimensions agreed before it goes live.
-        </motion.p>
-
+      <div className={BAND_CONTENT}>
         {/* Skeleton only while a configured CMS is fetching and has no data yet. */}
         {cmsEnabled && !cmsLoaded && patterns.length === 0 ? (
           <ListSkeleton count={3} variant="pattern" />
@@ -71,12 +50,12 @@ export default function DeploymentPatterns() {
               <path d="M6 3l5 5-5 5" />
             </svg>
           </Link>
-          <p className="text-sm text-fog max-w-[420px]">
+          <p className="text-sm text-fog max-w-[46ch]">
             Named references are published as engagements complete. We would rather show you nothing than
             show you something we cannot back up.
           </p>
         </motion.div>
       </div>
-    </section>
+    </Band>
   )
 }

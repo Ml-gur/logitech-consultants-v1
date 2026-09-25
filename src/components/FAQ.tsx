@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useCms } from '../lib/CmsProvider'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
+import { Band, SectionHeader } from './Section'
 
 // The numbered "01/ …" prefix is rendered here (not stored in the data) so
 // static fallback and CMS-sourced FAQs render identically.
@@ -14,33 +15,16 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <section id="faq" className="relative">
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-20 sm:py-28">
-        <div className="grid lg:grid-cols-[1fr_560px] gap-12 max-lg:gap-10">
-          <div className="max-lg:mb-2">
-            <motion.p
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal()}
-              className="section-label"
-            >
-              FAQs
-            </motion.p>
+    /* Self-contained band: interval + measure travel with the component, which
+       is why no page wraps it in its own `.shell`. A second measure nested
+       inside a page measure is what made the FAQ column sit 20px narrower than
+       every band above it. */
+    <Band id="faq">
+      <div className="grid lg:grid-cols-[1fr_560px] gap-12 max-lg:gap-10">
+        <SectionHeader label="FAQs" title="Need answers?" className="max-lg:mb-2" />
 
-            <motion.h2
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal(0.06)}
-              className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em]"
-            >
-              Need answers?
-            </motion.h2>
-          </div>
-
-          {/* Right column, stacked carbon radius-24 cards */}
-          <div className="flex flex-col gap-3">
+        {/* Right column, stacked raised radius-24 cards */}
+        <div className="flex flex-col gap-3">
             {faqs.map((faq, i) => (
               <motion.div
                 key={i}
@@ -48,7 +32,7 @@ export default function FAQ() {
                 whileInView={revealWhileInView}
                 viewport={revealViewport}
                 transition={springReveal(i * 0.06)}
-                className="rounded-[24px] bg-[#191919] border border-white/10"
+                className="rounded-[24px] bg-raised border border-white/10"
               >
                 <button
                   onClick={() => setOpenIndex(openIndex === i ? null : i)}
@@ -90,9 +74,8 @@ export default function FAQ() {
                 )}
               </motion.div>
             ))}
-          </div>
         </div>
       </div>
-    </section>
+    </Band>
   )
 }

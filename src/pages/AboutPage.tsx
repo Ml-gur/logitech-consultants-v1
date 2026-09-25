@@ -39,14 +39,14 @@ export default function AboutPage() {
           },
         ]}
       />
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
+      <div className="relative shell">
         {/* Hero */}
         <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
           About us
         </motion.p>
         <motion.h1
           initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.08)}
-          className="text-[clamp(40px,6vw,80px)] leading-[1.02] tracking-[-0.03em] max-w-[820px] mb-6"
+          className="text-heading-band-lg leading-[1.02] tracking-[-0.03em] max-w-[820px] mb-6"
         >
           Intelligence <span className="text-signal">at work.</span>
         </motion.h1>
@@ -78,7 +78,7 @@ export default function AboutPage() {
             <motion.div
               key={t.k}
               initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.08)}
-              className="rounded-[24px] bg-[#191919] border border-white/10 p-6"
+              className="rounded-[24px] bg-raised border border-white/10 p-6"
             >
               <p className="text-[15px] font-medium text-paper mb-2">{t.k}</p>
               <p className="text-sm text-fog leading-relaxed">{t.v}</p>
@@ -87,7 +87,7 @@ export default function AboutPage() {
         </div>
 
         {/* Purpose / mission / vision */}
-        <div className="pt-24 grid lg:grid-cols-3 gap-4">
+        <div className="pt-[var(--band-y)] grid lg:grid-cols-3 gap-4">
           {[
             { label: 'Purpose', body: PURPOSE },
             { label: 'Mission', body: MISSION },
@@ -96,7 +96,7 @@ export default function AboutPage() {
             <motion.div
               key={block.label}
               initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.08)}
-              className="rounded-[30px] bg-[#191919] border border-white/10 p-7"
+              className="rounded-[30px] bg-raised border border-white/10 p-7"
             >
               <p className="text-xs uppercase tracking-[0.14em] text-fog mb-5">{block.label}</p>
               <p className="font-display text-[19px] leading-snug text-paper">{block.body}</p>
@@ -105,13 +105,13 @@ export default function AboutPage() {
         </div>
 
         {/* Why we exist */}
-        <div className="pt-24">
+        <div className="pt-[var(--band-y)]">
           <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
             Why we exist
           </motion.p>
           <motion.p
             initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.08)}
-            className="font-display text-[clamp(24px,3.5vw,40px)] font-medium leading-snug tracking-[-0.02em] max-w-[900px]"
+            className="font-display text-heading-feature font-medium leading-snug tracking-[-0.02em] max-w-[900px]"
           >
             Organizations do not simply need more AI. They need AI connected to the work that matters, the calls
             that go unanswered, the information nobody can find, the requests that get lost between systems, the
@@ -123,10 +123,10 @@ export default function AboutPage() {
         <div className="pt-16">
           <motion.div
             initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()}
-            className="rounded-[30px] border border-signal/30 bg-[#191919] p-8 sm:p-10 max-w-[900px]"
+            className="rounded-[30px] border border-signal/30 bg-raised p-8 sm:p-10 max-w-[900px]"
           >
             <p className="text-xs uppercase tracking-[0.14em] text-fog mb-4">The internal version</p>
-            <p className="font-display text-[clamp(20px,2.6vw,30px)] font-medium leading-snug text-paper">
+            <p className="font-display text-heading-quote font-medium leading-snug text-paper">
               {DEFINITIONS.internal}
             </p>
             <p className="text-sm text-fog leading-relaxed mt-5">
@@ -137,13 +137,13 @@ export default function AboutPage() {
         </div>
 
         {/* Values */}
-        <div className="pt-24">
+        <div className="pt-[var(--band-y)]">
           <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
             Our values
           </motion.p>
           <motion.h2
             initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
-            className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] mb-16"
+            className="text-heading-band mb-16"
           >
             What we will not trade away.
           </motion.h2>
@@ -164,13 +164,13 @@ export default function AboutPage() {
         </div>
 
         {/* Principles */}
-        <div className="pt-24">
+        <div className="pt-[var(--band-y)]">
           <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
             Brand principles
           </motion.p>
           <motion.h2
             initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
-            className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] max-w-[680px] mb-14"
+            className="text-heading-band max-w-[680px] mb-14"
           >
             Rules, not aspirations.
           </motion.h2>
@@ -180,7 +180,7 @@ export default function AboutPage() {
               <motion.div
                 key={p.title}
                 initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.05)}
-                className="flex items-start gap-4 rounded-[20px] bg-[#191919] border border-white/10 p-5"
+                className="flex items-start gap-4 rounded-[20px] bg-raised border border-white/10 p-5"
               >
                 <span className="font-mono text-xs text-signal mt-1 tabular-nums shrink-0">
                   {String(i + 1).padStart(2, '0')}
@@ -192,13 +192,13 @@ export default function AboutPage() {
         </div>
 
         {/* Africa-to-world */}
-        <div className="pt-24">
+        <div className="pt-[var(--band-y)]">
           <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
             Built from Africa
           </motion.p>
           <motion.h2
             initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
-            className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] max-w-[760px] mb-8"
+            className="text-heading-band max-w-[760px] mb-8"
           >
             Origin, insight and capability, not a limitation.
           </motion.h2>
@@ -231,13 +231,13 @@ export default function AboutPage() {
         </div>
 
         {/* Segments */}
-        <div className="pt-24">
+        <div className="pt-[var(--band-y)]">
           <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
             Who we serve
           </motion.p>
           <motion.h2
             initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
-            className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] mb-14"
+            className="text-heading-band mb-14"
           >
             The environments we go deep in.
           </motion.h2>
@@ -247,7 +247,7 @@ export default function AboutPage() {
               <motion.div
                 key={s.name}
                 initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.06)}
-                className="rounded-[24px] bg-[#191919] border border-white/10 p-6"
+                className="rounded-[24px] bg-raised border border-white/10 p-6"
               >
                 <h3 className="text-[17px] font-medium mb-3">{s.name}</h3>
                 <p className="text-sm text-fog leading-relaxed">{s.detail}</p>
@@ -257,13 +257,13 @@ export default function AboutPage() {
         </div>
 
         {/* Team */}
-        <div className="pt-24">
+        <div className="pt-[var(--band-y)]">
           <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
             Our team
           </motion.p>
           <motion.h2
             initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
-            className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] mb-16"
+            className="text-heading-band mb-16"
           >
             Small, senior, and on the deployment.
           </motion.h2>
@@ -282,7 +282,7 @@ export default function AboutPage() {
               <motion.div
                 key={member.name}
                 initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.08)}
-                className="rounded-[24px] bg-[#191919] border border-white/10 p-7 transition-all duration-300"
+                className="rounded-[24px] bg-raised border border-white/10 p-7 transition-all duration-300"
                 style={{ '--ring': p.ring } as React.CSSProperties}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = p.ring; (e.currentTarget as HTMLElement).style.boxShadow = `0 0 24px ${p.ring}` }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.10)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none' }}
@@ -307,11 +307,7 @@ export default function AboutPage() {
           home page (which stays intentionally minimal). */}
       <WhyUs />
 
-      <section className="relative">
-        <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
-          <FAQ />
-        </div>
-      </section>
+      <FAQ />
     </>
   )
 }

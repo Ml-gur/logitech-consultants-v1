@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { motion, AnimatePresence, MotionConfig } from 'framer-motion'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 import { CAPABILITIES } from '../lib/brand'
+import { BAND_CONTENT, Band, SectionHeader } from './Section'
 
 /* ---------- White product panels (bright UI on the dark canvas) ---------- */
 
@@ -90,7 +92,7 @@ function ActionIllustration() {
     <div className="h-full rounded-[12px] bg-white px-4 py-3 flex flex-col justify-between border border-black/5">
       {rows.map((row) => (
         <div key={row.label} className="flex items-center gap-3 rounded-[10px] bg-[#f4f4f6] px-2.5 py-2 border border-black/5">
-          <div className="w-10 h-10 rounded-[10px] bg-[#191919] flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-[10px] bg-raised flex items-center justify-center shrink-0">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white" aria-hidden>
               <path d={row.icon} />
             </svg>
@@ -118,7 +120,7 @@ function OrchestrationIllustration() {
         <span className="font-mono text-[10px] text-[#6d6e71]">audit · evals · gates</span>
       </div>
       {/* Orchestrator bar */}
-      <div className="rounded-[10px] bg-[#191919] px-3 py-2.5 mb-3">
+      <div className="rounded-[10px] bg-raised px-3 py-2.5 mb-3">
         <div className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-[#7084ff]" aria-hidden />
           <span className="text-[11px] font-medium text-white">Workflow orchestrator</span>
@@ -187,43 +189,38 @@ function Checklist({ items }: { items: string[] }) {
 export default function TabbedFeatures() {
   const [active, setActive] = useState(CAPABILITIES[0].id)
   const current = CAPABILITIES.find((t) => t.id === active) ?? CAPABILITIES[0]
+  const { hash } = useLocation()
+
+  // A deep link names a capability (/#understand), not just the band, so select
+  // the tab it refers to. Landing on the band with the wrong tab open would
+  // make the anchor technically work and factually misleading.
+  useEffect(() => {
+    const id = hash.replace(/^#/, '')
+    if (CAPABILITIES.some((c) => c.id === id)) setActive(id)
+  }, [hash])
 
   return (
     <MotionConfig reducedMotion="user">
-      <section id="capabilities" className="relative">
-        <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-20 sm:py-28">
-          <motion.p
-            initial={revealInitial}
-            whileInView={revealWhileInView}
-            viewport={revealViewport}
-            transition={springReveal()}
-            className="section-label text-center"
-          >
-            What we build
-          </motion.p>
+      {/* `attached`: this band opens the argument, so it hugs the tool strip
+          above it while the air below belongs to the next band. */}
+      <Band id="capabilities" tone="attached" className="scroll-mt-28">
+        {/* One anchor per capability, on the band itself, so /#understand lands
+            here rather than on a zero-height span at the foot of the page. */}
+        {CAPABILITIES.map((c) => (
+          <span key={c.id} id={c.id} aria-hidden />
+        ))}
+        {/* Centred: this band is a statement of the four actions, and the
+            capability detail below it is the evidence for that statement. The
+            heading and lede carry the whole header, no label above them (see
+            the eyebrow budget in HomePage.tsx). */}
+        <SectionHeader
+          layout="center"
+          title="Four capabilities. One working system."
+          lede="Intelligence that communicates, understands, acts and coordinates, deployed together, not sold as separate experiments."
+        />
 
-          <motion.h2
-            initial={revealInitial}
-            whileInView={revealWhileInView}
-            viewport={revealViewport}
-            transition={springReveal(0.08)}
-            className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] text-center max-w-[760px] mx-auto mb-4"
-          >
-            Four capabilities. One working system.
-          </motion.h2>
-
-          <motion.p
-            initial={revealInitial}
-            whileInView={revealWhileInView}
-            viewport={revealViewport}
-            transition={springReveal(0.14)}
-            className="text-[17px] text-fog text-center max-w-[560px] mx-auto mb-14"
-          >
-            Intelligence that communicates, understands, acts and coordinates, deployed together, not sold as
-            separate experiments.
-          </motion.p>
-
-          {/* Segmented tab control, 30px radius, Carbon fill, active dot */}
+        <div className={BAND_CONTENT}>
+          {/* Segmented tab control, 30px radius, raised fill, active dot */}
           <motion.div
             initial={revealInitial}
             whileInView={revealWhileInView}
@@ -234,7 +231,7 @@ export default function TabbedFeatures() {
             <div
               role="tablist"
               aria-label="Capabilities"
-              className="inline-flex max-w-full overflow-x-auto rounded-[30px] bg-[#191919] border border-white/10 p-1.5 gap-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              className="inline-flex max-w-full overflow-x-auto rounded-[30px] bg-raised border border-white/10 p-1.5 gap-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             >
               {CAPABILITIES.map((tab) => {
                 const selected = tab.id === active
@@ -278,7 +275,7 @@ export default function TabbedFeatures() {
             >
               <div className="min-w-0 max-w-[520px]">
                 <h3 className="text-[28px] leading-tight mb-4">{current.headline}</h3>
-                <p className="text-[17px] text-fog leading-relaxed mb-6">{current.description}</p>
+                <p className="text-lede text-fog leading-relaxed mb-6">{current.description}</p>
 
                 {/* The concrete systems in this capability family */}
                 <div className="flex flex-wrap gap-2 mb-10">
@@ -315,7 +312,7 @@ export default function TabbedFeatures() {
             </motion.div>
           </AnimatePresence>
         </div>
-      </section>
+      </Band>
     </MotionConfig>
   )
 }

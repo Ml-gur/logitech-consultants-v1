@@ -26,7 +26,7 @@ export default function DeploymentCard({
   const inner = (
     <>
       {/* Image, left half, no zoom on hover */}
-      <div className="relative aspect-[16/10] md:aspect-auto md:min-h-[380px] overflow-hidden bg-[#191919] min-w-0">
+      <div className="relative aspect-[16/10] md:aspect-auto md:min-h-[380px] overflow-hidden bg-carbon min-w-0">
         {c.image ? (
           <img
             src={c.image}
@@ -39,7 +39,7 @@ export default function DeploymentCard({
           <div className="absolute inset-0 bg-gradient-to-br from-[#2c2c2c] via-[#1f1f1f] to-[#141414]" />
         )}
         {/* Category chip, top-left on the image */}
-        <span className="absolute top-4 left-4 tag-pill px-3 py-1.5 bg-[#0e0e0e]/85 backdrop-blur-sm">
+        <span className="absolute top-4 left-4 tag-pill px-3 py-1.5 bg-midnight/85 backdrop-blur-sm">
           {c.category}
         </span>
       </div>
@@ -47,7 +47,7 @@ export default function DeploymentCard({
       {/* Content, name, capability stack, measures, CTA */}
       <div className="relative p-7 sm:p-9 md:p-12 flex flex-col min-w-0">
         <h3 className="font-display text-2xl md:text-[32px] font-medium text-paper mb-3">{c.name}</h3>
-        <p className="text-[15px] text-fog leading-relaxed mb-6">{c.tagline}</p>
+        <p className="text-[15px] text-fog leading-relaxed mb-6 max-w-[62ch]">{c.tagline}</p>
 
         {/* Capability stack, which of the four actions this spans */}
         <div className="flex flex-wrap gap-2 mb-8">
@@ -86,7 +86,7 @@ export default function DeploymentCard({
   )
 
   const shell = cn(
-    'group block bg-[#191919] rounded-[30px] overflow-hidden grid grid-cols-1 md:grid-cols-2 border border-white/10 transition-colors duration-300 hover:border-signal/40',
+    'group block bg-raised rounded-[30px] overflow-hidden grid grid-cols-1 md:grid-cols-2 border border-white/10 transition-colors duration-300 hover:border-signal/40',
     className
   )
 

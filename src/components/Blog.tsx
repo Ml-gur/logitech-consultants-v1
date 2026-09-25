@@ -57,7 +57,7 @@ export default function Blog() {
               transition={springReveal(i * 0.08)}
             >
               <Link to={`/blog/${post.slug}`} className="group block h-full">
-                <div className="aspect-[4/5] rounded-[20px] overflow-hidden mb-4 bg-[#191919] border border-white/10">
+                <div className="aspect-[4/5] rounded-[20px] overflow-hidden mb-4 bg-raised border border-white/10">
                   {post.image ? (
                     <img
                       src={post.image}

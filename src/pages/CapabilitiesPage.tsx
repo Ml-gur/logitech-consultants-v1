@@ -25,14 +25,14 @@ export default function CapabilitiesPage() {
           ...CAPABILITIES.map((c) => serviceLd(c.name, c.description)),
         ]}
       />
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
+      <div className="relative shell">
         <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
           Capabilities
         </motion.p>
 
         <motion.h1
           initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.08)}
-          className="text-[clamp(36px,6vw,72px)] leading-[1.02] tracking-[-0.03em] max-w-[820px] mb-6"
+          className="text-heading-band-lg leading-[1.02] tracking-[-0.03em] max-w-[820px] mb-6"
         >
           Four actions. One <span className="text-signal">working system.</span>
         </motion.h1>
@@ -53,7 +53,7 @@ export default function CapabilitiesPage() {
               key={cap.id}
               id={cap.id}
               initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.06)}
-              className="rounded-[30px] bg-[#191919] border border-white/10 p-7 sm:p-10 scroll-mt-28"
+              className="rounded-[30px] bg-raised border border-white/10 p-7 sm:p-10 scroll-mt-28"
             >
               <div className="grid lg:grid-cols-[1fr_1fr] gap-10 lg:gap-16">
                 <div className="min-w-0">
@@ -61,7 +61,7 @@ export default function CapabilitiesPage() {
                     <span className="font-mono text-sm text-signal tabular-nums">
                       {String(i + 1).padStart(2, '0')}
                     </span>
-                    <h2 className="font-display text-[clamp(28px,4vw,44px)] font-medium leading-tight tracking-[-0.02em]">
+                    <h2 className="font-display text-heading-feature font-medium leading-tight tracking-[-0.02em]">
                       {cap.name}
                     </h2>
                   </div>
@@ -97,20 +97,20 @@ export default function CapabilitiesPage() {
         </div>
 
         {/* The layer diagram */}
-        <div className="pt-24">
+        <div className="pt-[var(--band-y)]">
           <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
             How the layers stack
           </motion.p>
           <motion.h2
             initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
-            className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] max-w-[720px] mb-14"
+            className="text-heading-band max-w-[720px] mb-14"
           >
             Orchestration sits above action, which sits above understanding.
           </motion.h2>
 
           <motion.div
             initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.1)}
-            className="rounded-[30px] bg-[#191919] border border-white/10 p-7 sm:p-12"
+            className="rounded-[30px] bg-raised border border-white/10 p-7 sm:p-12"
           >
             <div className="mx-auto max-w-[560px] space-y-3">
               {[...CAPABILITIES].reverse().map((cap, i) => (
@@ -142,13 +142,13 @@ export default function CapabilitiesPage() {
         </div>
 
         {/* Differentiators */}
-        <div className="pt-24">
+        <div className="pt-[var(--band-y)]">
           <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
             What makes it different
           </motion.p>
           <motion.h2
             initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
-            className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] max-w-[680px] mb-14"
+            className="text-heading-band max-w-[680px] mb-14"
           >
             Differentiation is a combination, not a feature.
           </motion.h2>
@@ -169,13 +169,13 @@ export default function CapabilitiesPage() {
         </div>
 
         {/* Who we build for */}
-        <div className="pt-24">
+        <div className="pt-[var(--band-y)]">
           <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
             Who we build for
           </motion.p>
           <motion.h2
             initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(0.06)}
-            className="text-[clamp(34px,5vw,56px)] leading-[1.05] tracking-[-0.02em] max-w-[720px] mb-6"
+            className="text-heading-band max-w-[720px] mb-6"
           >
             Depth in a few environments beats breadth in none.
           </motion.h2>
@@ -193,7 +193,7 @@ export default function CapabilitiesPage() {
               <motion.div
                 key={s.name}
                 initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal(i * 0.06)}
-                className="rounded-[24px] bg-[#191919] border border-white/10 p-7"
+                className="rounded-[24px] bg-raised border border-white/10 p-7"
               >
                 <h3 className="text-lg font-medium mb-3">{s.name}</h3>
                 <p className="text-sm text-fog leading-relaxed">{s.detail}</p>
@@ -225,11 +225,7 @@ export default function CapabilitiesPage() {
       <Governance />
       <Process />
 
-      <section className="relative">
-        <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
-          <FAQ />
-        </div>
-      </section>
+      <FAQ />
     </>
   )
 }

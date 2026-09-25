@@ -1,31 +1,28 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { cn } from '../utils'
 import { revealInitial, revealWhileInView, revealViewport, springReveal } from '../motion'
 import { PRINCIPLES } from '../lib/brand'
+import { BAND_CONTENT, Band, SectionHeader } from './Section'
 
 const CLOSING_INDEX = PRINCIPLES.length - 1
 
 function PrincipleCard({ title, index }: { title: string; index: number }) {
   const closing = index === CLOSING_INDEX
 
+  // The lift lives in CSS, not in `onMouseEnter` handlers that mutate `style`.
+  // Handlers only ever fired for a pointer, so the card that carried the band's
+  // hover affordance was the one card a keyboard could never light up, and a
+  // touch device got no feedback at all.
   return (
     <figure
-      className={`group relative flex h-full flex-col rounded-[20px] p-6 sm:p-7 transition-all duration-300 ${
-        closing ? 'lg:flex-row lg:items-center lg:gap-10 lg:py-10' : ''
-      }`}
-      style={{
-        background: 'var(--color-carbon)',
-        border: '1px solid rgba(255,255,255,0.07)',
-      }}
-      onMouseEnter={e => {
-        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(124,145,255,0.28)'
-        ;(e.currentTarget as HTMLElement).style.boxShadow = '0 0 20px rgba(61,85,240,0.1)'
-      }}
-      onMouseLeave={e => {
-        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'
-        ;(e.currentTarget as HTMLElement).style.boxShadow = 'none'
-      }}
+      className={cn(
+        'group relative flex h-full flex-col rounded-[20px] bg-raised border border-white/[0.07] p-6 sm:p-7',
+        'transition-[border-color,box-shadow] duration-300',
+        'hover:border-signal/[0.28] hover:shadow-[0_0_20px_rgba(61,85,240,0.1)]',
+        closing && 'lg:flex-row lg:items-center lg:gap-10 lg:py-10',
+      )}
     >
       <p
         className={`font-mono text-[11px] tracking-[0.12em] ${closing ? 'lg:mb-0 mb-5' : 'mb-5'}`}
@@ -59,7 +56,10 @@ function PrincipleCard({ title, index }: { title: string; index: number }) {
         style={{
           borderTop: closing ? undefined : '1px solid rgba(255,255,255,0.06)',
           borderLeft: closing ? '1px solid rgba(255,255,255,0.06)' : undefined,
-          color: 'var(--color-slate)',
+          // `fog`, not `slate`: this label is 10px text on a card, where slate
+          // measures 3.5:1 — under the AA floor, and against the rule ADR-008
+          // already states ("never slate for small text"). Fog measures 6.3:1.
+          color: 'var(--color-fog)',
         }}
       >
         Naivolabs principle
@@ -69,57 +69,33 @@ function PrincipleCard({ title, index }: { title: string; index: number }) {
 }
 
 export default function Principles() {
+  // A hairline here, not above Measurement: this is where the page stops
+  // showing what we build and starts stating how we work.
+  //
+  // `loose`: the page's second and biggest register change, and the widest seam
+  // on the page. The rule sits inside the interval rather than at its edge.
   return (
-    <section id="principles" className="relative">
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 py-24 sm:py-32">
-        <div className="grid lg:grid-cols-[1fr_2fr] gap-12 lg:gap-16 items-start mb-12 sm:mb-16">
-          <div>
-            <motion.p
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal()}
-              className="section-label"
-            >
-              How we work
-            </motion.p>
-
-            <motion.h2
-              initial={revealInitial}
-              whileInView={revealWhileInView}
-              viewport={revealViewport}
-              transition={springReveal(0.06)}
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontWeight: 400,
-                fontSize: 'clamp(32px, 4.5vw, 52px)',
-                lineHeight: 1.1,
-                letterSpacing: '-0.02em',
-              }}
-            >
+    <Band id="principles" rule tone="loose">
+        {/* Split header, and the one place on the page where it earns its keep:
+            the lede is the band's argument (what will replace this wall of
+            principles once there is a customer to name), not a restatement of
+            the heading, and bottom-aligning it puts the two halves of one
+            thought on the same baseline. Everywhere else the header stacks. */}
+        <SectionHeader
+          layout="split"
+          title={
+            <>
               Seven rules we do{' '}
               <em style={{ fontStyle: 'italic', fontWeight: 300, color: 'var(--color-signal)' }}>
                 not
               </em>{' '}
               bend.
-            </motion.h2>
-          </div>
+            </>
+          }
+          lede="When there is a reference customer to name, this is where it will go. Until then, here is what you can hold us to."
+        />
 
-          <motion.p
-            initial={revealInitial}
-            whileInView={revealWhileInView}
-            viewport={revealViewport}
-            transition={springReveal(0.1)}
-            className="text-[16px] sm:text-[17px] leading-relaxed self-end"
-            style={{ color: 'var(--color-fog)' }}
-          >
-            When there is a reference customer to name, this is where it will go. Until then,
-            here is what you can hold us to.
-          </motion.p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 ${BAND_CONTENT}`}>
           {PRINCIPLES.map((p, i) => (
             <motion.div
               key={p.title}
@@ -133,7 +109,6 @@ export default function Principles() {
             </motion.div>
           ))}
         </div>
-      </div>
-    </section>
+    </Band>
   )
 }

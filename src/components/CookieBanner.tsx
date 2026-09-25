@@ -71,14 +71,18 @@ export default function CookieBanner() {
           animate={{ y: 0, opacity: 1 }}
           exit={reduce ? { opacity: 0 } : { y: 24, opacity: 0 }}
           transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-x-0 bottom-0 z-[70] px-4 pb-4"
+          className="fixed inset-x-0 bottom-0 z-[70] pb-4"
         >
+          {/* The banner sits on the same `.shell` as the page, so its edges
+              line up with the content behind it instead of landing 4px off
+              with a 1100px measure of its own. */}
+          <div className="shell">
           <div
             ref={regionRef}
             role="region"
             aria-label="Cookie consent"
             tabIndex={-1}
-            className="mx-auto max-w-[1100px] rounded-[24px] bg-[#191919] border border-white/10 shadow-[0_-8px_40px_rgba(0,0,0,0.5)] p-5 sm:p-6 outline-none"
+            className="rounded-[24px] bg-raised border border-white/10 shadow-[0_-8px_40px_rgba(0,0,0,0.5)] p-5 sm:p-6 outline-none"
           >
             <div className="flex flex-col lg:flex-row lg:items-start gap-5">
               <div className="flex-1 min-w-0">
@@ -189,6 +193,7 @@ export default function CookieBanner() {
                 )}
               </div>
             </div>
+          </div>
           </div>
         </motion.div>
       )}

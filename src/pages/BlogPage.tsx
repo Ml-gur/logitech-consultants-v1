@@ -29,7 +29,7 @@ export default function BlogPage() {
           },
         ]}
       />
-      <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
+      <div className="relative shell">
         <motion.p initial={revealInitial} whileInView={revealWhileInView} viewport={revealViewport} transition={springReveal()} className="section-label">
           Insights
         </motion.p>
@@ -39,7 +39,7 @@ export default function BlogPage() {
           whileInView={revealWhileInView}
           viewport={revealViewport}
           transition={springReveal(0.08)}
-          className="text-[clamp(36px,6vw,72px)] leading-[1.02] tracking-[-0.03em] max-w-[760px] mb-6"
+          className="text-heading-band-lg leading-[1.02] tracking-[-0.03em] max-w-[760px] mb-6"
         >
           Notes from <span className="text-signal">production AI.</span>
         </motion.h1>
@@ -66,7 +66,7 @@ export default function BlogPage() {
               transition={springReveal(i * 0.08)}
             >
               <Link to={`/blog/${post.slug}`} className="group block h-full">
-                <div className="aspect-[4/5] rounded-[20px] overflow-hidden mb-4 bg-[#191919] border border-white/10">
+                <div className="aspect-[4/5] rounded-[20px] overflow-hidden mb-4 bg-raised border border-white/10">
                   {post.image ? (
                     <img
                       src={post.image}
